@@ -210,6 +210,18 @@ var MenuEditor = (function () {
         if (onChange) onChange(deepClone(data));
       },
 
+      // Update without snapshotting — for continuous drag operations.
+      // Call snapshotNow() once before the drag starts.
+      updateSilent: function (path, value) {
+        setAtPath(data, path, value);
+        emit('change');
+        if (onChange) onChange(deepClone(data));
+      },
+
+      snapshotNow: function () {
+        snapshot();
+      },
+
       replaceData: function (newData, resetUndo) {
         if (resetUndo) {
           undoStack = [];
@@ -1405,6 +1417,7 @@ var MenuEditor = (function () {
           'var d=document.createElement("div");d.className="ds-pad-handle ds-pad-handle--"+side;' +
           'd.addEventListener("mousedown",function(ev){' +
           'ev.stopPropagation();ev.preventDefault();' +
+          'window.parent.postMessage({type:"preview-pad-start"},"*");' +
           'var startY=ev.clientY;var startX=ev.clientX;' +
           'var cs=getComputedStyle(parent);var startVal=parseFloat(cs["padding-"+side])||0;' +
           'function onMove(mv){' +
@@ -1740,6 +1753,10 @@ var MenuEditor = (function () {
         }
       }
 
+      if (e.data.type === 'preview-pad-start') {
+        store.snapshotNow();
+      }
+
       if (e.data.type === 'preview-pad-drag') {
         // Padding drag: convert px to % and update
         var id = e.data.id;
@@ -1774,7 +1791,7 @@ var MenuEditor = (function () {
           padObj = { top: currentPad.top || 0, right: currentPad.right || 0, bottom: currentPad.bottom || 0, left: currentPad.left || 0 };
         }
         padObj[side] = pct;
-        store.update(path + '.padding', padObj);
+        store.updateSilent(path + '.padding', padObj);
       }
     }
 

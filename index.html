@@ -9,6 +9,24 @@
 <body>
   <div id="display"></div>
 
+  <!-- Editor panel (hidden until toggled) -->
+  <div id="ds-editor-wrapper" class="ds-editor-wrapper">
+    <div class="ds-editor">
+      <div class="ds-editor__header">
+        <span>JSON Editor</span>
+        <button id="ds-editor-copy">Copy</button>
+      </div>
+      <textarea id="ds-editor-textarea" class="ds-editor__textarea" spellcheck="false"></textarea>
+      <div id="ds-editor-error" class="ds-editor__error"></div>
+    </div>
+    <div id="ds-editor-preview" class="ds-editor__preview"></div>
+  </div>
+
+  <!-- Validation panel (hidden until toggled) -->
+  <div id="ds-validation-panel" class="ds-validation-panel">
+    <ul id="ds-validation-list" class="ds-validation-panel__list"></ul>
+  </div>
+
   <script src="renderer.js"></script>
   <script>
     (function () {
@@ -25,81 +43,265 @@
         return data;
       }
 
-      MenuRenderer.loadFromUrl(menuUrl, target).catch(function (err) {
-        target.innerHTML = '<p style="color:red;padding:40px;font-family:sans-serif;">Error loading menu: ' + err.message + '</p>';
-      });
+      if (!preview) {
+        MenuRenderer.loadFromUrl(menuUrl, target).catch(function (err) {
+          target.innerHTML = '<p style="color:red;padding:40px;font-family:sans-serif;">Error loading menu: ' + err.message + '</p>';
+        });
+        return;
+      }
 
-      if (preview) {
-        var toolbar = document.createElement('div');
-        toolbar.className = 'ds-toolbar';
-        toolbar.innerHTML =
-          '<span class="ds-toolbar__title">Dev Tools</span>' +
-          '<label>Resolution ' +
-            '<select id="ds-res">' +
-              '<option value="1080">1080p</option>' +
-              '<option value="2k">2K</option>' +
-              '<option value="4k">4K</option>' +
-            '</select>' +
-          '</label>' +
-          '<label>JSON ' +
-            '<input type="file" id="ds-file" accept=".json">' +
-          '</label>' +
-          '<label>Example ' +
-            '<select id="ds-example">' +
-              '<option value="">— pick —</option>' +
-              '<option value="examples/coffee.json">Coffee Shop</option>' +
-              '<option value="examples/minimal.json">Minimal</option>' +
-            '</select>' +
-          '</label>';
-        document.body.appendChild(toolbar);
+      // ── Dev mode ────────────────────────────────────────────────────
 
-        var currentData = null;
+      var currentData = null;
+      var editorOpen = false;
+      var gridActive = false;
+      var validationOpen = false;
 
-        function rerender(data) {
-          currentData = data;
-          var res = document.getElementById('ds-res').value;
-          data.layout = data.layout || {};
-          data.layout.resolution = res;
-          data.layout.mode = 'preview';
-          MenuRenderer.render(data, target);
+      var editorWrapper = document.getElementById('ds-editor-wrapper');
+      var editorPreview = document.getElementById('ds-editor-preview');
+      var editorTextarea = document.getElementById('ds-editor-textarea');
+      var editorError = document.getElementById('ds-editor-error');
+      var validationPanel = document.getElementById('ds-validation-panel');
+      var validationList = document.getElementById('ds-validation-list');
+
+      // Build toolbar
+      var toolbar = document.createElement('div');
+      toolbar.className = 'ds-toolbar';
+      toolbar.innerHTML =
+        '<span class="ds-toolbar__title">Dev Tools</span>' +
+        '<div id="ds-indicator" class="ds-toolbar__indicator">' +
+          '<span id="ds-dot" class="ds-toolbar__dot ds-toolbar__dot--valid"></span>' +
+          '<span id="ds-indicator-label" class="ds-toolbar__indicator-label">Valid</span>' +
+        '</div>' +
+        '<label>Resolution ' +
+          '<select id="ds-res">' +
+            '<option value="1080">1080p</option>' +
+            '<option value="2k">2K</option>' +
+            '<option value="4k">4K</option>' +
+          '</select>' +
+        '</label>' +
+        '<button id="ds-grid-btn">Grid</button>' +
+        '<button id="ds-edit-btn">Edit</button>' +
+        '<label>JSON ' +
+          '<input type="file" id="ds-file" accept=".json">' +
+        '</label>' +
+        '<label>Example ' +
+          '<select id="ds-example">' +
+            '<option value="">— pick —</option>' +
+            '<option value="examples/coffee.json">Coffee Shop</option>' +
+            '<option value="examples/minimal.json">Minimal</option>' +
+          '</select>' +
+        '</label>';
+      document.body.appendChild(toolbar);
+
+      // ── Rendering ─────────────────────────────────────────────────
+
+      function getRenderTarget() {
+        return editorOpen ? editorPreview : target;
+      }
+
+      function rerender(data) {
+        currentData = data;
+        var clone = JSON.parse(JSON.stringify(data));
+        clone.layout = clone.layout || {};
+        clone.layout.resolution = document.getElementById('ds-res').value;
+        clone.layout.mode = 'preview';
+        MenuRenderer.render(clone, getRenderTarget());
+        updateValidation();
+        if (gridActive) applyGrid();
+      }
+
+      function loadAndRender(url) {
+        fetch(url)
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            currentData = JSON.parse(JSON.stringify(data));
+            updateEditorContent();
+            rerender(currentData);
+          })
+          .catch(function (err) {
+            var t = getRenderTarget();
+            t.innerHTML = '<p style="color:red;padding:40px;font-family:sans-serif;">Error: ' + err.message + '</p>';
+          });
+      }
+
+      // ── Validation UI ─────────────────────────────────────────────
+
+      function updateValidation() {
+        var result = MenuRenderer.lastValidation;
+        if (!result) return;
+
+        var dot = document.getElementById('ds-dot');
+        var label = document.getElementById('ds-indicator-label');
+        var total = result.errors.length + result.warnings.length;
+
+        dot.className = 'ds-toolbar__dot';
+        if (result.errors.length > 0) {
+          dot.classList.add('ds-toolbar__dot--error');
+          label.textContent = result.errors.length + ' error' + (result.errors.length > 1 ? 's' : '');
+        } else if (result.warnings.length > 0) {
+          dot.classList.add('ds-toolbar__dot--warning');
+          label.textContent = result.warnings.length + ' warning' + (result.warnings.length > 1 ? 's' : '');
+        } else {
+          dot.classList.add('ds-toolbar__dot--valid');
+          label.textContent = 'Valid';
         }
 
-        var origLoad = MenuRenderer.loadFromUrl;
-        MenuRenderer.loadFromUrl = function (url, t) {
-          return origLoad(url, t).then(function (data) {
-            patchPreviewMode(data);
-            MenuRenderer.render(data, t);
-            currentData = JSON.parse(JSON.stringify(data));
-            return data;
-          });
-        };
-
-        document.getElementById('ds-res').addEventListener('change', function () {
-          if (currentData) rerender(JSON.parse(JSON.stringify(currentData)));
+        // Build panel content
+        validationList.innerHTML = '';
+        if (total === 0) {
+          validationList.innerHTML = '<li class="ds-validation-panel__empty">No errors or warnings</li>';
+          return;
+        }
+        result.errors.forEach(function (e) {
+          var li = document.createElement('li');
+          li.className = 'ds-validation-panel__item ds-validation-panel__item--error';
+          li.innerHTML = '<span class="ds-validation-panel__path">' + escapeHtml(e.path) + '</span>' +
+            '<span class="ds-validation-panel__msg">' + escapeHtml(e.message) + '</span>';
+          validationList.appendChild(li);
         });
-
-        document.getElementById('ds-file').addEventListener('change', function (e) {
-          var file = e.target.files[0];
-          if (!file) return;
-          var reader = new FileReader();
-          reader.onload = function () {
-            try {
-              var data = JSON.parse(reader.result);
-              rerender(data);
-            } catch (err) {
-              console.error('Invalid JSON:', err.message);
-            }
-          };
-          reader.readAsText(file);
+        result.warnings.forEach(function (w) {
+          var li = document.createElement('li');
+          li.className = 'ds-validation-panel__item ds-validation-panel__item--warning';
+          li.innerHTML = '<span class="ds-validation-panel__path">' + escapeHtml(w.path) + '</span>' +
+            '<span class="ds-validation-panel__msg">' + escapeHtml(w.message) + '</span>';
+          validationList.appendChild(li);
         });
-
-        document.getElementById('ds-example').addEventListener('change', function () {
-          var url = this.value;
-          if (url) MenuRenderer.loadFromUrl(url, target);
-        });
-
-        MenuRenderer.loadFromUrl(menuUrl, target);
       }
+
+      document.getElementById('ds-indicator').addEventListener('click', function () {
+        validationOpen = !validationOpen;
+        validationPanel.classList.toggle('open', validationOpen);
+      });
+
+      // ── Grid overlay ──────────────────────────────────────────────
+
+      function applyGrid() {
+        var vp = (getRenderTarget()).querySelector('.ds-viewport');
+        if (vp) vp.classList.add('ds-debug-grid');
+      }
+
+      function removeGrid() {
+        var vp = (getRenderTarget()).querySelector('.ds-viewport');
+        if (vp) vp.classList.remove('ds-debug-grid');
+      }
+
+      document.getElementById('ds-grid-btn').addEventListener('click', function () {
+        gridActive = !gridActive;
+        this.classList.toggle('active', gridActive);
+        if (gridActive) {
+          applyGrid();
+        } else {
+          removeGrid();
+        }
+      });
+
+      // ── Editor panel ──────────────────────────────────────────────
+
+      function updateEditorContent() {
+        if (currentData) {
+          editorTextarea.value = JSON.stringify(currentData, null, 2);
+          editorError.classList.remove('visible');
+          editorError.textContent = '';
+        }
+      }
+
+      function toggleEditor() {
+        editorOpen = !editorOpen;
+        document.getElementById('ds-edit-btn').classList.toggle('active', editorOpen);
+
+        if (editorOpen) {
+          editorWrapper.classList.add('open');
+          target.style.display = 'none';
+          updateEditorContent();
+          if (currentData) rerender(currentData);
+        } else {
+          editorWrapper.classList.remove('open');
+          target.style.display = '';
+          if (currentData) rerender(currentData);
+        }
+      }
+
+      document.getElementById('ds-edit-btn').addEventListener('click', toggleEditor);
+
+      // Copy button
+      document.getElementById('ds-editor-copy').addEventListener('click', function () {
+        navigator.clipboard.writeText(editorTextarea.value).then(function () {
+          var btn = document.getElementById('ds-editor-copy');
+          btn.textContent = 'Copied';
+          setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+        });
+      });
+
+      // Live edit with debounce
+      var editTimer;
+      editorTextarea.addEventListener('input', function () {
+        clearTimeout(editTimer);
+        editTimer = setTimeout(function () {
+          var text = editorTextarea.value;
+          try {
+            var data = JSON.parse(text);
+            editorError.classList.remove('visible');
+            editorError.textContent = '';
+            currentData = JSON.parse(JSON.stringify(data));
+            rerender(currentData);
+          } catch (err) {
+            editorError.textContent = err.message;
+            editorError.classList.add('visible');
+          }
+        }, 500);
+      });
+
+      // Tab key inserts spaces
+      editorTextarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          var start = this.selectionStart;
+          var end = this.selectionEnd;
+          this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+          this.selectionStart = this.selectionEnd = start + 2;
+        }
+      });
+
+      // ── Toolbar controls ──────────────────────────────────────────
+
+      document.getElementById('ds-res').addEventListener('change', function () {
+        if (currentData) rerender(JSON.parse(JSON.stringify(currentData)));
+      });
+
+      document.getElementById('ds-file').addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var data = JSON.parse(reader.result);
+            currentData = JSON.parse(JSON.stringify(data));
+            updateEditorContent();
+            rerender(currentData);
+          } catch (err) {
+            console.error('Invalid JSON:', err.message);
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('ds-example').addEventListener('change', function () {
+        var url = this.value;
+        if (url) loadAndRender(url);
+      });
+
+      // ── Utility ───────────────────────────────────────────────────
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // ── Initial load ──────────────────────────────────────────────
+
+      loadAndRender(menuUrl);
     })();
   </script>
 </body>

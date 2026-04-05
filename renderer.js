@@ -356,6 +356,7 @@ var MenuRenderer = (function () {
 
   function buildLeafArea(area, spacing) {
     var section = el('div', 'ds-area');
+    if (area.id) section.setAttribute('data-area-id', area.id);
 
     // Area padding
     var areaPad = normalizePadding(area.padding, 0);
@@ -401,6 +402,7 @@ var MenuRenderer = (function () {
 
   function buildAreaGroup(area, spacing, depth) {
     var section = el('div', 'ds-area ds-area-group');
+    if (area.id) section.setAttribute('data-area-id', area.id);
 
     // Area padding
     var areaPad = normalizePadding(area.padding, 0);
@@ -601,13 +603,206 @@ var MenuRenderer = (function () {
     };
   }
 
+  // ── Validation ──────────────────────────────────────────────────────────
+
+  var VALID_RESOLUTIONS = ['1080', '2k', '4k'];
+  var VALID_ORIENTATIONS = ['landscape', 'portrait'];
+  var VALID_MODES = ['display', 'preview'];
+  var VALID_ALIGNS = ['left', 'center', 'right'];
+  var VALID_VALIGNS = ['top', 'center', 'bottom'];
+  var VALID_PRICE_ALIGNS = ['left', 'right'];
+
+  var KNOWN_LAYOUT_KEYS = [
+    'resolution', 'orientation', 'mode', 'background_color',
+    'x_spacer', 'y_spacer', 'viewport_padding', 'area_gap',
+    'container', 'title', 'logo'
+  ];
+  var KNOWN_AREA_KEYS = [
+    'id', 'title', 'padding', 'gutter', 'align', 'valign',
+    'item_align', 'price_align', 'column_count', 'columns',
+    'items', 'areas'
+  ];
+  var KNOWN_ITEM_KEYS = [
+    'id', 'name', 'description', 'price', 'variations',
+    'padding', 'align', 'hide_if_empty'
+  ];
+
+  function validate(data) {
+    var errors = [];
+    var warnings = [];
+
+    if (!data || typeof data !== 'object') {
+      errors.push({ path: '', message: 'Data must be an object' });
+      return { valid: false, errors: errors, warnings: warnings };
+    }
+
+    // areas is required
+    if (!data.areas) {
+      errors.push({ path: 'areas', message: 'Required field missing' });
+    } else if (!Array.isArray(data.areas)) {
+      errors.push({ path: 'areas', message: 'Must be an array' });
+    } else if (data.areas.length === 0) {
+      warnings.push({ path: 'areas', message: 'Areas array is empty' });
+    } else {
+      data.areas.forEach(function (area, i) {
+        validateArea(area, 'areas[' + i + ']', errors, warnings);
+      });
+    }
+
+    // layout checks
+    if (data.layout) {
+      var lo = data.layout;
+      if (lo.resolution && VALID_RESOLUTIONS.indexOf(lo.resolution) === -1) {
+        errors.push({ path: 'layout.resolution', message: 'Must be one of: ' + VALID_RESOLUTIONS.join(', ') });
+      }
+      if (lo.orientation && VALID_ORIENTATIONS.indexOf(lo.orientation) === -1) {
+        errors.push({ path: 'layout.orientation', message: 'Must be one of: ' + VALID_ORIENTATIONS.join(', ') });
+      }
+      if (lo.mode && VALID_MODES.indexOf(lo.mode) === -1) {
+        errors.push({ path: 'layout.mode', message: 'Must be one of: ' + VALID_MODES.join(', ') });
+      }
+      if (lo.viewport_padding != null) {
+        validatePadding(lo.viewport_padding, 'layout.viewport_padding', errors);
+      }
+      // unknown keys
+      Object.keys(lo).forEach(function (k) {
+        if (KNOWN_LAYOUT_KEYS.indexOf(k) === -1) {
+          warnings.push({ path: 'layout.' + k, message: 'Unknown field' });
+        }
+      });
+    }
+
+    return { valid: errors.length === 0, errors: errors, warnings: warnings };
+  }
+
+  function validatePadding(val, path, errors) {
+    if (typeof val === 'number') return;
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+      var validKeys = ['top', 'right', 'bottom', 'left'];
+      Object.keys(val).forEach(function (k) {
+        if (validKeys.indexOf(k) === -1) {
+          errors.push({ path: path + '.' + k, message: 'Unknown padding key' });
+        } else if (typeof val[k] !== 'number') {
+          errors.push({ path: path + '.' + k, message: 'Must be a number' });
+        }
+      });
+      return;
+    }
+    errors.push({ path: path, message: 'Must be a number or { top, right, bottom, left } object' });
+  }
+
+  function validateArea(area, path, errors, warnings) {
+    if (!area || typeof area !== 'object') {
+      errors.push({ path: path, message: 'Must be an object' });
+      return;
+    }
+    if (!area.id) {
+      errors.push({ path: path + '.id', message: 'Required field missing' });
+    }
+    if (area.align && VALID_ALIGNS.indexOf(area.align) === -1) {
+      errors.push({ path: path + '.align', message: 'Must be one of: ' + VALID_ALIGNS.join(', ') });
+    }
+    if (area.valign && VALID_VALIGNS.indexOf(area.valign) === -1) {
+      errors.push({ path: path + '.valign', message: 'Must be one of: ' + VALID_VALIGNS.join(', ') });
+    }
+    if (area.item_align && VALID_ALIGNS.indexOf(area.item_align) === -1) {
+      errors.push({ path: path + '.item_align', message: 'Must be one of: ' + VALID_ALIGNS.join(', ') });
+    }
+    if (area.price_align && VALID_PRICE_ALIGNS.indexOf(area.price_align) === -1) {
+      errors.push({ path: path + '.price_align', message: 'Must be one of: ' + VALID_PRICE_ALIGNS.join(', ') });
+    }
+    if (area.column_count != null && typeof area.column_count !== 'number') {
+      errors.push({ path: path + '.column_count', message: 'Must be a number' });
+    }
+    if (area.padding != null) {
+      validatePadding(area.padding, path + '.padding', errors);
+    }
+
+    // Unknown keys
+    Object.keys(area).forEach(function (k) {
+      if (KNOWN_AREA_KEYS.indexOf(k) === -1) {
+        warnings.push({ path: path + '.' + k, message: 'Unknown field' });
+      }
+    });
+
+    // Nested areas (group)
+    if (area.areas && Array.isArray(area.areas)) {
+      if (area.items && area.items.length > 0) {
+        warnings.push({ path: path, message: 'Has both items and areas — items will be ignored' });
+      }
+      if (area.areas.length === 0) {
+        warnings.push({ path: path + '.areas', message: 'Sub-areas array is empty' });
+      }
+      area.areas.forEach(function (sub, j) {
+        validateArea(sub, path + '.areas[' + j + ']', errors, warnings);
+      });
+    } else if (area.items) {
+      // Leaf area — validate items
+      if (!Array.isArray(area.items)) {
+        errors.push({ path: path + '.items', message: 'Must be an array' });
+      } else {
+        area.items.forEach(function (item, j) {
+          validateItem(item, path + '.items[' + j + ']', errors, warnings);
+        });
+      }
+    } else {
+      warnings.push({ path: path, message: 'Area has neither items nor sub-areas' });
+    }
+  }
+
+  function validateItem(item, path, errors, warnings) {
+    if (!item || typeof item !== 'object') {
+      errors.push({ path: path, message: 'Must be an object' });
+      return;
+    }
+    if (!item.id) {
+      errors.push({ path: path + '.id', message: 'Required field missing' });
+    }
+    if (!item.name) {
+      errors.push({ path: path + '.name', message: 'Required field missing' });
+    }
+    if (!item.price && (!item.variations || item.variations.length === 0)) {
+      if (!item.hide_if_empty) {
+        warnings.push({ path: path, message: 'Item has no price and no variations' });
+      }
+    }
+    if (item.variations && !Array.isArray(item.variations)) {
+      errors.push({ path: path + '.variations', message: 'Must be an array' });
+    }
+    if (item.padding != null) {
+      validatePadding(item.padding, path + '.padding', errors);
+    }
+    if (item.align && VALID_ALIGNS.indexOf(item.align) === -1) {
+      errors.push({ path: path + '.align', message: 'Must be one of: ' + VALID_ALIGNS.join(', ') });
+    }
+    // Unknown keys
+    Object.keys(item).forEach(function (k) {
+      if (KNOWN_ITEM_KEYS.indexOf(k) === -1) {
+        warnings.push({ path: path + '.' + k, message: 'Unknown field' });
+      }
+    });
+  }
+
+  // Store last validation result for external access
+  var lastValidation = null;
+
+  // Patch render to run validation
+  var _origRender = render;
+  function renderWithValidation(data, target) {
+    if (typeof data === 'string') data = JSON.parse(data);
+    lastValidation = validate(data);
+    _origRender(data, target);
+  }
+
   // ── Public API ─────────────────────────────────────────────────────────
 
   return {
-    render: render,
+    render: renderWithValidation,
     loadFromUrl: loadFromUrl,
     watch: watch,
-    formatPrice: formatPrice
+    formatPrice: formatPrice,
+    validate: validate,
+    get lastValidation() { return lastValidation; }
   };
 
 })();

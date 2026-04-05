@@ -256,3 +256,232 @@ html, body {
   color: #fff;
   margin-right: 8px;
 }
+
+.ds-toolbar button {
+  background: #333;
+  color: #ccc;
+  border: 1px solid #555;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ds-toolbar button:hover {
+  background: #444;
+}
+
+.ds-toolbar button.active {
+  background: #0066cc;
+  color: #fff;
+  border-color: #0088ff;
+}
+
+/* Validation indicator */
+.ds-toolbar__indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.ds-toolbar__indicator:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ds-toolbar__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ds-toolbar__dot--valid   { background: #4caf50; }
+.ds-toolbar__dot--warning { background: #ff9800; }
+.ds-toolbar__dot--error   { background: #f44336; }
+
+.ds-toolbar__indicator-label {
+  font-size: 12px;
+}
+
+/* Validation panel */
+.ds-validation-panel {
+  position: fixed;
+  bottom: 38px;
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.92);
+  border-top: 1px solid #333;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  z-index: 10001;
+  display: none;
+}
+
+.ds-validation-panel.open {
+  display: block;
+}
+
+.ds-validation-panel__list {
+  list-style: none;
+  padding: 8px 16px;
+}
+
+.ds-validation-panel__item {
+  padding: 3px 0;
+  display: flex;
+  gap: 8px;
+}
+
+.ds-validation-panel__path {
+  color: #82aaff;
+  flex-shrink: 0;
+}
+
+.ds-validation-panel__msg {
+  color: #ccc;
+}
+
+.ds-validation-panel__item--error .ds-validation-panel__msg {
+  color: #ff8a80;
+}
+
+.ds-validation-panel__item--warning .ds-validation-panel__msg {
+  color: #ffe082;
+}
+
+.ds-validation-panel__empty {
+  padding: 12px 16px;
+  color: #4caf50;
+}
+
+/* Debug grid overlay */
+.ds-debug-grid .ds-areas {
+  outline: 2px dashed rgba(66, 165, 245, 0.5);
+  outline-offset: -2px;
+}
+
+.ds-debug-grid .ds-area {
+  outline: 1px solid rgba(76, 175, 80, 0.5);
+  outline-offset: -1px;
+  position: relative;
+}
+
+.ds-debug-grid .ds-area::before {
+  content: attr(data-area-id);
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(76, 175, 80, 0.7);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 0 0 3px 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.ds-debug-grid .ds-area-group__grid {
+  outline: 1px dashed rgba(156, 39, 176, 0.4);
+  outline-offset: -1px;
+}
+
+.ds-debug-grid .ds-items {
+  outline: 1px dotted rgba(255, 152, 0, 0.4);
+  outline-offset: -1px;
+}
+
+.ds-debug-grid .ds-item {
+  outline: 1px dotted rgba(255, 255, 255, 0.15);
+  outline-offset: -1px;
+}
+
+/* Editor panel */
+.ds-editor-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 38px;
+  right: 0;
+  display: none;
+  z-index: 9999;
+}
+
+.ds-editor-wrapper.open {
+  display: flex;
+}
+
+.ds-editor {
+  width: 420px;
+  min-width: 300px;
+  background: #1e1e1e;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.ds-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #252525;
+  border-bottom: 1px solid #333;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.ds-editor__header button {
+  background: #333;
+  color: #ccc;
+  border: 1px solid #555;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ds-editor__header button:hover {
+  background: #444;
+}
+
+.ds-editor__textarea {
+  flex: 1;
+  resize: none;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: none;
+  padding: 12px;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  tab-size: 2;
+  outline: none;
+}
+
+.ds-editor__error {
+  padding: 6px 12px;
+  background: #3a1a1a;
+  color: #ff8a80;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  border-top: 1px solid #5a2a2a;
+  display: none;
+}
+
+.ds-editor__error.visible {
+  display: block;
+}
+
+.ds-editor__preview {
+  flex: 1;
+  overflow: hidden;
+  background: #000;
+}

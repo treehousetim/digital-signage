@@ -1228,6 +1228,22 @@ var MenuEditor = (function () {
         return;
       }
       minimapWrap.style.display = '';
+
+      // Update minimap aspect ratio to match viewport
+      var mmMaxW = 160, mmMaxH = 160;
+      var aspect = currentVpW / currentVpH;
+      var mmW, mmH;
+      if (aspect >= 1) {
+        mmW = mmMaxW;
+        mmH = Math.round(mmMaxW / aspect);
+      } else {
+        mmH = mmMaxH;
+        mmW = Math.round(mmMaxH * aspect);
+      }
+      minimapCanvas.width = mmW;
+      minimapCanvas.height = mmH;
+      minimapWrap.style.width = mmW + 'px';
+      minimapWrap.style.height = mmH + 'px';
       var containerW = previewScroll.clientWidth;
       var containerH = previewScroll.clientHeight;
       var scale = ZOOM_SCALES[zoomLevel];
@@ -1236,8 +1252,6 @@ var MenuEditor = (function () {
 
       // Draw minimap background
       var ctx = minimapCanvas.getContext('2d');
-      var mmW = minimapCanvas.width;
-      var mmH = minimapCanvas.height;
       ctx.fillStyle = '#222';
       ctx.fillRect(0, 0, mmW, mmH);
       ctx.strokeStyle = '#555';

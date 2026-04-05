@@ -375,7 +375,7 @@ var MenuRenderer = (function () {
     // Variations
     if (hasVariations) {
       var showPrices = item.show_variation_prices !== false;
-      var inline = item.variations_inline === true;
+      var inline = item.variations_inline !== false;
       var varList = el('div', 'ds-variations' + (inline ? ' ds-variations--inline' : ''));
       item.variations.forEach(function (v) {
         var vRow = el('div', 'ds-variation');

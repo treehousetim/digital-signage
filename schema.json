@@ -287,8 +287,8 @@
         },
         "variations_inline": {
           "type": "boolean",
-          "default": false,
-          "description": "When true, display variations in a compact inline row instead of stacked rows."
+          "default": true,
+          "description": "Display variations in a compact inline row. Set to false for stacked rows."
         },
         "variations": {
           "type": "array",

@@ -1138,16 +1138,130 @@ var MenuEditor = (function () {
 
     container.appendChild(tabs);
 
+    // Zoom state
+    var zoomLevel = 0; // 0 = fit, 1-5 = zoom levels
+    var ZOOM_SCALES = [0, 0.25, 0.5, 0.75, 1.0, 1.5]; // 0 = auto-fit
+
+    // Zoom controls in tabs bar
+    var zoomWrap = el('div', 'me-preview-zoom');
+    var zoomOutBtn = el('button', 'me-preview-btn', { title: 'Zoom out' });
+    zoomOutBtn.textContent = '\u2212';
+    var zoomLabel = el('span', 'me-preview-zoom__label');
+    zoomLabel.textContent = 'Fit';
+    var zoomInBtn = el('button', 'me-preview-btn', { title: 'Zoom in' });
+    zoomInBtn.textContent = '+';
+    var zoomFitBtn = el('button', 'me-preview-btn', { title: 'Fit to view' });
+    zoomFitBtn.textContent = 'Fit';
+    zoomOutBtn.addEventListener('click', function () {
+      if (zoomLevel > 0) { zoomLevel--; applyZoom(); }
+    });
+    zoomInBtn.addEventListener('click', function () {
+      if (zoomLevel < ZOOM_SCALES.length - 1) { zoomLevel++; applyZoom(); }
+    });
+    zoomFitBtn.addEventListener('click', function () {
+      zoomLevel = 0; applyZoom();
+    });
+    zoomWrap.appendChild(zoomOutBtn);
+    zoomWrap.appendChild(zoomLabel);
+    zoomWrap.appendChild(zoomInBtn);
+    zoomWrap.appendChild(zoomFitBtn);
+    tabs.appendChild(zoomWrap);
+
     // Content area
     var contentArea = el('div', 'me-preview-content');
     container.appendChild(contentArea);
+
+    // Preview wrapper — scrollable container for zoomed content
+    var previewScroll = el('div', 'me-preview-scroll');
+    contentArea.appendChild(previewScroll);
 
     // Iframe for preview
     var iframe;
     if (rendererAvailable) {
       iframe = el('iframe', 'me-preview-iframe');
       iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-      contentArea.appendChild(iframe);
+      previewScroll.appendChild(iframe);
+    }
+
+    // Minimap
+    var minimapWrap = el('div', 'me-minimap');
+    var minimapCanvas = el('canvas', 'me-minimap__canvas');
+    minimapCanvas.width = 160;
+    minimapCanvas.height = 90;
+    var minimapRect = el('div', 'me-minimap__rect');
+    minimapWrap.appendChild(minimapCanvas);
+    minimapWrap.appendChild(minimapRect);
+    contentArea.appendChild(minimapWrap);
+
+    var currentVpW = 3840, currentVpH = 2160;
+
+    function applyZoom() {
+      if (!iframe) return;
+      var containerW = previewScroll.clientWidth;
+      var containerH = previewScroll.clientHeight;
+      var scale;
+      if (zoomLevel === 0) {
+        // Fit mode
+        scale = Math.min(containerW / currentVpW, containerH / currentVpH);
+        zoomLabel.textContent = 'Fit';
+        previewScroll.style.overflow = 'hidden';
+      } else {
+        scale = ZOOM_SCALES[zoomLevel];
+        zoomLabel.textContent = Math.round(scale * 100) + '%';
+        previewScroll.style.overflow = 'auto';
+      }
+      iframe.style.width = currentVpW + 'px';
+      iframe.style.height = currentVpH + 'px';
+      iframe.style.transform = 'scale(' + scale + ')';
+      iframe.style.transformOrigin = 'top left';
+      // Set the scroll container's inner size to match scaled content
+      if (zoomLevel > 0) {
+        previewScroll.style.setProperty('--scaled-w', (currentVpW * scale) + 'px');
+        previewScroll.style.setProperty('--scaled-h', (currentVpH * scale) + 'px');
+      }
+      updateMinimap();
+    }
+
+    function updateMinimap() {
+      if (zoomLevel === 0) {
+        minimapWrap.style.display = 'none';
+        return;
+      }
+      minimapWrap.style.display = '';
+      var containerW = previewScroll.clientWidth;
+      var containerH = previewScroll.clientHeight;
+      var scale = ZOOM_SCALES[zoomLevel];
+      var scaledW = currentVpW * scale;
+      var scaledH = currentVpH * scale;
+
+      // Draw minimap background
+      var ctx = minimapCanvas.getContext('2d');
+      var mmW = minimapCanvas.width;
+      var mmH = minimapCanvas.height;
+      ctx.fillStyle = '#222';
+      ctx.fillRect(0, 0, mmW, mmH);
+      ctx.strokeStyle = '#555';
+      ctx.strokeRect(0, 0, mmW, mmH);
+
+      // Viewport rect
+      var visibleW = Math.min(containerW, scaledW);
+      var visibleH = Math.min(containerH, scaledH);
+      var scrollX = previewScroll.scrollLeft;
+      var scrollY = previewScroll.scrollTop;
+
+      var rectX = (scrollX / scaledW) * mmW;
+      var rectY = (scrollY / scaledH) * mmH;
+      var rectW = (visibleW / scaledW) * mmW;
+      var rectH = (visibleH / scaledH) * mmH;
+
+      minimapRect.style.left = rectX + 'px';
+      minimapRect.style.top = rectY + 'px';
+      minimapRect.style.width = rectW + 'px';
+      minimapRect.style.height = rectH + 'px';
+    }
+
+    if (previewScroll) {
+      previewScroll.addEventListener('scroll', updateMinimap);
     }
 
     // JSON output
@@ -1189,12 +1303,15 @@ var MenuEditor = (function () {
 
     function refreshContent() {
       if (activeTab === 'preview' && iframe) {
-        iframe.style.display = '';
+        previewScroll.style.display = '';
         jsonPre.style.display = 'none';
+        zoomWrap.style.display = '';
         updatePreview();
       } else {
-        if (iframe) iframe.style.display = 'none';
+        previewScroll.style.display = 'none';
+        minimapWrap.style.display = 'none';
         jsonPre.style.display = '';
+        zoomWrap.style.display = 'none';
         var jsonStr = JSON.stringify(store.getData(), null, 2);
         jsonCode.innerHTML = syntaxHighlight(escapeHtml(jsonStr));
       }
@@ -1207,10 +1324,16 @@ var MenuEditor = (function () {
         if (!iframe) return;
         var data = store.getClone();
         data.layout = data.layout || {};
-        data.layout.mode = 'preview';
+        data.layout.mode = 'display';
+        // Track viewport dimensions for zoom
+        var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
+        var res = resMap[data.layout.resolution] || resMap['4k'];
+        var isPort = data.layout.orientation === 'portrait';
+        currentVpW = isPort ? res.h : res.w;
+        currentVpH = isPort ? res.w : res.h;
         var html = '<!DOCTYPE html><html><head>' +
           '<link rel="stylesheet" href="theme.css">' +
-          '<style>html,body{margin:0;padding:0;overflow:hidden;background:#000;width:100%;height:100%}</style>' +
+          '<style>html,body{margin:0;padding:0;overflow:hidden;background:#000}</style>' +
           '</head><body>' +
           '<div id="display" style="width:100%;height:100%"></div>' +
           '<script src="renderer.js"><\/script>' +
@@ -1231,11 +1354,11 @@ var MenuEditor = (function () {
         iframe.srcdoc = html;
         iframe.onload = function () {
           iframe.contentWindow.postMessage({ type: 'render', data: data }, '*');
-          // Re-apply grid state after render
           setTimeout(function () {
             if (iframe.contentWindow && getGridActive) {
               iframe.contentWindow.postMessage({ type: 'grid', enabled: getGridActive() }, '*');
             }
+            applyZoom();
           }, 100);
         };
       }, 200);

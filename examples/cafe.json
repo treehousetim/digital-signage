@@ -1,13 +1,13 @@
 {
   "layout": {
-    "resolution": "1080",
+    "resolution": "4k",
     "orientation": "landscape",
     "background_color": "#2c1810",
-    "viewport_padding": { "top": 20, "right": 40, "bottom": 20, "left": 40 },
-    "area_gap": 20,
+    "viewport_padding": { "top": 40, "right": 80, "bottom": 40, "left": 80 },
+    "area_gap": 40,
     "container": {
       "columns": 2,
-      "gutter": 48
+      "gutter": 96
     },
     "title": {
       "text": "The Corner Cafe",
@@ -15,11 +15,11 @@
         "family": "Playfair Display",
         "weight": "700",
         "color": "#f5e6d3",
-        "size": "52px"
+        "size": "104px"
       },
       "position": {
         "x_align": "center",
-        "top_padding": 28
+        "top_padding": 56
       }
     }
   },
@@ -28,25 +28,25 @@
       "family": "Playfair Display",
       "weight": "600",
       "color": "#d4a574",
-      "size": "26px"
+      "size": "52px"
     },
     "item_name_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#f5e6d3",
-      "size": "20px"
+      "size": "40px"
     },
     "item_price_font": {
       "family": "Lato",
       "weight": "700",
       "color": "#f5e6d3",
-      "size": "20px"
+      "size": "40px"
     },
     "variation_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#c4a882",
-      "size": "15px"
+      "size": "30px"
     },
     "divider_color": "#4a3528",
     "area_background": "transparent"
@@ -73,7 +73,7 @@
           "id": "sides",
           "title": "Sides",
           "column_count": 2,
-          "gutter": 24,
+          "gutter": 48,
           "items": [
             { "id": "toast", "name": "Sourdough Toast", "price": "4.00" },
             { "id": "bacon", "name": "Bacon (3 strips)", "price": "5.00" },

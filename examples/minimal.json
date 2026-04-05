@@ -1,4 +1,7 @@
 {
+  "layout": {
+    "resolution": "4k"
+  },
   "areas": [
     {
       "id": "menu",

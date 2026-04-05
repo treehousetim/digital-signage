@@ -1,13 +1,13 @@
 {
   "layout": {
-    "resolution": "1080",
+    "resolution": "4k",
     "orientation": "landscape",
     "background_color": "#0d1117",
-    "viewport_padding": { "top": 12, "right": 28, "bottom": 12, "left": 28 },
-    "area_gap": 16,
+    "viewport_padding": { "top": 24, "right": 56, "bottom": 24, "left": 56 },
+    "area_gap": 32,
     "container": {
       "columns": 3,
-      "gutter": 24
+      "gutter": 48
     },
     "title": {
       "text": "Infrastructure Status",
@@ -15,11 +15,11 @@
         "family": "Roboto",
         "weight": "700",
         "color": "#58a6ff",
-        "size": "42px"
+        "size": "84px"
       },
       "position": {
         "x_align": "center",
-        "top_padding": 20
+        "top_padding": 40
       }
     }
   },
@@ -28,25 +28,25 @@
       "family": "Roboto",
       "weight": "600",
       "color": "#3fb950",
-      "size": "22px"
+      "size": "44px"
     },
     "item_name_font": {
       "family": "Roboto",
       "weight": "400",
       "color": "#c9d1d9",
-      "size": "18px"
+      "size": "36px"
     },
     "item_price_font": {
       "family": "Roboto",
       "weight": "700",
       "color": "#3fb950",
-      "size": "18px"
+      "size": "36px"
     },
     "variation_font": {
       "family": "Roboto",
       "weight": "400",
       "color": "#8b949e",
-      "size": "14px"
+      "size": "28px"
     },
     "divider_color": "#21262d",
     "area_background": "#161b22"
@@ -56,7 +56,7 @@
       "id": "prod-services",
       "title": "Production Services",
       "column_count": 1,
-      "padding": 12,
+      "padding": 24,
       "items": [
         { "id": "api-gateway", "name": "API Gateway", "description": "us-east-1, us-west-2", "price": "UP" },
         { "id": "auth-service", "name": "Auth Service", "description": "OAuth2 / SSO provider", "price": "UP" },
@@ -71,7 +71,7 @@
       "id": "databases",
       "title": "Databases",
       "column_count": 1,
-      "padding": 12,
+      "padding": 24,
       "items": [
         { "id": "pg-primary", "name": "PostgreSQL Primary", "description": "db-prod-01, 64GB", "price": "UP" },
         { "id": "pg-replica", "name": "PostgreSQL Replica", "description": "db-prod-02, read-only", "price": "UP" },
@@ -85,7 +85,7 @@
       "id": "infra",
       "title": "Infrastructure",
       "column_count": 1,
-      "padding": 12,
+      "padding": 24,
       "items": [
         { "id": "k8s-prod", "name": "K8s Cluster (prod)", "description": "12 nodes, auto-scaling", "price": "UP" },
         { "id": "k8s-staging", "name": "K8s Cluster (staging)", "description": "4 nodes", "price": "UP" },

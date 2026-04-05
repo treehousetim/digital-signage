@@ -35,17 +35,17 @@ var MenuRenderer = (function () {
       orientation: 'landscape',
       mode: 'display',
       background_color: '#1a1a1a',
-      x_spacer: 24,
-      y_spacer: 32,
+      x_spacer: 48,
+      y_spacer: 64,
       viewport_padding: null,
       area_gap: null,
       container: { columns: 1, gutter: null }
     },
     theme: {
-      area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: '28px' },
-      item_name_font: { family: 'Lato', weight: '400', color: '#ffffff', size: '22px' },
-      item_price_font: { family: 'Lato', weight: '700', color: '#ffffff', size: '22px' },
-      variation_font: { family: 'Lato', weight: '400', color: '#cccccc', size: '16px' },
+      area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: '56px' },
+      item_name_font: { family: 'Lato', weight: '400', color: '#ffffff', size: '44px' },
+      item_price_font: { family: 'Lato', weight: '700', color: '#ffffff', size: '44px' },
+      variation_font: { family: 'Lato', weight: '400', color: '#cccccc', size: '32px' },
       divider_color: '#444444',
       area_background: 'transparent'
     }
@@ -292,7 +292,7 @@ var MenuRenderer = (function () {
 
     var itemPadding = normalizePadding(
       item.padding,
-      { top: 8, right: 0, bottom: 8, left: 0 }
+      { top: 16, right: 0, bottom: 16, left: 0 }
     );
 
     var itemAlign = item.align || areaDefaults.itemAlign || 'left';
@@ -382,7 +382,7 @@ var MenuRenderer = (function () {
     // Item grid
     var cols = area.column_count || 1;
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(cols, 3));
-    var gutter = (area.gutter != null) ? area.gutter : 8;
+    var gutter = (area.gutter != null) ? area.gutter : 16;
     grid.style.columnGap = gutter + 'px';
     grid.style.rowGap = '0px';
 

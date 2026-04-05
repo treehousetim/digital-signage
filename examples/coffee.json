@@ -1,13 +1,13 @@
 {
   "layout": {
-    "resolution": "1080",
+    "resolution": "4k",
     "orientation": "portrait",
     "background_color": "#1a1a1a",
-    "viewport_padding": { "top": 16, "right": 32, "bottom": 16, "left": 32 },
-    "area_gap": 24,
+    "viewport_padding": { "top": 32, "right": 64, "bottom": 32, "left": 64 },
+    "area_gap": 48,
     "container": {
       "columns": 3,
-      "gutter": 40
+      "gutter": 80
     },
     "title": {
       "text": "Coffee",
@@ -15,11 +15,11 @@
         "family": "Montserrat",
         "weight": "700",
         "color": "#ffffff",
-        "size": "48px"
+        "size": "96px"
       },
       "position": {
         "x_align": "center",
-        "top_padding": 30
+        "top_padding": 60
       }
     }
   },
@@ -28,25 +28,25 @@
       "family": "Montserrat",
       "weight": "600",
       "color": "#f0c040",
-      "size": "28px"
+      "size": "56px"
     },
     "item_name_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#ffffff",
-      "size": "22px"
+      "size": "44px"
     },
     "item_price_font": {
       "family": "Lato",
       "weight": "700",
       "color": "#ffffff",
-      "size": "22px"
+      "size": "44px"
     },
     "variation_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#cccccc",
-      "size": "16px"
+      "size": "32px"
     },
     "divider_color": "#444444",
     "area_background": "transparent"
@@ -55,14 +55,14 @@
     {
       "id": "drinks-column",
       "columns": 1,
-      "gutter": 24,
+      "gutter": 48,
       "areas": [
         {
           "id": "hot-drinks",
           "title": "Hot Drinks",
           "column_count": 1,
-          "gutter": 32,
-          "padding": { "bottom": 8 },
+          "gutter": 64,
+          "padding": { "bottom": 16 },
           "items": [
             {
               "id": "latte",
@@ -136,7 +136,7 @@
           "id": "cold-drinks",
           "title": "Cold Drinks",
           "column_count": 1,
-          "gutter": 32,
+          "gutter": 64,
           "items": [
             {
               "id": "iced-latte",

@@ -1299,9 +1299,79 @@ var MenuEditor = (function () {
     toolbar.appendChild(sep);
     toolbar.appendChild(undoBtn);
     toolbar.appendChild(redoBtn);
+    var pngBtn = el('button', 'me-toolbar__btn', { title: 'Export PNG at full resolution' });
+    pngBtn.textContent = 'Export PNG';
+    pngBtn.addEventListener('click', function () {
+      if (typeof html2canvas === 'undefined') {
+        console.error('[MenuEditor] html2canvas is required for PNG export. Include it via script tag.');
+        return;
+      }
+      pngBtn.disabled = true;
+      pngBtn.textContent = 'Rendering...';
+
+      // Create offscreen container at full native resolution
+      var offscreen = el('div', '', {
+        style: 'position:fixed;left:-99999px;top:0;z-index:-1;'
+      });
+      document.body.appendChild(offscreen);
+
+      // Render at full resolution with no preview scaling
+      var data = store.getClone();
+      data.layout = data.layout || {};
+      data.layout.mode = 'display';
+
+      // Load renderer styles
+      var style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = 'theme.css';
+      offscreen.appendChild(style);
+
+      var renderTarget = el('div');
+      offscreen.appendChild(renderTarget);
+
+      // Wait for styles to load then render and capture
+      setTimeout(function () {
+        MenuRenderer.render(data, renderTarget);
+
+        var viewport = renderTarget.querySelector('.ds-viewport');
+        if (!viewport) {
+          cleanup();
+          return;
+        }
+
+        html2canvas(viewport, {
+          backgroundColor: null,
+          scale: 1,
+          width: viewport.offsetWidth,
+          height: viewport.offsetHeight,
+          logging: false
+        }).then(function (canvas) {
+          canvas.toBlob(function (blob) {
+            var url = URL.createObjectURL(blob);
+            var a = el('a', '', { href: url, download: 'menu.png' });
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            cleanup();
+          }, 'image/png');
+        }).catch(function (err) {
+          console.error('[MenuEditor] PNG export failed:', err);
+          cleanup();
+        });
+      }, 200);
+
+      function cleanup() {
+        document.body.removeChild(offscreen);
+        pngBtn.disabled = false;
+        pngBtn.textContent = 'Export PNG';
+      }
+    });
+
     var sep2 = el('span', 'me-toolbar__sep');
     toolbar.appendChild(sep2);
     toolbar.appendChild(gridBtn);
+    toolbar.appendChild(pngBtn);
 
     // Examples dropdown
     var sep3 = el('span', 'me-toolbar__sep');

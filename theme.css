@@ -7,48 +7,48 @@
 :root {
   /* Layout (legacy) */
   --ds-background-color: #1a1a1a;
-  --ds-x-spacer: 24px;
-  --ds-y-spacer: 32px;
+  --ds-x-spacer: 48px;
+  --ds-y-spacer: 64px;
 
   /* Viewport padding */
-  --ds-viewport-padding-top: 32px;
-  --ds-viewport-padding-right: 24px;
-  --ds-viewport-padding-bottom: 32px;
-  --ds-viewport-padding-left: 24px;
+  --ds-viewport-padding-top: 64px;
+  --ds-viewport-padding-right: 48px;
+  --ds-viewport-padding-bottom: 64px;
+  --ds-viewport-padding-left: 48px;
 
   /* Container spacing */
-  --ds-container-gutter: 24px;
-  --ds-area-gap: 32px;
+  --ds-container-gutter: 48px;
+  --ds-area-gap: 64px;
 
   /* Title */
   --ds-title-font-family: 'Montserrat', sans-serif;
   --ds-title-font-weight: 700;
   --ds-title-font-color: #ffffff;
-  --ds-title-font-size: 48px;
+  --ds-title-font-size: 96px;
 
   /* Area titles */
   --ds-area-title-font-family: 'Montserrat', sans-serif;
   --ds-area-title-font-weight: 600;
   --ds-area-title-font-color: #f0c040;
-  --ds-area-title-font-size: 28px;
+  --ds-area-title-font-size: 56px;
 
   /* Item names */
   --ds-item-name-font-family: 'Lato', sans-serif;
   --ds-item-name-font-weight: 400;
   --ds-item-name-font-color: #ffffff;
-  --ds-item-name-font-size: 22px;
+  --ds-item-name-font-size: 44px;
 
   /* Item prices */
   --ds-item-price-font-family: 'Lato', sans-serif;
   --ds-item-price-font-weight: 700;
   --ds-item-price-font-color: #ffffff;
-  --ds-item-price-font-size: 22px;
+  --ds-item-price-font-size: 44px;
 
   /* Variations */
   --ds-variation-font-family: 'Lato', sans-serif;
   --ds-variation-font-weight: 400;
   --ds-variation-font-color: #cccccc;
-  --ds-variation-font-size: 16px;
+  --ds-variation-font-size: 32px;
 
   /* Dividers and backgrounds */
   --ds-divider-color: #444444;
@@ -124,7 +124,7 @@ html, body {
   color: var(--ds-area-title-font-color);
   font-size: var(--ds-area-title-font-size);
   line-height: 1.3;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 /* Area group — nested sub-areas container */

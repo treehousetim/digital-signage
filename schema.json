@@ -22,6 +22,12 @@
           "default": "landscape",
           "description": "Screen orientation. Landscape is 1920x1080 base, portrait is 1080x1920 base."
         },
+        "mode": {
+          "type": "string",
+          "enum": ["display", "preview"],
+          "default": "display",
+          "description": "Rendering mode. 'display' renders at native resolution with CSS scale. 'preview' scales to fit the browser viewport for previewing on any screen."
+        },
         "background_color": {
           "type": "string",
           "default": "#1a1a1a",
@@ -30,22 +36,34 @@
         "x_spacer": {
           "type": "number",
           "default": 24,
-          "description": "Horizontal spacing in pixels between elements (at native 1080p scale)."
+          "description": "Legacy horizontal spacing fallback (px). Use viewport_padding and container.gutter instead."
         },
         "y_spacer": {
           "type": "number",
           "default": 32,
-          "description": "Vertical spacing in pixels between elements (at native 1080p scale)."
+          "description": "Legacy vertical spacing fallback (px). Use viewport_padding and area_gap instead."
+        },
+        "viewport_padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Padding from the screen edges to the content area. Overrides x_spacer/y_spacer when present."
+        },
+        "area_gap": {
+          "type": "number",
+          "description": "Vertical gap in pixels between area sections. Defaults to y_spacer value."
         },
         "container": {
           "type": "object",
-          "description": "Controls how areas are arranged on screen.",
+          "description": "Controls how top-level areas are arranged on screen.",
           "properties": {
             "columns": {
               "type": "integer",
-              "enum": [1, 2],
+              "enum": [1, 2, 3],
               "default": 1,
-              "description": "Number of columns for area layout. 1 = vertical stack, 2 = side by side."
+              "description": "Number of columns for area layout."
+            },
+            "gutter": {
+              "type": "number",
+              "description": "Gap in pixels between area columns. Defaults to x_spacer value."
             }
           }
         },
@@ -127,77 +145,28 @@
     "areas": {
       "type": "array",
       "description": "The menu areas (sections) containing items to display.",
-      "items": {
-        "type": "object",
-        "required": ["id", "items"],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique identifier for this area."
-          },
-          "title": {
-            "type": "string",
-            "description": "Display title for this section. Optional — omit for untitled groups."
-          },
-          "column_count": {
-            "type": "integer",
-            "default": 1,
-            "description": "Number of columns for the item grid within this area."
-          },
-          "items": {
-            "type": "array",
-            "description": "Menu items in this area.",
-            "items": {
-              "type": "object",
-              "required": ["id", "name"],
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "description": "Unique identifier for this item."
-                },
-                "name": {
-                  "type": "string",
-                  "description": "Display name of the menu item."
-                },
-                "description": {
-                  "type": "string",
-                  "description": "Optional short description shown below the item name."
-                },
-                "price": {
-                  "type": "string",
-                  "description": "Single price for items without variations. Displayed as a dollar amount."
-                },
-                "variations": {
-                  "type": "array",
-                  "description": "Size or style variations with individual prices. When present, replaces the single price.",
-                  "items": {
-                    "type": "object",
-                    "required": ["name", "price"],
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "Variation label (e.g. Small, Large, 12oz)."
-                      },
-                      "price": {
-                        "type": "string",
-                        "description": "Price for this variation."
-                      }
-                    }
-                  }
-                },
-                "hide_if_empty": {
-                  "type": "boolean",
-                  "default": false,
-                  "description": "If true, hide this item when it has no price and no variations."
-                }
-              }
-            }
-          }
-        }
-      }
+      "items": { "$ref": "#/$defs/area" }
     }
   },
   "$defs": {
+    "padding": {
+      "oneOf": [
+        {
+          "type": "number",
+          "description": "Uniform padding on all sides in pixels."
+        },
+        {
+          "type": "object",
+          "description": "Per-side padding in pixels.",
+          "properties": {
+            "top":    { "type": "number", "default": 0 },
+            "right":  { "type": "number", "default": 0 },
+            "bottom": { "type": "number", "default": 0 },
+            "left":   { "type": "number", "default": 0 }
+          }
+        }
+      ]
+    },
     "font": {
       "type": "object",
       "description": "Font definition with family, weight, color, and size.",
@@ -221,6 +190,127 @@
           "type": "string",
           "default": "22px",
           "description": "CSS font-size value."
+        }
+      }
+    },
+    "area": {
+      "type": "object",
+      "description": "A menu area. Either a leaf (has items) or a group (has sub-areas). Items and areas are mutually exclusive.",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this area."
+        },
+        "title": {
+          "type": "string",
+          "description": "Display title for this section. Optional — omit for untitled groups."
+        },
+        "padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Internal padding within this area. Number or {top,right,bottom,left} object."
+        },
+        "gutter": {
+          "type": "number",
+          "description": "Gap between columns — item columns (leaf areas) or sub-area columns (group areas)."
+        },
+        "align": {
+          "type": "string",
+          "enum": ["left", "center", "right"],
+          "default": "left",
+          "description": "Horizontal alignment of the area title."
+        },
+        "valign": {
+          "type": "string",
+          "enum": ["top", "center", "bottom"],
+          "default": "top",
+          "description": "Vertical alignment of this area within its parent grid cell."
+        },
+        "item_align": {
+          "type": "string",
+          "enum": ["left", "center", "right"],
+          "default": "left",
+          "description": "Default text alignment for item names in this area."
+        },
+        "price_align": {
+          "type": "string",
+          "enum": ["left", "right"],
+          "default": "right",
+          "description": "Alignment of item prices."
+        },
+        "column_count": {
+          "type": "integer",
+          "default": 1,
+          "description": "Number of columns for the item grid within this leaf area (1-3)."
+        },
+        "columns": {
+          "type": "integer",
+          "default": 1,
+          "description": "Number of columns for sub-area layout in a group area."
+        },
+        "items": {
+          "type": "array",
+          "description": "Menu items in this leaf area.",
+          "items": { "$ref": "#/$defs/item" }
+        },
+        "areas": {
+          "type": "array",
+          "description": "Nested sub-areas. When present, this area is a group container. Mutually exclusive with items.",
+          "items": { "$ref": "#/$defs/area" }
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this item."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the menu item."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional short description shown below the item name."
+        },
+        "price": {
+          "type": "string",
+          "description": "Single price for items without variations. Displayed as a dollar amount."
+        },
+        "variations": {
+          "type": "array",
+          "description": "Size or style variations with individual prices. When present, replaces the single price.",
+          "items": {
+            "type": "object",
+            "required": ["name", "price"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Variation label (e.g. Small, Large, 12oz)."
+              },
+              "price": {
+                "type": "string",
+                "description": "Price for this variation."
+              }
+            }
+          }
+        },
+        "padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Padding around this item. Defaults to {top:8, bottom:8}."
+        },
+        "align": {
+          "type": "string",
+          "enum": ["left", "center", "right"],
+          "description": "Text alignment for this item. Inherits from area.item_align if omitted."
+        },
+        "hide_if_empty": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, hide this item when it has no price and no variations."
         }
       }
     }

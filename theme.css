@@ -5,10 +5,20 @@
  */
 
 :root {
-  /* Layout */
+  /* Layout (legacy) */
   --ds-background-color: #1a1a1a;
   --ds-x-spacer: 24px;
   --ds-y-spacer: 32px;
+
+  /* Viewport padding */
+  --ds-viewport-padding-top: 32px;
+  --ds-viewport-padding-right: 24px;
+  --ds-viewport-padding-bottom: 32px;
+  --ds-viewport-padding-left: 24px;
+
+  /* Container spacing */
+  --ds-container-gutter: 24px;
+  --ds-area-gap: 32px;
 
   /* Title */
   --ds-title-font-family: 'Montserrat', sans-serif;
@@ -104,23 +114,9 @@ html, body {
   display: block;
 }
 
-/* Areas container */
+/* Areas container — rendered as CSS grid by renderer.js */
 .ds-areas {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.ds-areas--cols-1 {
-  flex-direction: column;
-}
-
-.ds-areas--cols-2 {
-  flex-direction: row;
-}
-
-.ds-areas--cols-2 .ds-area {
-  flex: 0 0 calc(50% - var(--ds-x-spacer) / 2);
-  min-width: 0;
+  display: grid;
 }
 
 /* Single area */
@@ -138,10 +134,15 @@ html, body {
   margin-bottom: 12px;
 }
 
+/* Area group — nested sub-areas container */
+.ds-area-group__grid {
+  display: grid;
+}
+
 /* Item grid */
 .ds-items {
   display: grid;
-  gap: 8px;
+  gap: 0;
 }
 
 .ds-items--cols-1 { grid-template-columns: 1fr; }
@@ -150,7 +151,6 @@ html, body {
 
 /* Single item */
 .ds-item {
-  padding: 8px 0;
   border-bottom: 1px solid var(--ds-divider-color);
 }
 

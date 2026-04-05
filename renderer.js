@@ -27,14 +27,19 @@ var MenuRenderer = (function () {
     'Raleway', 'Poppins', 'Playfair Display', 'Merriweather', 'Nunito'
   ];
 
+  var MAX_NESTING_DEPTH = 4;
+
   var DEFAULTS = {
     layout: {
       resolution: '1080',
       orientation: 'landscape',
+      mode: 'display',
       background_color: '#1a1a1a',
       x_spacer: 24,
       y_spacer: 32,
-      container: { columns: 1 }
+      viewport_padding: null,
+      area_gap: null,
+      container: { columns: 1, gutter: null }
     },
     theme: {
       area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: '28px' },
@@ -66,6 +71,22 @@ var MenuRenderer = (function () {
       }
     }
     return result;
+  }
+
+  function normalizePadding(val, fallback) {
+    if (val == null && fallback != null) return normalizePadding(fallback);
+    if (val == null) return { top: 0, right: 0, bottom: 0, left: 0 };
+    if (typeof val === 'number') return { top: val, right: val, bottom: val, left: val };
+    return {
+      top: val.top || 0,
+      right: val.right || 0,
+      bottom: val.bottom || 0,
+      left: val.left || 0
+    };
+  }
+
+  function paddingCSS(p) {
+    return p.top + 'px ' + p.right + 'px ' + p.bottom + 'px ' + p.left + 'px';
   }
 
   function formatPrice(value) {
@@ -136,12 +157,27 @@ var MenuRenderer = (function () {
 
   // ── CSS Custom Properties ──────────────────────────────────────────────
 
-  function buildCSSVars(layout, theme) {
+  function buildCSSVars(layout, theme, resolvedSpacing) {
     var vars = [];
+    var vp = resolvedSpacing.viewportPadding;
+    var containerGutter = resolvedSpacing.containerGutter;
+    var areaGap = resolvedSpacing.areaGap;
 
     vars.push('--ds-background-color: ' + layout.background_color);
+
+    // Legacy spacers (backward compat)
     vars.push('--ds-x-spacer: ' + layout.x_spacer + 'px');
     vars.push('--ds-y-spacer: ' + layout.y_spacer + 'px');
+
+    // Viewport padding
+    vars.push('--ds-viewport-padding-top: ' + vp.top + 'px');
+    vars.push('--ds-viewport-padding-right: ' + vp.right + 'px');
+    vars.push('--ds-viewport-padding-bottom: ' + vp.bottom + 'px');
+    vars.push('--ds-viewport-padding-left: ' + vp.left + 'px');
+
+    // Container gutter and area gap
+    vars.push('--ds-container-gutter: ' + containerGutter + 'px');
+    vars.push('--ds-area-gap: ' + areaGap + 'px');
 
     if (layout.title && layout.title.font) {
       var tf = layout.title.font;
@@ -168,7 +204,7 @@ var MenuRenderer = (function () {
     return vars;
   }
 
-  function injectThemeStyle(vars, target) {
+  function injectThemeStyle(vars) {
     var id = 'ds-theme-overrides';
     var existing = document.getElementById(id);
     if (existing) existing.remove();
@@ -179,20 +215,47 @@ var MenuRenderer = (function () {
     document.head.appendChild(style);
   }
 
+  // ── Spacing Resolution ─────────────────────────────────────────────────
+
+  function resolveSpacing(layout) {
+    var xSp = layout.x_spacer;
+    var ySp = layout.y_spacer;
+
+    var viewportPadding;
+    if (layout.viewport_padding != null) {
+      viewportPadding = normalizePadding(layout.viewport_padding);
+    } else {
+      viewportPadding = { top: ySp, right: xSp, bottom: ySp, left: xSp };
+    }
+
+    var containerGutter = (layout.container && layout.container.gutter != null)
+      ? layout.container.gutter
+      : xSp;
+
+    var areaGap = (layout.area_gap != null) ? layout.area_gap : ySp;
+
+    return {
+      viewportPadding: viewportPadding,
+      containerGutter: containerGutter,
+      areaGap: areaGap
+    };
+  }
+
   // ── DOM Builders ───────────────────────────────────────────────────────
 
   function buildHeader(layout) {
     var header = el('div', 'ds-header');
+    var vp = resolveSpacing(layout).viewportPadding;
 
     // Logo
     if (layout.logo && layout.logo.src) {
       var logo = layout.logo;
       var logoWrap = el('div', 'ds-logo ds-logo--' + (logo.x_align || 'left'));
       logoWrap.style.top = (logo.top_padding || 20) + 'px';
-      if (logo.x_align === 'left') {
-        logoWrap.style.left = layout.x_spacer + 'px';
+      if (logo.x_align === 'right') {
+        logoWrap.style.right = vp.right + 'px';
       } else {
-        logoWrap.style.right = layout.x_spacer + 'px';
+        logoWrap.style.left = vp.left + 'px';
       }
       var img = el('img', null, {
         src: logo.src,
@@ -211,15 +274,15 @@ var MenuRenderer = (function () {
       var titleEl = el('div', 'ds-title ds-title--' + align);
       titleEl.textContent = titleCfg.text;
       titleEl.style.paddingTop = (pos.top_padding || 40) + 'px';
-      titleEl.style.paddingLeft = layout.x_spacer + 'px';
-      titleEl.style.paddingRight = layout.x_spacer + 'px';
+      titleEl.style.paddingLeft = vp.left + 'px';
+      titleEl.style.paddingRight = vp.right + 'px';
       header.appendChild(titleEl);
     }
 
     return header;
   }
 
-  function buildItem(item, theme) {
+  function buildItem(item, areaDefaults) {
     var hasPrice = item.price != null && item.price !== '';
     var hasVariations = item.variations && item.variations.length > 0;
 
@@ -227,11 +290,28 @@ var MenuRenderer = (function () {
       return null;
     }
 
+    var itemPadding = normalizePadding(
+      item.padding,
+      { top: 8, right: 0, bottom: 8, left: 0 }
+    );
+
+    var itemAlign = item.align || areaDefaults.itemAlign || 'left';
+    var priceAlign = areaDefaults.priceAlign || 'right';
+
     var wrap = el('div', 'ds-item');
+    wrap.style.padding = paddingCSS(itemPadding);
 
     var row = el('div', 'ds-item__row');
+    if (priceAlign === 'left') {
+      row.style.justifyContent = 'flex-start';
+      row.style.gap = '16px';
+    }
+
     var nameEl = el('span', 'ds-item__name');
     nameEl.textContent = item.name;
+    if (itemAlign !== 'left') {
+      nameEl.style.textAlign = itemAlign;
+    }
     row.appendChild(nameEl);
 
     if (hasPrice && !hasVariations) {
@@ -245,11 +325,19 @@ var MenuRenderer = (function () {
     if (item.description) {
       var desc = el('div', 'ds-item__description');
       desc.textContent = item.description;
+      if (itemAlign !== 'left') {
+        desc.style.textAlign = itemAlign;
+      }
       wrap.appendChild(desc);
     }
 
     if (hasVariations) {
       var varList = el('ul', 'ds-variations');
+      if (itemAlign === 'center') {
+        varList.style.justifyContent = 'center';
+      } else if (itemAlign === 'right') {
+        varList.style.justifyContent = 'flex-end';
+      }
       item.variations.forEach(function (v) {
         var li = el('li', 'ds-variation');
         var vName = el('span', 'ds-variation__name');
@@ -266,26 +354,151 @@ var MenuRenderer = (function () {
     return wrap;
   }
 
-  function buildArea(area, layout) {
+  function buildLeafArea(area, spacing) {
     var section = el('div', 'ds-area');
 
+    // Area padding
+    var areaPad = normalizePadding(area.padding, 0);
+    section.style.padding = paddingCSS(areaPad);
+
+    // Vertical alignment in parent grid
+    if (area.valign) {
+      var valignMap = { top: 'start', center: 'center', bottom: 'end' };
+      section.style.alignSelf = valignMap[area.valign] || 'start';
+    }
+
+    // Area title
     if (area.title) {
+      var titleAlign = area.align || 'left';
       var titleEl = el('h2', 'ds-area__title');
       titleEl.textContent = area.title;
+      if (titleAlign !== 'left') {
+        titleEl.style.textAlign = titleAlign;
+      }
       section.appendChild(titleEl);
     }
 
+    // Item grid
     var cols = area.column_count || 1;
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(cols, 3));
-    grid.style.columnGap = layout.x_spacer + 'px';
+    var gutter = (area.gutter != null) ? area.gutter : 8;
+    grid.style.columnGap = gutter + 'px';
+    grid.style.rowGap = '0px';
+
+    var areaDefaults = {
+      itemAlign: area.item_align || 'left',
+      priceAlign: area.price_align || 'right'
+    };
 
     (area.items || []).forEach(function (item) {
-      var node = buildItem(item);
+      var node = buildItem(item, areaDefaults);
       if (node) grid.appendChild(node);
     });
 
     section.appendChild(grid);
     return section;
+  }
+
+  function buildAreaGroup(area, spacing, depth) {
+    var section = el('div', 'ds-area ds-area-group');
+
+    // Area padding
+    var areaPad = normalizePadding(area.padding, 0);
+    section.style.padding = paddingCSS(areaPad);
+
+    // Vertical alignment in parent grid
+    if (area.valign) {
+      var valignMap = { top: 'start', center: 'center', bottom: 'end' };
+      section.style.alignSelf = valignMap[area.valign] || 'start';
+    }
+
+    // Group title (optional)
+    if (area.title) {
+      var titleAlign = area.align || 'left';
+      var titleEl = el('h2', 'ds-area__title');
+      titleEl.textContent = area.title;
+      if (titleAlign !== 'left') {
+        titleEl.style.textAlign = titleAlign;
+      }
+      section.appendChild(titleEl);
+    }
+
+    // Sub-areas grid
+    var subCols = area.columns || 1;
+    var subGutter = (area.gutter != null) ? area.gutter : spacing.containerGutter;
+    var subGap = spacing.areaGap;
+
+    var grid = el('div', 'ds-area-group__grid');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(' + subCols + ', 1fr)';
+    grid.style.columnGap = subGutter + 'px';
+    grid.style.rowGap = subGap + 'px';
+
+    (area.areas || []).forEach(function (subArea) {
+      grid.appendChild(buildArea(subArea, spacing, depth + 1));
+    });
+
+    section.appendChild(grid);
+    return section;
+  }
+
+  function buildArea(area, spacing, depth) {
+    depth = depth || 0;
+    if (depth > MAX_NESTING_DEPTH) {
+      console.warn('[MenuRenderer] Max nesting depth exceeded, skipping area:', area.id);
+      return el('div');
+    }
+
+    if (area.areas && area.areas.length > 0) {
+      return buildAreaGroup(area, spacing, depth);
+    }
+    return buildLeafArea(area, spacing);
+  }
+
+  // ── Preview Mode ───────────────────────────────────────────────────────
+
+  var resizeHandler = null;
+
+  function applyPreviewScale(viewport, baseW, baseH, resScale, target) {
+    var canvasW = baseW * resScale;
+    var canvasH = baseH * resScale;
+    var availW = target.clientWidth || window.innerWidth;
+    var availH = target.clientHeight || window.innerHeight;
+    var fitScale = Math.min(availW / canvasW, availH / canvasH);
+    viewport.style.transform = 'scale(' + fitScale + ')';
+    viewport.style.transformOrigin = 'top center';
+  }
+
+  function setupPreviewMode(viewport, layout, target) {
+    var resScale = SCALE_MAP[layout.resolution] || 1.0;
+    var isPortrait = layout.orientation === 'portrait';
+    var baseW = isPortrait ? 1080 : 1920;
+    var baseH = isPortrait ? 1920 : 1080;
+
+    target.style.display = 'flex';
+    target.style.justifyContent = 'center';
+    target.style.alignItems = 'flex-start';
+    target.style.width = '100vw';
+    target.style.height = '100vh';
+    target.style.overflow = 'hidden';
+
+    applyPreviewScale(viewport, baseW, baseH, resScale, target);
+
+    var debounceTimer;
+    resizeHandler = function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () {
+        applyPreviewScale(viewport, baseW, baseH, resScale, target);
+      }, 150);
+    };
+    window.addEventListener('resize', resizeHandler);
+  }
+
+  function cleanupPreview() {
+    if (resizeHandler) {
+      window.removeEventListener('resize', resizeHandler);
+      resizeHandler = null;
+    }
   }
 
   // ── Main Render ────────────────────────────────────────────────────────
@@ -294,43 +507,58 @@ var MenuRenderer = (function () {
     if (!target) throw new Error('MenuRenderer.render: target element is required');
     if (typeof data === 'string') data = JSON.parse(data);
 
+    cleanupPreview();
+
     var layout = merge(DEFAULTS.layout, data.layout);
     var theme = merge(DEFAULTS.theme, data.theme);
     var areas = data.areas || [];
+
+    // Resolve spacing
+    var spacing = resolveSpacing(layout);
 
     // Inject Google Fonts
     var fontMap = collectFonts(data);
     injectGoogleFonts(fontMap);
 
     // Inject CSS custom property overrides
-    var cssVars = buildCSSVars(layout, theme);
+    var cssVars = buildCSSVars(layout, theme, spacing);
     injectThemeStyle(cssVars);
 
     // Clear target
     target.innerHTML = '';
+    target.removeAttribute('style');
 
     // Viewport
     var scale = SCALE_MAP[layout.resolution] || 1.0;
     var isPortrait = layout.orientation === 'portrait';
     var viewport = el('div', 'ds-viewport' + (isPortrait ? ' ds-viewport--portrait' : ''));
-    viewport.style.transform = 'scale(' + scale + ')';
 
     // Header
     var header = buildHeader(layout);
     viewport.appendChild(header);
 
-    // Areas container
+    // Areas container — CSS grid
     var containerCols = (layout.container && layout.container.columns) || 1;
-    var areasWrap = el('div', 'ds-areas ds-areas--cols-' + containerCols);
-    areasWrap.style.padding = layout.y_spacer + 'px ' + layout.x_spacer + 'px';
-    areasWrap.style.gap = layout.y_spacer + 'px ' + layout.x_spacer + 'px';
+    var areasWrap = el('div', 'ds-areas');
+    areasWrap.style.display = 'grid';
+    areasWrap.style.gridTemplateColumns = 'repeat(' + containerCols + ', 1fr)';
+    areasWrap.style.columnGap = spacing.containerGutter + 'px';
+    areasWrap.style.rowGap = spacing.areaGap + 'px';
+    areasWrap.style.padding = paddingCSS(spacing.viewportPadding);
 
     areas.forEach(function (area) {
-      areasWrap.appendChild(buildArea(area, layout));
+      areasWrap.appendChild(buildArea(area, spacing, 0));
     });
 
     viewport.appendChild(areasWrap);
     target.appendChild(viewport);
+
+    // Apply scaling — preview or display mode
+    if (layout.mode === 'preview') {
+      setupPreviewMode(viewport, layout, target);
+    } else {
+      viewport.style.transform = 'scale(' + scale + ')';
+    }
   }
 
   // ── URL Loading ────────────────────────────────────────────────────────
@@ -355,10 +583,8 @@ var MenuRenderer = (function () {
     var interval = (intervalSeconds || 60) * 1000;
     var key = url + '::' + (target.id || Math.random());
 
-    // Clear previous watcher for this key
     if (watchTimers[key]) clearInterval(watchTimers[key]);
 
-    // Initial load
     loadFromUrl(url, target);
 
     watchTimers[key] = setInterval(function () {
@@ -381,7 +607,6 @@ var MenuRenderer = (function () {
     render: render,
     loadFromUrl: loadFromUrl,
     watch: watch,
-    /** Utility: format a price string as a dollar amount */
     formatPrice: formatPrice
   };
 

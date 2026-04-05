@@ -461,12 +461,12 @@ var MenuRenderer = (function () {
 
   var resizeHandler = null;
 
-  function applyPreviewScale(viewport, canvasW, canvasH, target) {
-    var availW = target.clientWidth || window.innerWidth;
-    var availH = target.clientHeight || window.innerHeight;
+  function applyPreviewScale(viewport, canvasW, canvasH) {
+    var availW = window.innerWidth;
+    var availH = window.innerHeight;
     var fitScale = Math.min(availW / canvasW, availH / canvasH);
     viewport.style.transform = 'scale(' + fitScale + ')';
-    viewport.style.transformOrigin = 'top center';
+    viewport.style.transformOrigin = 'top left';
   }
 
   function setupPreviewMode(viewport, layout, target) {
@@ -475,20 +475,15 @@ var MenuRenderer = (function () {
     var canvasW = isPortrait ? res.h : res.w;
     var canvasH = isPortrait ? res.w : res.h;
 
-    target.style.display = 'flex';
-    target.style.justifyContent = 'center';
-    target.style.alignItems = 'flex-start';
-    target.style.width = '100vw';
-    target.style.height = '100vh';
     target.style.overflow = 'hidden';
 
-    applyPreviewScale(viewport, canvasW, canvasH, target);
+    applyPreviewScale(viewport, canvasW, canvasH);
 
     var debounceTimer;
     resizeHandler = function () {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(function () {
-        applyPreviewScale(viewport, canvasW, canvasH, target);
+        applyPreviewScale(viewport, canvasW, canvasH);
       }, 150);
     };
     window.addEventListener('resize', resizeHandler);

@@ -278,11 +278,21 @@
         },
         "price": {
           "type": "string",
-          "description": "Single price for items without variations. Displayed as a dollar amount."
+          "description": "Base price for this item. Always displayed when present, even alongside variations. Use with variations for patterns like 'Sandwich $10' with add-on variations."
+        },
+        "show_variation_prices": {
+          "type": "boolean",
+          "default": true,
+          "description": "When false, hide individual variation prices (useful when variations are descriptive labels only)."
+        },
+        "variations_inline": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, display variations in a compact inline row instead of stacked rows."
         },
         "variations": {
           "type": "array",
-          "description": "Size or style variations with individual prices. When present, replaces the single price.",
+          "description": "Variations with individual prices, displayed as rows below the item. Can coexist with a base price for add-on pricing patterns.",
           "items": {
             "type": "object",
             "required": ["name", "price"],

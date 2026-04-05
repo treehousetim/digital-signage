@@ -403,6 +403,8 @@ var MenuEditor = (function () {
       { key: 'price', type: 'text', label: 'Price' },
       { key: 'align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
+      { key: 'variations_inline', type: 'checkbox', label: 'Variations Inline' },
+      { key: 'show_variation_prices', type: 'checkbox', label: 'Show Variation Prices', defaultChecked: true },
       { key: 'padding', type: 'padding', label: 'Padding (%)' }
     ],
     variation: [
@@ -467,7 +469,7 @@ var MenuEditor = (function () {
 
     } else if (fieldDef.type === 'checkbox') {
       var cb = el('input', 'me-field__checkbox', { type: 'checkbox' });
-      cb.checked = !!value;
+      cb.checked = (value != null) ? !!value : !!fieldDef.defaultChecked;
       cb.addEventListener('change', function () {
         store.update(fullPath, cb.checked || undefined);
       });

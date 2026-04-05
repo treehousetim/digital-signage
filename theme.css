@@ -173,29 +173,47 @@ html, body {
   margin-top: 2px;
 }
 
-/* Variations */
+/* Variations — rendered as rows with name left, price right */
 .ds-variations {
-  list-style: none;
-  margin-top: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
+  margin-top: 0.15em;
 }
 
 .ds-variation {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1em;
   font-family: var(--ds-variation-font-family);
   font-weight: var(--ds-variation-font-weight);
   color: var(--ds-variation-font-color);
   font-size: var(--ds-variation-font-size);
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 .ds-variation__name {
-  margin-right: 4px;
+  flex: 1;
 }
 
 .ds-variation__price {
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Inline variation mode — compact horizontal layout */
+.ds-variations--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1em 1em;
+}
+
+.ds-variations--inline .ds-variation {
+  flex: 0 0 auto;
+}
+
+.ds-variations--inline .ds-variation__name {
+  flex: none;
+  margin-right: 0.3em;
 }
 
 /* Highlight — used by editor hover-to-preview */

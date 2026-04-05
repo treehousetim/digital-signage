@@ -354,7 +354,8 @@ var MenuRenderer = (function () {
     }
     row.appendChild(nameEl);
 
-    if (hasPrice && !hasVariations) {
+    // Show base price if present (even when variations exist)
+    if (hasPrice) {
       var priceEl = el('span', 'ds-item__price');
       priceEl.textContent = formatPrice(item.price);
       row.appendChild(priceEl);
@@ -371,22 +372,23 @@ var MenuRenderer = (function () {
       wrap.appendChild(desc);
     }
 
+    // Variations
     if (hasVariations) {
-      var varList = el('ul', 'ds-variations');
-      if (itemAlign === 'center') {
-        varList.style.justifyContent = 'center';
-      } else if (itemAlign === 'right') {
-        varList.style.justifyContent = 'flex-end';
-      }
+      var showPrices = item.show_variation_prices !== false;
+      var inline = item.variations_inline === true;
+      var varList = el('div', 'ds-variations' + (inline ? ' ds-variations--inline' : ''));
       item.variations.forEach(function (v) {
-        var li = el('li', 'ds-variation');
+        var vRow = el('div', 'ds-variation');
+        if (v.id) vRow.setAttribute('data-ds-id', v.id);
         var vName = el('span', 'ds-variation__name');
         vName.textContent = v.name;
-        var vPrice = el('span', 'ds-variation__price');
-        vPrice.textContent = formatPrice(v.price);
-        li.appendChild(vName);
-        li.appendChild(vPrice);
-        varList.appendChild(li);
+        vRow.appendChild(vName);
+        if (showPrices) {
+          var vPrice = el('span', 'ds-variation__price');
+          vPrice.textContent = formatPrice(v.price);
+          vRow.appendChild(vPrice);
+        }
+        varList.appendChild(vRow);
       });
       wrap.appendChild(varList);
     }
@@ -673,7 +675,8 @@ var MenuRenderer = (function () {
   ];
   var KNOWN_ITEM_KEYS = [
     'id', 'name', 'description', 'price', 'variations',
-    'padding', 'align', 'hide_if_empty'
+    'padding', 'align', 'hide_if_empty',
+    'show_variation_prices', 'variations_inline'
   ];
 
   function validate(data) {

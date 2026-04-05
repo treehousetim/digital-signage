@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Signage Menu Renderer</title>
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+  <div id="display"></div>
+
+  <script src="renderer.js"></script>
+  <script>
+    (function () {
+      var target = document.getElementById('display');
+      var params = new URLSearchParams(window.location.search);
+      var menuUrl = params.get('menu') || 'examples/coffee.json';
+      var preview = params.has('preview');
+
+      MenuRenderer.loadFromUrl(menuUrl, target).catch(function (err) {
+        target.innerHTML = '<p style="color:red;padding:40px;font-family:sans-serif;">Error loading menu: ' + err.message + '</p>';
+      });
+
+      // Dev toolbar — only shown with ?preview or ?preview=true
+      if (preview) {
+        var toolbar = document.createElement('div');
+        toolbar.className = 'ds-toolbar';
+        toolbar.innerHTML =
+          '<span class="ds-toolbar__title">Dev Tools</span>' +
+          '<label>Resolution ' +
+            '<select id="ds-res">' +
+              '<option value="1080">1080p</option>' +
+              '<option value="2k">2K</option>' +
+              '<option value="4k">4K</option>' +
+            '</select>' +
+          '</label>' +
+          '<label>JSON ' +
+            '<input type="file" id="ds-file" accept=".json">' +
+          '</label>' +
+          '<label>Example ' +
+            '<select id="ds-example">' +
+              '<option value="">— pick —</option>' +
+              '<option value="examples/coffee.json">Coffee Shop</option>' +
+              '<option value="examples/minimal.json">Minimal</option>' +
+            '</select>' +
+          '</label>';
+        document.body.appendChild(toolbar);
+
+        var currentData = null;
+
+        // Re-render helper that patches resolution and renders
+        function rerender(data) {
+          currentData = data;
+          var res = document.getElementById('ds-res').value;
+          data.layout = data.layout || {};
+          data.layout.resolution = res;
+          MenuRenderer.render(data, target);
+        }
+
+        // Keep a copy of last-loaded data for resolution switching
+        var origLoad = MenuRenderer.loadFromUrl;
+        MenuRenderer.loadFromUrl = function (url, t) {
+          return origLoad(url, t).then(function (data) {
+            currentData = JSON.parse(JSON.stringify(data));
+            return data;
+          });
+        };
+
+        document.getElementById('ds-res').addEventListener('change', function () {
+          if (currentData) rerender(JSON.parse(JSON.stringify(currentData)));
+        });
+
+        document.getElementById('ds-file').addEventListener('change', function (e) {
+          var file = e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var data = JSON.parse(reader.result);
+              rerender(data);
+            } catch (err) {
+              alert('Invalid JSON: ' + err.message);
+            }
+          };
+          reader.readAsText(file);
+        });
+
+        document.getElementById('ds-example').addEventListener('change', function () {
+          var url = this.value;
+          if (url) MenuRenderer.loadFromUrl(url, target);
+        });
+
+        // Load initial and capture data
+        MenuRenderer.loadFromUrl(menuUrl, target);
+      }
+    })();
+  </script>
+</body>
+</html>

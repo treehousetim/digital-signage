@@ -1,0 +1,25 @@
+{
+  "areas": [
+    {
+      "id": "menu",
+      "title": "Menu",
+      "items": [
+        {
+          "id": "item-1",
+          "name": "Coffee",
+          "price": "3.00"
+        },
+        {
+          "id": "item-2",
+          "name": "Tea",
+          "price": "2.50"
+        },
+        {
+          "id": "item-3",
+          "name": "Water",
+          "price": "1.00"
+        }
+      ]
+    }
+  ]
+}

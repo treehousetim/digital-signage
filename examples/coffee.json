@@ -1,0 +1,226 @@
+{
+  "layout": {
+    "resolution": "1080",
+    "orientation": "landscape",
+    "background_color": "#1a1a1a",
+    "x_spacer": 24,
+    "y_spacer": 32,
+    "container": {
+      "columns": 2
+    },
+    "title": {
+      "text": "Coffee",
+      "font": {
+        "family": "Montserrat",
+        "weight": "700",
+        "color": "#ffffff",
+        "size": "48px"
+      },
+      "position": {
+        "x_align": "center",
+        "top_padding": 40
+      }
+    }
+  },
+  "theme": {
+    "area_title_font": {
+      "family": "Montserrat",
+      "weight": "600",
+      "color": "#f0c040",
+      "size": "28px"
+    },
+    "item_name_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#ffffff",
+      "size": "22px"
+    },
+    "item_price_font": {
+      "family": "Lato",
+      "weight": "700",
+      "color": "#ffffff",
+      "size": "22px"
+    },
+    "variation_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#cccccc",
+      "size": "16px"
+    },
+    "divider_color": "#444444",
+    "area_background": "transparent"
+  },
+  "areas": [
+    {
+      "id": "hot-drinks",
+      "title": "Hot Drinks",
+      "column_count": 2,
+      "items": [
+        {
+          "id": "latte",
+          "name": "Latte",
+          "description": "Espresso with steamed milk",
+          "variations": [
+            { "name": "Small", "price": "4.50" },
+            { "name": "Large", "price": "5.50" }
+          ]
+        },
+        {
+          "id": "cappuccino",
+          "name": "Cappuccino",
+          "description": "Equal parts espresso, steamed milk, and foam",
+          "variations": [
+            { "name": "Small", "price": "4.50" },
+            { "name": "Large", "price": "5.50" }
+          ]
+        },
+        {
+          "id": "americano",
+          "name": "Americano",
+          "description": "Espresso with hot water",
+          "variations": [
+            { "name": "Small", "price": "3.50" },
+            { "name": "Large", "price": "4.50" }
+          ]
+        },
+        {
+          "id": "flat-white",
+          "name": "Flat White",
+          "description": "Double ristretto with velvety steamed milk",
+          "price": "5.00"
+        },
+        {
+          "id": "mocha",
+          "name": "Mocha",
+          "description": "Espresso, chocolate, and steamed milk",
+          "variations": [
+            { "name": "Small", "price": "5.00" },
+            { "name": "Large", "price": "6.00" }
+          ]
+        },
+        {
+          "id": "drip-coffee",
+          "name": "Drip Coffee",
+          "description": "House blend, freshly brewed",
+          "variations": [
+            { "name": "Small", "price": "2.50" },
+            { "name": "Large", "price": "3.50" }
+          ]
+        },
+        {
+          "id": "espresso",
+          "name": "Espresso",
+          "description": "Single or double shot",
+          "variations": [
+            { "name": "Single", "price": "2.50" },
+            { "name": "Double", "price": "3.50" }
+          ]
+        },
+        {
+          "id": "hot-chocolate",
+          "name": "Hot Chocolate",
+          "description": "Rich cocoa with steamed milk and whipped cream",
+          "price": "4.50"
+        }
+      ]
+    },
+    {
+      "id": "cold-drinks",
+      "title": "Cold Drinks",
+      "column_count": 2,
+      "items": [
+        {
+          "id": "iced-latte",
+          "name": "Iced Latte",
+          "description": "Espresso over ice with cold milk",
+          "variations": [
+            { "name": "Small", "price": "5.00" },
+            { "name": "Large", "price": "6.00" }
+          ]
+        },
+        {
+          "id": "cold-brew",
+          "name": "Cold Brew",
+          "description": "Slow-steeped for 18 hours",
+          "variations": [
+            { "name": "Small", "price": "4.50" },
+            { "name": "Large", "price": "5.50" }
+          ]
+        },
+        {
+          "id": "iced-americano",
+          "name": "Iced Americano",
+          "description": "Espresso and cold water over ice",
+          "variations": [
+            { "name": "Small", "price": "3.50" },
+            { "name": "Large", "price": "4.50" }
+          ]
+        },
+        {
+          "id": "iced-mocha",
+          "name": "Iced Mocha",
+          "description": "Espresso, chocolate, milk, and ice",
+          "variations": [
+            { "name": "Small", "price": "5.50" },
+            { "name": "Large", "price": "6.50" }
+          ]
+        },
+        {
+          "id": "lemonade",
+          "name": "Fresh Lemonade",
+          "description": "House-squeezed with a hint of mint",
+          "price": "3.50"
+        },
+        {
+          "id": "iced-tea",
+          "name": "Iced Tea",
+          "description": "Black or green, unsweetened",
+          "price": "3.00"
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "title": "Food",
+      "column_count": 2,
+      "items": [
+        {
+          "id": "croissant",
+          "name": "Butter Croissant",
+          "description": "Flaky, golden, baked fresh daily",
+          "price": "3.50"
+        },
+        {
+          "id": "almond-croissant",
+          "name": "Almond Croissant",
+          "description": "Filled with almond cream and toasted almonds",
+          "price": "4.50"
+        },
+        {
+          "id": "avocado-toast",
+          "name": "Avocado Toast",
+          "description": "Sourdough, smashed avocado, chili flakes, sea salt",
+          "price": "8.50"
+        },
+        {
+          "id": "bagel",
+          "name": "Bagel with Cream Cheese",
+          "description": "Choice of plain, everything, or sesame",
+          "price": "4.00"
+        },
+        {
+          "id": "banana-bread",
+          "name": "Banana Bread",
+          "description": "Moist, walnut-studded, house-made",
+          "price": "3.50"
+        },
+        {
+          "id": "breakfast-sandwich",
+          "name": "Breakfast Sandwich",
+          "description": "Egg, cheddar, and bacon on a brioche bun",
+          "price": "7.50"
+        }
+      ]
+    }
+  ]
+}

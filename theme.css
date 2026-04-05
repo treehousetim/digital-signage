@@ -1,0 +1,258 @@
+/* Digital Signage Menu Renderer — Theme CSS
+ * All visual properties are driven by CSS custom properties.
+ * The renderer injects overrides from the JSON theme object at runtime.
+ * To customize without JSON, override these variables in your own stylesheet.
+ */
+
+:root {
+  /* Layout */
+  --ds-background-color: #1a1a1a;
+  --ds-x-spacer: 24px;
+  --ds-y-spacer: 32px;
+
+  /* Title */
+  --ds-title-font-family: 'Montserrat', sans-serif;
+  --ds-title-font-weight: 700;
+  --ds-title-font-color: #ffffff;
+  --ds-title-font-size: 48px;
+
+  /* Area titles */
+  --ds-area-title-font-family: 'Montserrat', sans-serif;
+  --ds-area-title-font-weight: 600;
+  --ds-area-title-font-color: #f0c040;
+  --ds-area-title-font-size: 28px;
+
+  /* Item names */
+  --ds-item-name-font-family: 'Lato', sans-serif;
+  --ds-item-name-font-weight: 400;
+  --ds-item-name-font-color: #ffffff;
+  --ds-item-name-font-size: 22px;
+
+  /* Item prices */
+  --ds-item-price-font-family: 'Lato', sans-serif;
+  --ds-item-price-font-weight: 700;
+  --ds-item-price-font-color: #ffffff;
+  --ds-item-price-font-size: 22px;
+
+  /* Variations */
+  --ds-variation-font-family: 'Lato', sans-serif;
+  --ds-variation-font-weight: 400;
+  --ds-variation-font-color: #cccccc;
+  --ds-variation-font-size: 16px;
+
+  /* Dividers and backgrounds */
+  --ds-divider-color: #444444;
+  --ds-area-background: transparent;
+}
+
+/* Reset */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Scaling container */
+.ds-viewport {
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--ds-background-color);
+}
+
+.ds-viewport--portrait {
+  width: 1080px;
+  height: 1920px;
+}
+
+/* Header area: title + logo */
+.ds-header {
+  position: relative;
+  width: 100%;
+}
+
+.ds-title {
+  font-family: var(--ds-title-font-family);
+  font-weight: var(--ds-title-font-weight);
+  color: var(--ds-title-font-color);
+  font-size: var(--ds-title-font-size);
+  line-height: 1.2;
+}
+
+.ds-title--left   { text-align: left; }
+.ds-title--center { text-align: center; }
+.ds-title--right  { text-align: right; }
+
+.ds-logo {
+  position: absolute;
+  top: 0;
+}
+
+.ds-logo--left  { left: 0; }
+.ds-logo--right { right: 0; }
+
+.ds-logo img {
+  display: block;
+}
+
+/* Areas container */
+.ds-areas {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ds-areas--cols-1 {
+  flex-direction: column;
+}
+
+.ds-areas--cols-2 {
+  flex-direction: row;
+}
+
+.ds-areas--cols-2 .ds-area {
+  flex: 0 0 calc(50% - var(--ds-x-spacer) / 2);
+  min-width: 0;
+}
+
+/* Single area */
+.ds-area {
+  background: var(--ds-area-background);
+  border-radius: 4px;
+}
+
+.ds-area__title {
+  font-family: var(--ds-area-title-font-family);
+  font-weight: var(--ds-area-title-font-weight);
+  color: var(--ds-area-title-font-color);
+  font-size: var(--ds-area-title-font-size);
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+/* Item grid */
+.ds-items {
+  display: grid;
+  gap: 8px;
+}
+
+.ds-items--cols-1 { grid-template-columns: 1fr; }
+.ds-items--cols-2 { grid-template-columns: 1fr 1fr; }
+.ds-items--cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+/* Single item */
+.ds-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ds-divider-color);
+}
+
+.ds-item:last-child {
+  border-bottom: none;
+}
+
+.ds-item__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.ds-item__name {
+  font-family: var(--ds-item-name-font-family);
+  font-weight: var(--ds-item-name-font-weight);
+  color: var(--ds-item-name-font-color);
+  font-size: var(--ds-item-name-font-size);
+  line-height: 1.3;
+}
+
+.ds-item__price {
+  font-family: var(--ds-item-price-font-family);
+  font-weight: var(--ds-item-price-font-weight);
+  color: var(--ds-item-price-font-color);
+  font-size: var(--ds-item-price-font-size);
+  line-height: 1.3;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ds-item__description {
+  font-family: var(--ds-variation-font-family);
+  font-weight: var(--ds-variation-font-weight);
+  color: var(--ds-variation-font-color);
+  font-size: var(--ds-variation-font-size);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Variations */
+.ds-variations {
+  list-style: none;
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.ds-variation {
+  font-family: var(--ds-variation-font-family);
+  font-weight: var(--ds-variation-font-weight);
+  color: var(--ds-variation-font-color);
+  font-size: var(--ds-variation-font-size);
+  line-height: 1.4;
+}
+
+.ds-variation__name {
+  margin-right: 4px;
+}
+
+.ds-variation__price {
+  font-weight: 600;
+}
+
+/* Dev toolbar */
+.ds-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.85);
+  color: #ccc;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  z-index: 10000;
+  border-top: 1px solid #333;
+}
+
+.ds-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ds-toolbar select,
+.ds-toolbar input[type="file"] {
+  background: #222;
+  color: #eee;
+  border: 1px solid #555;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.ds-toolbar__title {
+  font-weight: 600;
+  color: #fff;
+  margin-right: 8px;
+}

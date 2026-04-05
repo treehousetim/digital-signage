@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/treehousetim/digital-signage/schema.json",
+  "title": "Digital Signage Menu Definition",
+  "description": "JSON schema for the digital signage menu templating engine. Defines layout, theming, and menu content for full-screen display rendering.",
+  "type": "object",
+  "required": ["areas"],
+  "properties": {
+    "layout": {
+      "type": "object",
+      "description": "Controls the overall screen layout, resolution scaling, title, and logo placement.",
+      "properties": {
+        "resolution": {
+          "type": "string",
+          "enum": ["1080", "2k", "4k"],
+          "default": "1080",
+          "description": "Display resolution. Content is authored at 1920x1080 and scaled: 1080=1.0x, 2k=1.5x, 4k=2.0x."
+        },
+        "orientation": {
+          "type": "string",
+          "enum": ["landscape", "portrait"],
+          "default": "landscape",
+          "description": "Screen orientation. Landscape is 1920x1080 base, portrait is 1080x1920 base."
+        },
+        "background_color": {
+          "type": "string",
+          "default": "#1a1a1a",
+          "description": "CSS color value for the full-screen background."
+        },
+        "x_spacer": {
+          "type": "number",
+          "default": 24,
+          "description": "Horizontal spacing in pixels between elements (at native 1080p scale)."
+        },
+        "y_spacer": {
+          "type": "number",
+          "default": 32,
+          "description": "Vertical spacing in pixels between elements (at native 1080p scale)."
+        },
+        "container": {
+          "type": "object",
+          "description": "Controls how areas are arranged on screen.",
+          "properties": {
+            "columns": {
+              "type": "integer",
+              "enum": [1, 2],
+              "default": 1,
+              "description": "Number of columns for area layout. 1 = vertical stack, 2 = side by side."
+            }
+          }
+        },
+        "title": {
+          "type": "object",
+          "description": "The main title displayed at the top of the screen.",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The title text to display."
+            },
+            "font": { "$ref": "#/$defs/font" },
+            "position": {
+              "type": "object",
+              "properties": {
+                "x_align": {
+                  "type": "string",
+                  "enum": ["left", "center", "right"],
+                  "default": "center",
+                  "description": "Horizontal alignment of the title."
+                },
+                "top_padding": {
+                  "type": "number",
+                  "default": 40,
+                  "description": "Pixel offset from the top edge of the screen."
+                }
+              }
+            }
+          }
+        },
+        "logo": {
+          "type": "object",
+          "description": "An optional logo image displayed in a top corner.",
+          "properties": {
+            "src": {
+              "type": "string",
+              "description": "Path or URL to the logo image."
+            },
+            "x_align": {
+              "type": "string",
+              "enum": ["left", "right"],
+              "default": "left",
+              "description": "Which corner the logo appears in."
+            },
+            "top_padding": {
+              "type": "number",
+              "default": 20,
+              "description": "Pixel offset from the top edge."
+            },
+            "max_height": {
+              "type": "number",
+              "default": 80,
+              "description": "Maximum height of the logo in pixels."
+            }
+          }
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "description": "Font and color definitions applied globally via CSS custom properties. All values can be overridden at runtime.",
+      "properties": {
+        "area_title_font": { "$ref": "#/$defs/font" },
+        "item_name_font": { "$ref": "#/$defs/font" },
+        "item_price_font": { "$ref": "#/$defs/font" },
+        "variation_font": { "$ref": "#/$defs/font" },
+        "divider_color": {
+          "type": "string",
+          "default": "#444444",
+          "description": "CSS color for dividers between items."
+        },
+        "area_background": {
+          "type": "string",
+          "default": "transparent",
+          "description": "CSS color for the background of each area block."
+        }
+      }
+    },
+    "areas": {
+      "type": "array",
+      "description": "The menu areas (sections) containing items to display.",
+      "items": {
+        "type": "object",
+        "required": ["id", "items"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this area."
+          },
+          "title": {
+            "type": "string",
+            "description": "Display title for this section. Optional — omit for untitled groups."
+          },
+          "column_count": {
+            "type": "integer",
+            "default": 1,
+            "description": "Number of columns for the item grid within this area."
+          },
+          "items": {
+            "type": "array",
+            "description": "Menu items in this area.",
+            "items": {
+              "type": "object",
+              "required": ["id", "name"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for this item."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display name of the menu item."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Optional short description shown below the item name."
+                },
+                "price": {
+                  "type": "string",
+                  "description": "Single price for items without variations. Displayed as a dollar amount."
+                },
+                "variations": {
+                  "type": "array",
+                  "description": "Size or style variations with individual prices. When present, replaces the single price.",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "price"],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Variation label (e.g. Small, Large, 12oz)."
+                      },
+                      "price": {
+                        "type": "string",
+                        "description": "Price for this variation."
+                      }
+                    }
+                  }
+                },
+                "hide_if_empty": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "If true, hide this item when it has no price and no variations."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "font": {
+      "type": "object",
+      "description": "Font definition with family, weight, color, and size.",
+      "properties": {
+        "family": {
+          "type": "string",
+          "default": "Lato",
+          "description": "CSS font-family name. Google Fonts (Montserrat, Lato, Roboto, Open Sans, Oswald) are auto-loaded."
+        },
+        "weight": {
+          "type": "string",
+          "default": "400",
+          "description": "CSS font-weight value."
+        },
+        "color": {
+          "type": "string",
+          "default": "#ffffff",
+          "description": "CSS color value."
+        },
+        "size": {
+          "type": "string",
+          "default": "22px",
+          "description": "CSS font-size value."
+        }
+      }
+    }
+  }
+}

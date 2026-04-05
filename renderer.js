@@ -338,6 +338,7 @@ var MenuRenderer = (function () {
     var priceAlign = areaDefaults.priceAlign || 'right';
 
     var wrap = el('div', 'ds-item');
+    if (item.id) wrap.setAttribute('data-ds-id', item.id);
     wrap.style.padding = paddingCSS(itemPadding);
 
     var row = el('div', 'ds-item__row');
@@ -395,7 +396,10 @@ var MenuRenderer = (function () {
 
   function buildLeafArea(area, spacing, vpW, vpH) {
     var section = el('div', 'ds-area');
-    if (area.id) section.setAttribute('data-area-id', area.id);
+    if (area.id) {
+      section.setAttribute('data-area-id', area.id);
+      section.setAttribute('data-ds-id', area.id);
+    }
 
     // Area padding
     var rawPad = normalizePadding(area.padding, 0);
@@ -442,7 +446,10 @@ var MenuRenderer = (function () {
 
   function buildAreaGroup(area, spacing, depth, vpW, vpH) {
     var section = el('div', 'ds-area ds-area-group');
-    if (area.id) section.setAttribute('data-area-id', area.id);
+    if (area.id) {
+      section.setAttribute('data-area-id', area.id);
+      section.setAttribute('data-ds-id', area.id);
+    }
 
     // Area padding
     var rawPad = normalizePadding(area.padding, 0);

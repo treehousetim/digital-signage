@@ -198,6 +198,13 @@ html, body {
   font-weight: 600;
 }
 
+/* Highlight — used by editor hover-to-preview */
+.ds-highlight {
+  outline: 3px solid rgba(66, 165, 245, 0.8) !important;
+  outline-offset: 2px;
+  background: rgba(66, 165, 245, 0.08) !important;
+}
+
 /* Dev toolbar */
 .ds-toolbar {
   position: fixed;

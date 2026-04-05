@@ -1008,7 +1008,9 @@ var MenuEditor = (function () {
       });
     }
 
-    store.on('change', refresh);
+    // Only rebuild inspector on selection change (not on every data change,
+    // which would destroy the focused input while the user is typing).
+    // Undo/redo emit 'select' too, so restored values are picked up.
     store.on('select', refresh);
     refresh();
   }

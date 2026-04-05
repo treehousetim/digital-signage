@@ -1,0 +1,109 @@
+{
+  "layout": {
+    "resolution": "1080",
+    "orientation": "portrait",
+    "background_color": "#faf3eb",
+    "viewport_padding": { "top": 24, "right": 36, "bottom": 24, "left": 36 },
+    "area_gap": 28,
+    "container": {
+      "columns": 1
+    },
+    "title": {
+      "text": "Sunrise Bakery",
+      "font": {
+        "family": "Playfair Display",
+        "weight": "700",
+        "color": "#3d2b1f",
+        "size": "56px"
+      },
+      "position": {
+        "x_align": "center",
+        "top_padding": 36
+      }
+    }
+  },
+  "theme": {
+    "area_title_font": {
+      "family": "Playfair Display",
+      "weight": "600",
+      "color": "#8b5e3c",
+      "size": "30px"
+    },
+    "item_name_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#3d2b1f",
+      "size": "22px"
+    },
+    "item_price_font": {
+      "family": "Lato",
+      "weight": "700",
+      "color": "#3d2b1f",
+      "size": "22px"
+    },
+    "variation_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#7a6455",
+      "size": "16px"
+    },
+    "divider_color": "#d9cec3",
+    "area_background": "transparent"
+  },
+  "areas": [
+    {
+      "id": "breads",
+      "title": "Fresh Breads",
+      "column_count": 2,
+      "gutter": 32,
+      "items": [
+        { "id": "sourdough", "name": "Sourdough Loaf", "description": "24-hour ferment, stone-baked", "price": "8.50" },
+        { "id": "baguette", "name": "French Baguette", "description": "Crispy crust, soft crumb", "price": "5.00" },
+        { "id": "ciabatta", "name": "Ciabatta", "description": "Italian olive oil bread", "price": "6.00" },
+        { "id": "rye", "name": "Dark Rye", "description": "Caraway seed, molasses", "price": "7.50" },
+        { "id": "brioche", "name": "Brioche Loaf", "description": "Buttery, golden pull-apart", "price": "9.00" },
+        { "id": "focaccia", "name": "Rosemary Focaccia", "description": "Sea salt, olive oil, herbs", "price": "7.00" }
+      ]
+    },
+    {
+      "id": "pastries",
+      "title": "Pastries",
+      "column_count": 2,
+      "gutter": 32,
+      "items": [
+        { "id": "croissant", "name": "Butter Croissant", "price": "4.00" },
+        { "id": "pain-choc", "name": "Pain au Chocolat", "price": "4.50" },
+        { "id": "almond-crois", "name": "Almond Croissant", "price": "5.00" },
+        { "id": "danish", "name": "Fruit Danish", "description": "Seasonal fruit, cream cheese", "price": "4.50" },
+        { "id": "cinnamon-roll", "name": "Cinnamon Roll", "description": "Cream cheese glaze", "price": "5.00" },
+        { "id": "scone", "name": "Scone", "description": "Blueberry or cranberry-orange", "price": "3.50" }
+      ]
+    },
+    {
+      "id": "cakes",
+      "title": "Cakes & Tarts",
+      "column_count": 2,
+      "gutter": 32,
+      "items": [
+        { "id": "carrot-cake", "name": "Carrot Cake", "description": "Cream cheese frosting, walnuts", "variations": [{ "id": "var-1", "name": "Slice", "price": "6.00" }, { "id": "var-2", "name": "Whole", "price": "38.00" }] },
+        { "id": "choc-torte", "name": "Chocolate Torte", "description": "Flourless, raspberry coulis", "variations": [{ "id": "var-3", "name": "Slice", "price": "7.00" }, { "id": "var-4", "name": "Whole", "price": "42.00" }] },
+        { "id": "lemon-tart", "name": "Lemon Tart", "description": "Bruleed meringue top", "price": "6.50" },
+        { "id": "fruit-tart", "name": "Seasonal Fruit Tart", "description": "Pastry cream, fresh fruit", "price": "6.50" }
+      ]
+    },
+    {
+      "id": "drinks",
+      "title": "Drinks",
+      "column_count": 3,
+      "gutter": 24,
+      "items": [
+        { "id": "drip", "name": "Coffee", "price": "3.50" },
+        { "id": "latte", "name": "Latte", "price": "5.00" },
+        { "id": "tea", "name": "Tea", "price": "3.00" },
+        { "id": "hot-choc", "name": "Hot Chocolate", "price": "4.50" },
+        { "id": "juice", "name": "Fresh OJ", "price": "5.00" },
+        { "id": "water", "name": "Sparkling Water", "price": "2.50" }
+      ]
+    }
+  ]
+}

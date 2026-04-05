@@ -16,10 +16,10 @@ var MenuRenderer = (function () {
 
   // ── Constants ──────────────────────────────────────────────────────────
 
-  var SCALE_MAP = {
-    '1080': 1.0,
-    '2k': 1.5,
-    '4k': 2.0
+  var RESOLUTION_MAP = {
+    '1080': { w: 1920, h: 1080 },
+    '2k':   { w: 2560, h: 1440 },
+    '4k':   { w: 3840, h: 2160 }
   };
 
   var GOOGLE_FONTS = [
@@ -31,7 +31,7 @@ var MenuRenderer = (function () {
 
   var DEFAULTS = {
     layout: {
-      resolution: '1080',
+      resolution: '4k',
       orientation: 'landscape',
       mode: 'display',
       background_color: '#1a1a1a',
@@ -461,9 +461,7 @@ var MenuRenderer = (function () {
 
   var resizeHandler = null;
 
-  function applyPreviewScale(viewport, baseW, baseH, resScale, target) {
-    var canvasW = baseW * resScale;
-    var canvasH = baseH * resScale;
+  function applyPreviewScale(viewport, canvasW, canvasH, target) {
     var availW = target.clientWidth || window.innerWidth;
     var availH = target.clientHeight || window.innerHeight;
     var fitScale = Math.min(availW / canvasW, availH / canvasH);
@@ -472,10 +470,10 @@ var MenuRenderer = (function () {
   }
 
   function setupPreviewMode(viewport, layout, target) {
-    var resScale = SCALE_MAP[layout.resolution] || 1.0;
+    var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];
     var isPortrait = layout.orientation === 'portrait';
-    var baseW = isPortrait ? 1080 : 1920;
-    var baseH = isPortrait ? 1920 : 1080;
+    var canvasW = isPortrait ? res.h : res.w;
+    var canvasH = isPortrait ? res.w : res.h;
 
     target.style.display = 'flex';
     target.style.justifyContent = 'center';
@@ -484,13 +482,13 @@ var MenuRenderer = (function () {
     target.style.height = '100vh';
     target.style.overflow = 'hidden';
 
-    applyPreviewScale(viewport, baseW, baseH, resScale, target);
+    applyPreviewScale(viewport, canvasW, canvasH, target);
 
     var debounceTimer;
     resizeHandler = function () {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(function () {
-        applyPreviewScale(viewport, baseW, baseH, resScale, target);
+        applyPreviewScale(viewport, canvasW, canvasH, target);
       }, 150);
     };
     window.addEventListener('resize', resizeHandler);
@@ -530,10 +528,14 @@ var MenuRenderer = (function () {
     target.innerHTML = '';
     target.removeAttribute('style');
 
-    // Viewport
-    var scale = SCALE_MAP[layout.resolution] || 1.0;
+    // Viewport — resolution sets the container pixel size directly
+    var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];
     var isPortrait = layout.orientation === 'portrait';
-    var viewport = el('div', 'ds-viewport' + (isPortrait ? ' ds-viewport--portrait' : ''));
+    var vpW = isPortrait ? res.h : res.w;
+    var vpH = isPortrait ? res.w : res.h;
+    var viewport = el('div', 'ds-viewport');
+    viewport.style.width = vpW + 'px';
+    viewport.style.height = vpH + 'px';
 
     // Header
     var header = buildHeader(layout);
@@ -555,11 +557,9 @@ var MenuRenderer = (function () {
     viewport.appendChild(areasWrap);
     target.appendChild(viewport);
 
-    // Apply scaling — preview or display mode
+    // Apply scaling — preview mode fits to browser viewport
     if (layout.mode === 'preview') {
       setupPreviewMode(viewport, layout, target);
-    } else {
-      viewport.style.transform = 'scale(' + scale + ')';
     }
   }
 

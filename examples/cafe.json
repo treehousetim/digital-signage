@@ -1,0 +1,118 @@
+{
+  "layout": {
+    "resolution": "1080",
+    "orientation": "landscape",
+    "background_color": "#2c1810",
+    "viewport_padding": { "top": 20, "right": 40, "bottom": 20, "left": 40 },
+    "area_gap": 20,
+    "container": {
+      "columns": 2,
+      "gutter": 48
+    },
+    "title": {
+      "text": "The Corner Cafe",
+      "font": {
+        "family": "Playfair Display",
+        "weight": "700",
+        "color": "#f5e6d3",
+        "size": "52px"
+      },
+      "position": {
+        "x_align": "center",
+        "top_padding": 28
+      }
+    }
+  },
+  "theme": {
+    "area_title_font": {
+      "family": "Playfair Display",
+      "weight": "600",
+      "color": "#d4a574",
+      "size": "26px"
+    },
+    "item_name_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#f5e6d3",
+      "size": "20px"
+    },
+    "item_price_font": {
+      "family": "Lato",
+      "weight": "700",
+      "color": "#f5e6d3",
+      "size": "20px"
+    },
+    "variation_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#c4a882",
+      "size": "15px"
+    },
+    "divider_color": "#4a3528",
+    "area_background": "transparent"
+  },
+  "areas": [
+    {
+      "id": "breakfast-column",
+      "columns": 1,
+      "areas": [
+        {
+          "id": "breakfast",
+          "title": "Breakfast",
+          "column_count": 1,
+          "items": [
+            { "id": "eggs-benny", "name": "Eggs Benedict", "description": "Poached eggs, hollandaise, brioche", "price": "14.50" },
+            { "id": "avocado-toast", "name": "Avocado Toast", "description": "Sourdough, feta, chili oil, radish", "price": "12.00" },
+            { "id": "french-toast", "name": "French Toast", "description": "Brioche, berries, maple cream", "price": "13.00" },
+            { "id": "omelette", "name": "Garden Omelette", "description": "Free-range eggs, seasonal vegetables, gruyere", "price": "13.50" },
+            { "id": "granola-bowl", "name": "Granola Bowl", "description": "House granola, Greek yogurt, honey, fruit", "price": "10.00" },
+            { "id": "full-breakfast", "name": "Full Breakfast", "description": "Two eggs, bacon, toast, hash, tomato", "price": "16.00" }
+          ]
+        },
+        {
+          "id": "sides",
+          "title": "Sides",
+          "column_count": 2,
+          "gutter": 24,
+          "items": [
+            { "id": "toast", "name": "Sourdough Toast", "price": "4.00" },
+            { "id": "bacon", "name": "Bacon (3 strips)", "price": "5.00" },
+            { "id": "fruit", "name": "Seasonal Fruit", "price": "6.00" },
+            { "id": "hash", "name": "Crispy Hash Browns", "price": "5.00" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drinks-column",
+      "columns": 1,
+      "areas": [
+        {
+          "id": "coffee",
+          "title": "Coffee & Espresso",
+          "column_count": 1,
+          "items": [
+            { "id": "drip", "name": "Drip Coffee", "variations": [{ "id": "var-1", "name": "Sm", "price": "3.00" }, { "id": "var-2", "name": "Lg", "price": "4.00" }] },
+            { "id": "latte", "name": "Latte", "variations": [{ "id": "var-3", "name": "Sm", "price": "4.50" }, { "id": "var-4", "name": "Lg", "price": "5.50" }] },
+            { "id": "cappuccino", "name": "Cappuccino", "price": "4.50" },
+            { "id": "espresso", "name": "Espresso", "variations": [{ "id": "var-5", "name": "Single", "price": "3.00" }, { "id": "var-6", "name": "Double", "price": "3.75" }] },
+            { "id": "mocha", "name": "Mocha", "description": "Dark chocolate, espresso, steamed milk", "price": "5.50" },
+            { "id": "chai", "name": "Chai Latte", "price": "5.00" }
+          ]
+        },
+        {
+          "id": "cold",
+          "title": "Cold Drinks",
+          "column_count": 1,
+          "items": [
+            { "id": "iced-latte", "name": "Iced Latte", "price": "5.50" },
+            { "id": "cold-brew", "name": "Cold Brew", "price": "5.00" },
+            { "id": "fresh-juice", "name": "Fresh Juice", "description": "Orange, grapefruit, or apple", "price": "6.00" },
+            { "id": "smoothie", "name": "Smoothie", "description": "Banana, berry, or mango", "price": "7.50" },
+            { "id": "iced-tea", "name": "Iced Tea", "price": "3.50" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -13,8 +13,8 @@
         "resolution": {
           "type": "string",
           "enum": ["1080", "2k", "4k"],
-          "default": "1080",
-          "description": "Display resolution. Content is authored at 1920x1080 and scaled: 1080=1.0x, 2k=1.5x, 4k=2.0x."
+          "default": "4k",
+          "description": "Display resolution. Sets the viewport container size: 1080=1920x1080, 2k=2560x1440, 4k=3840x2160."
         },
         "orientation": {
           "type": "string",
@@ -287,6 +287,10 @@
             "type": "object",
             "required": ["name", "price"],
             "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for this variation. Used by external systems to address specific variations."
+              },
               "name": {
                 "type": "string",
                 "description": "Variation label (e.g. Small, Large, 12oz)."

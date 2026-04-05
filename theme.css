@@ -69,19 +69,12 @@ html, body {
   background: #000;
 }
 
-/* Scaling container */
+/* Viewport container — dimensions set by renderer.js based on resolution */
 .ds-viewport {
-  width: 1920px;
-  height: 1080px;
   transform-origin: top left;
   overflow: hidden;
   position: relative;
   background-color: var(--ds-background-color);
-}
-
-.ds-viewport--portrait {
-  width: 1080px;
-  height: 1920px;
 }
 
 /* Header area: title + logo */

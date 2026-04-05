@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Editor — Digital Signage</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="editor.css">
+  <style>html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; background: #1e1e1e; }</style>
+</head>
+<body>
+  <div id="editor"></div>
+  <script src="renderer.js"></script>
+  <script src="editor.js"></script>
+  <script>
+    MenuEditor.create(document.getElementById('editor'));
+  </script>
+</body>
+</html>

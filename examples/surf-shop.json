@@ -1,0 +1,119 @@
+{
+  "layout": {
+    "resolution": "1080",
+    "orientation": "landscape",
+    "background_color": "#0a2a3a",
+    "viewport_padding": { "top": 16, "right": 36, "bottom": 16, "left": 36 },
+    "area_gap": 20,
+    "container": {
+      "columns": 2,
+      "gutter": 48
+    },
+    "title": {
+      "text": "Pacific Surf Co.",
+      "font": {
+        "family": "Oswald",
+        "weight": "700",
+        "color": "#f0e68c",
+        "size": "54px"
+      },
+      "position": {
+        "x_align": "center",
+        "top_padding": 24
+      }
+    }
+  },
+  "theme": {
+    "area_title_font": {
+      "family": "Oswald",
+      "weight": "600",
+      "color": "#5cc8e8",
+      "size": "26px"
+    },
+    "item_name_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#e8f0f5",
+      "size": "20px"
+    },
+    "item_price_font": {
+      "family": "Lato",
+      "weight": "700",
+      "color": "#f0e68c",
+      "size": "20px"
+    },
+    "variation_font": {
+      "family": "Lato",
+      "weight": "400",
+      "color": "#8ab8cc",
+      "size": "15px"
+    },
+    "divider_color": "#1a4a5e",
+    "area_background": "transparent"
+  },
+  "areas": [
+    {
+      "id": "lessons-column",
+      "columns": 1,
+      "areas": [
+        {
+          "id": "lessons",
+          "title": "Surf Lessons",
+          "column_count": 1,
+          "items": [
+            { "id": "intro", "name": "Intro to Surfing", "description": "2 hours, board and wetsuit included", "variations": [{ "id": "var-1", "name": "Group", "price": "65.00" }, { "id": "var-2", "name": "Private", "price": "120.00" }] },
+            { "id": "intermediate", "name": "Intermediate Session", "description": "Techniques, turns, and wave reading", "variations": [{ "id": "var-3", "name": "Group", "price": "75.00" }, { "id": "var-4", "name": "Private", "price": "140.00" }] },
+            { "id": "kids-camp", "name": "Kids Surf Camp", "description": "Ages 6-12, half day with snacks", "price": "85.00" },
+            { "id": "5-pack", "name": "5-Lesson Pack", "description": "Any level, save 15%", "variations": [{ "id": "var-5", "name": "Group", "price": "275.00" }, { "id": "var-6", "name": "Private", "price": "510.00" }] }
+          ]
+        },
+        {
+          "id": "rentals",
+          "title": "Board Rentals",
+          "column_count": 1,
+          "items": [
+            { "id": "foam", "name": "Foam Board", "description": "Beginners, soft top 8ft", "variations": [{ "id": "var-7", "name": "2hr", "price": "25.00" }, { "id": "var-8", "name": "Day", "price": "45.00" }] },
+            { "id": "shortboard", "name": "Shortboard", "description": "Performance, 5'8\"–6'4\"", "variations": [{ "id": "var-9", "name": "2hr", "price": "30.00" }, { "id": "var-10", "name": "Day", "price": "55.00" }] },
+            { "id": "longboard", "name": "Longboard", "description": "Classic noserider 9ft", "variations": [{ "id": "var-11", "name": "2hr", "price": "30.00" }, { "id": "var-12", "name": "Day", "price": "55.00" }] },
+            { "id": "wetsuit", "name": "Wetsuit", "description": "3/2mm full suit", "price": "20.00" },
+            { "id": "bodyboard", "name": "Bodyboard + Fins", "variations": [{ "id": "var-13", "name": "2hr", "price": "15.00" }, { "id": "var-14", "name": "Day", "price": "30.00" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shop-column",
+      "columns": 1,
+      "areas": [
+        {
+          "id": "boards",
+          "title": "Boards",
+          "column_count": 1,
+          "items": [
+            { "id": "foam-new", "name": "Foam Top 8' (beginner)", "price": "289.00" },
+            { "id": "fish", "name": "Retro Fish 5'10\"", "price": "549.00" },
+            { "id": "performance", "name": "Performance Shortboard", "price": "649.00" },
+            { "id": "longboard-new", "name": "Classic Longboard 9'2\"", "price": "749.00" },
+            { "id": "used", "name": "Used Boards", "description": "Selection varies — ask staff", "price": "150.00" }
+          ]
+        },
+        {
+          "id": "gear",
+          "title": "Gear & Accessories",
+          "column_count": 2,
+          "gutter": 24,
+          "items": [
+            { "id": "wetsuits", "name": "Wetsuits", "description": "3/2mm and 4/3mm", "variations": [{ "id": "var-15", "name": "3/2", "price": "189.00" }, { "id": "var-16", "name": "4/3", "price": "249.00" }] },
+            { "id": "leash", "name": "Board Leash", "price": "24.00" },
+            { "id": "wax", "name": "Surf Wax (3-pack)", "price": "8.00" },
+            { "id": "fins", "name": "Fin Set (tri)", "price": "45.00" },
+            { "id": "rash-guard", "name": "Rash Guard", "price": "35.00" },
+            { "id": "board-bag", "name": "Board Bag", "description": "Day use, padded", "price": "65.00" },
+            { "id": "sunscreen", "name": "Reef-Safe Sunscreen", "price": "14.00" },
+            { "id": "rack-pads", "name": "Car Rack Pads", "price": "29.00" }
+          ]
+        }
+      ]
+    }
+  ]
+}

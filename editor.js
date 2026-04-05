@@ -394,7 +394,15 @@ var MenuEditor = (function () {
       { key: 'gutter', type: 'number', label: 'Gutter (%)', step: 0.25 },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' }
+      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { group: 'Style Overrides', inheritable: true, fields: [
+        { key: 'style.title_font', type: 'font', label: 'Title Font' },
+        { key: 'style.item_name_font', type: 'font', label: 'Item Name Font' },
+        { key: 'style.item_price_font', type: 'font', label: 'Item Price Font' },
+        { key: 'style.variation_font', type: 'font', label: 'Variation Font' },
+        { key: 'style.divider_color', type: 'color', label: 'Divider Color' },
+        { key: 'style.background', type: 'color', label: 'Background' }
+      ]}
     ],
     item: [
       { key: 'id', type: 'text', label: 'ID' },
@@ -405,7 +413,11 @@ var MenuEditor = (function () {
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
       { key: 'variations_inline', type: 'checkbox', label: 'Variations Inline' },
       { key: 'show_variation_prices', type: 'checkbox', label: 'Show Variation Prices', defaultChecked: true },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' }
+      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { group: 'Style Overrides', inheritable: true, fields: [
+        { key: 'style.name_font', type: 'font', label: 'Name Font' },
+        { key: 'style.price_font', type: 'font', label: 'Price Font' }
+      ]}
     ],
     variation: [
       { key: 'id', type: 'text', label: 'ID' },
@@ -1021,9 +1033,41 @@ var MenuEditor = (function () {
 
           if (!isCollapsed) {
             var groupBody = el('div', 'me-inspector-group__body');
-            def.fields.forEach(function (fieldDef) {
-              renderField(groupBody, path, fieldDef, store);
-            });
+
+            // Inheritable groups show an "Inherited" cover
+            if (def.inheritable) {
+              var hasOverrides = def.fields.some(function (f) {
+                return getAtPath(store.getData(), path + '.' + f.key) != null;
+              });
+
+              if (!hasOverrides) {
+                var cover = el('div', 'me-inherited-cover');
+                cover.textContent = 'Inherited — click to override';
+                cover.addEventListener('click', function () {
+                  cover.style.display = 'none';
+                  groupBody.querySelectorAll('.me-field').forEach(function (f) {
+                    f.style.display = '';
+                  });
+                });
+                groupBody.appendChild(cover);
+              }
+
+              def.fields.forEach(function (fieldDef) {
+                renderField(groupBody, path, fieldDef, store);
+              });
+
+              // Hide fields if no overrides
+              if (!hasOverrides) {
+                groupBody.querySelectorAll('.me-field').forEach(function (f) {
+                  f.style.display = 'none';
+                });
+              }
+            } else {
+              def.fields.forEach(function (fieldDef) {
+                renderField(groupBody, path, fieldDef, store);
+              });
+            }
+
             groupEl.appendChild(groupBody);
           }
 

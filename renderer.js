@@ -279,6 +279,16 @@ var MenuRenderer = (function () {
     };
   }
 
+  // ── Style Override Utility ──────────────────────────────────────────────
+
+  function applyFontOverride(element, fontObj, baseFontSize) {
+    if (!fontObj) return;
+    if (fontObj.family) element.style.fontFamily = "'" + fontObj.family + "', sans-serif";
+    if (fontObj.weight) element.style.fontWeight = fontObj.weight;
+    if (fontObj.color) element.style.color = fontObj.color;
+    if (fontObj.size != null) element.style.fontSize = resolveFont(fontObj.size, baseFontSize);
+  }
+
   // ── DOM Builders ───────────────────────────────────────────────────────
 
   function buildHeader(layout, vpW, vpH, baseFontSize, spacing) {
@@ -323,7 +333,7 @@ var MenuRenderer = (function () {
     return header;
   }
 
-  function buildItem(item, areaDefaults, vpW, vpH) {
+  function buildItem(item, areaDefaults, vpW, vpH, baseFontSize) {
     var hasPrice = item.price != null && item.price !== '';
     var hasVariations = item.variations && item.variations.length > 0;
 
@@ -347,17 +357,23 @@ var MenuRenderer = (function () {
       row.style.gap = resolveH(0.4, vpW) + 'px';
     }
 
+    var itemStyle = item.style || {};
+    var nameFont = itemStyle.name_font || areaDefaults.nameFont;
+    var priceFont = itemStyle.price_font || areaDefaults.priceFont;
+
     var nameEl = el('span', 'ds-item__name');
     nameEl.textContent = item.name;
     if (itemAlign !== 'left') {
       nameEl.style.textAlign = itemAlign;
     }
+    applyFontOverride(nameEl, nameFont, baseFontSize);
     row.appendChild(nameEl);
 
     // Show base price if present (even when variations exist)
     if (hasPrice) {
       var priceEl = el('span', 'ds-item__price');
       priceEl.textContent = formatPrice(item.price);
+      applyFontOverride(priceEl, priceFont, baseFontSize);
       row.appendChild(priceEl);
     }
 
@@ -396,7 +412,7 @@ var MenuRenderer = (function () {
     return wrap;
   }
 
-  function buildLeafArea(area, spacing, vpW, vpH) {
+  function buildLeafArea(area, spacing, vpW, vpH, baseFontSize) {
     var section = el('div', 'ds-area');
     if (area.id) {
       section.setAttribute('data-area-id', area.id);
@@ -414,6 +430,11 @@ var MenuRenderer = (function () {
       section.style.alignSelf = valignMap[area.valign] || 'start';
     }
 
+    // Area-level style overrides
+    var areaStyle = area.style || {};
+    if (areaStyle.background) section.style.background = areaStyle.background;
+    if (areaStyle.divider_color) section.style.setProperty('--ds-divider-color', areaStyle.divider_color);
+
     // Area title
     if (area.title) {
       var titleAlign = area.align || 'left';
@@ -422,6 +443,7 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') {
         titleEl.style.textAlign = titleAlign;
       }
+      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize);
       section.appendChild(titleEl);
     }
 
@@ -434,11 +456,14 @@ var MenuRenderer = (function () {
 
     var areaDefaults = {
       itemAlign: area.item_align || 'left',
-      priceAlign: area.price_align || 'right'
+      priceAlign: area.price_align || 'right',
+      nameFont: areaStyle.item_name_font || null,
+      priceFont: areaStyle.item_price_font || null,
+      variationFont: areaStyle.variation_font || null
     };
 
     (area.items || []).forEach(function (item) {
-      var node = buildItem(item, areaDefaults, vpW, vpH);
+      var node = buildItem(item, areaDefaults, vpW, vpH, baseFontSize);
       if (node) grid.appendChild(node);
     });
 
@@ -446,7 +471,7 @@ var MenuRenderer = (function () {
     return section;
   }
 
-  function buildAreaGroup(area, spacing, depth, vpW, vpH) {
+  function buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize) {
     var section = el('div', 'ds-area ds-area-group');
     if (area.id) {
       section.setAttribute('data-area-id', area.id);
@@ -464,6 +489,10 @@ var MenuRenderer = (function () {
       section.style.alignSelf = valignMap[area.valign] || 'start';
     }
 
+    // Area-level style overrides
+    var areaStyle = area.style || {};
+    if (areaStyle.background) section.style.background = areaStyle.background;
+
     // Group title (optional)
     if (area.title) {
       var titleAlign = area.align || 'left';
@@ -472,6 +501,7 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') {
         titleEl.style.textAlign = titleAlign;
       }
+      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize);
       section.appendChild(titleEl);
     }
 
@@ -487,14 +517,14 @@ var MenuRenderer = (function () {
     grid.style.rowGap = subGap + 'px';
 
     (area.areas || []).forEach(function (subArea) {
-      grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH));
+      grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH, baseFontSize));
     });
 
     section.appendChild(grid);
     return section;
   }
 
-  function buildArea(area, spacing, depth, vpW, vpH) {
+  function buildArea(area, spacing, depth, vpW, vpH, baseFontSize) {
     depth = depth || 0;
     if (depth > MAX_NESTING_DEPTH) {
       console.warn('[MenuRenderer] Max nesting depth exceeded, skipping area:', area.id);
@@ -502,9 +532,9 @@ var MenuRenderer = (function () {
     }
 
     if (area.areas && area.areas.length > 0) {
-      return buildAreaGroup(area, spacing, depth, vpW, vpH);
+      return buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize);
     }
-    return buildLeafArea(area, spacing, vpW, vpH);
+    return buildLeafArea(area, spacing, vpW, vpH, baseFontSize);
   }
 
   // ── Preview Mode ───────────────────────────────────────────────────────
@@ -602,7 +632,7 @@ var MenuRenderer = (function () {
     areasWrap.style.padding = paddingCSS(spacing.viewportPadding);
 
     areas.forEach(function (area) {
-      areasWrap.appendChild(buildArea(area, spacing, 0, vpW, vpH));
+      areasWrap.appendChild(buildArea(area, spacing, 0, vpW, vpH, baseFontSize));
     });
 
     viewport.appendChild(areasWrap);
@@ -671,12 +701,12 @@ var MenuRenderer = (function () {
   var KNOWN_AREA_KEYS = [
     'id', 'title', 'padding', 'gutter', 'align', 'valign',
     'item_align', 'price_align', 'column_count', 'columns',
-    'items', 'areas'
+    'items', 'areas', 'style'
   ];
   var KNOWN_ITEM_KEYS = [
     'id', 'name', 'description', 'price', 'variations',
     'padding', 'align', 'hide_if_empty',
-    'show_variation_prices', 'variations_inline'
+    'show_variation_prices', 'variations_inline', 'style'
   ];
 
   function validate(data) {

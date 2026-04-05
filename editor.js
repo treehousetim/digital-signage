@@ -1352,8 +1352,13 @@ var MenuEditor = (function () {
           '[data-ds-id]{cursor:pointer}' +
           '[data-ds-id]:hover{outline:2px solid rgba(66,165,245,0.4);outline-offset:1px}' +
           '.ds-selected{outline:2px solid rgba(66,165,245,0.8)!important;outline-offset:2px;background:rgba(66,165,245,0.06)!important}' +
-          '.ds-pad-handle{position:absolute;background:rgba(66,165,245,0.3);z-index:1000;cursor:ns-resize}' +
-          '.ds-pad-handle--h{cursor:ew-resize}' +
+          '.ds-pad-handle{position:absolute;background:rgba(66,165,245,0.3);z-index:1000;min-width:6px;min-height:6px}' +
+          '.ds-pad-handle--top,.ds-pad-handle--bottom{cursor:ns-resize;left:0;right:0;height:8px}' +
+          '.ds-pad-handle--top{top:0}' +
+          '.ds-pad-handle--bottom{bottom:0}' +
+          '.ds-pad-handle--left,.ds-pad-handle--right{cursor:ew-resize;top:0;bottom:0;width:8px}' +
+          '.ds-pad-handle--left{left:0}' +
+          '.ds-pad-handle--right{right:0}' +
           '.ds-pad-handle:hover{background:rgba(66,165,245,0.6)}' +
           '</style>' +
           '</head><body>' +
@@ -1393,26 +1398,20 @@ var MenuEditor = (function () {
           // Padding drag handles
           'function showPadHandles(el,id){' +
           'document.querySelectorAll(".ds-pad-handle").forEach(function(h){h.remove();});' +
-          'var r=el.getBoundingClientRect();var cs=getComputedStyle(el);' +
-          'var pt=parseFloat(cs.paddingTop)||0;var pr=parseFloat(cs.paddingRight)||0;' +
-          'var pb=parseFloat(cs.paddingBottom)||0;var pl=parseFloat(cs.paddingLeft)||0;' +
-          'if(pt>2)makeHandle(el,id,"top",0,0,r.width,Math.max(pt,6));' +
-          'if(pb>2)makeHandle(el,id,"bottom",0,r.height-Math.max(pb,6),r.width,Math.max(pb,6));' +
-          'if(pl>2)makeHandle(el,id,"left",0,0,Math.max(pl,6),r.height);' +
-          'if(pr>2)makeHandle(el,id,"right",r.width-Math.max(pr,6),0,Math.max(pr,6),r.height);}' +
+          'el.style.position="relative";' +
+          '["top","bottom","left","right"].forEach(function(side){makeHandle(el,id,side);});}' +
           // Create a drag handle
-          'function makeHandle(parent,id,side,x,y,w,h){' +
-          'var d=document.createElement("div");d.className="ds-pad-handle"+(side==="left"||side==="right"?" ds-pad-handle--h":"");' +
-          'parent.style.position="relative";' +
-          'd.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";d.style.height=h+"px";' +
-          'var startY,startX,startVal;' +
+          'function makeHandle(parent,id,side){' +
+          'var d=document.createElement("div");d.className="ds-pad-handle ds-pad-handle--"+side;' +
           'd.addEventListener("mousedown",function(ev){' +
-          'ev.stopPropagation();ev.preventDefault();startY=ev.clientY;startX=ev.clientX;' +
-          'var cs=getComputedStyle(parent);startVal=parseFloat(cs["padding-"+side])||0;' +
+          'ev.stopPropagation();ev.preventDefault();' +
+          'var startY=ev.clientY;var startX=ev.clientX;' +
+          'var cs=getComputedStyle(parent);var startVal=parseFloat(cs["padding-"+side])||0;' +
           'function onMove(mv){' +
           'var delta=(side==="top"||side==="bottom")?(mv.clientY-startY):(mv.clientX-startX);' +
           'if(side==="top"||side==="left")delta=-delta;' +
           'var newVal=Math.max(0,startVal+delta);' +
+          'parent.style["padding-"+side]=newVal+"px";' +
           'window.parent.postMessage({type:"preview-pad-drag",id:id,side:side,px:newVal},"*");}' +
           'function onUp(){document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}' +
           'document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);});' +

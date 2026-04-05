@@ -475,12 +475,12 @@ var MenuEditor = (function () {
       wrapper.appendChild(cbWrap);
 
     } else if (fieldDef.type === 'color') {
-      var colorVal = value || '#000000';
       var isTransparent = value === 'transparent' || value === '';
+      var lastColor = (isTransparent || !value) ? '#000000' : value;
       var colorInput = el('input', 'me-field__color', { type: 'color' });
-      colorInput.value = isTransparent ? '#000000' : colorVal;
+      colorInput.value = lastColor;
       var hexInput = el('input', 'me-field__input me-field__input--short', { type: 'text' });
-      hexInput.value = isTransparent ? 'transparent' : colorVal;
+      hexInput.value = isTransparent ? 'transparent' : lastColor;
       var transpCb = el('input', '', { type: 'checkbox' });
       transpCb.checked = isTransparent;
       var transpLabel = el('label', 'me-field__cb-wrap me-field__cb-wrap--small');
@@ -490,6 +490,7 @@ var MenuEditor = (function () {
       transpLabel.appendChild(transpText);
 
       colorInput.addEventListener('input', function () {
+        lastColor = colorInput.value;
         hexInput.value = colorInput.value;
         transpCb.checked = false;
         store.update(fullPath, colorInput.value);
@@ -499,6 +500,7 @@ var MenuEditor = (function () {
           transpCb.checked = true;
           store.update(fullPath, 'transparent');
         } else {
+          lastColor = hexInput.value;
           colorInput.value = hexInput.value;
           transpCb.checked = false;
           store.update(fullPath, hexInput.value);
@@ -509,8 +511,9 @@ var MenuEditor = (function () {
           hexInput.value = 'transparent';
           store.update(fullPath, 'transparent');
         } else {
-          hexInput.value = colorInput.value;
-          store.update(fullPath, colorInput.value);
+          hexInput.value = lastColor;
+          colorInput.value = lastColor;
+          store.update(fullPath, lastColor);
         }
       });
 

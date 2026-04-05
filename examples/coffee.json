@@ -3,11 +3,11 @@
     "resolution": "4k",
     "orientation": "portrait",
     "background_color": "#1a1a1a",
-    "viewport_padding": { "top": 32, "right": 64, "bottom": 32, "left": 64 },
-    "area_gap": 48,
+    "viewport_padding": { "top": 0.833, "right": 2.963, "bottom": 0.833, "left": 2.963 },
+    "area_gap": 1.25,
     "container": {
       "columns": 3,
-      "gutter": 80
+      "gutter": 3.704
     },
     "title": {
       "text": "Coffee",
@@ -15,11 +15,11 @@
         "family": "Montserrat",
         "weight": "700",
         "color": "#ffffff",
-        "size": "96px"
+        "size": 3
       },
       "position": {
         "x_align": "center",
-        "top_padding": 60
+        "top_padding": 1.563
       }
     }
   },
@@ -28,25 +28,25 @@
       "family": "Montserrat",
       "weight": "600",
       "color": "#f0c040",
-      "size": "56px"
+      "size": 1.75
     },
     "item_name_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#ffffff",
-      "size": "44px"
+      "size": 1.375
     },
     "item_price_font": {
       "family": "Lato",
       "weight": "700",
       "color": "#ffffff",
-      "size": "44px"
+      "size": 1.375
     },
     "variation_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#cccccc",
-      "size": "32px"
+      "size": 1
     },
     "divider_color": "#444444",
     "area_background": "transparent"
@@ -55,14 +55,14 @@
     {
       "id": "drinks-column",
       "columns": 1,
-      "gutter": 48,
+      "gutter": 2.222,
       "areas": [
         {
           "id": "hot-drinks",
           "title": "Hot Drinks",
           "column_count": 1,
-          "gutter": 64,
-          "padding": { "bottom": 16 },
+          "gutter": 2.963,
+          "padding": { "bottom": 0.417 },
           "items": [
             {
               "id": "latte",
@@ -136,7 +136,7 @@
           "id": "cold-drinks",
           "title": "Cold Drinks",
           "column_count": 1,
-          "gutter": 64,
+          "gutter": 2.963,
           "items": [
             {
               "id": "iced-latte",

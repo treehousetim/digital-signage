@@ -3,11 +3,11 @@
     "resolution": "4k",
     "orientation": "landscape",
     "background_color": "#0a2a3a",
-    "viewport_padding": { "top": 32, "right": 72, "bottom": 32, "left": 72 },
-    "area_gap": 40,
+    "viewport_padding": { "top": 1.481, "right": 1.875, "bottom": 1.481, "left": 1.875 },
+    "area_gap": 1.852,
     "container": {
       "columns": 2,
-      "gutter": 96
+      "gutter": 2.5
     },
     "title": {
       "text": "Pacific Surf Co.",
@@ -15,11 +15,11 @@
         "family": "Oswald",
         "weight": "700",
         "color": "#f0e68c",
-        "size": "108px"
+        "size": 3.375
       },
       "position": {
         "x_align": "center",
-        "top_padding": 48
+        "top_padding": 2.222
       }
     }
   },
@@ -28,25 +28,25 @@
       "family": "Oswald",
       "weight": "600",
       "color": "#5cc8e8",
-      "size": "52px"
+      "size": 1.625
     },
     "item_name_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#e8f0f5",
-      "size": "40px"
+      "size": 1.25
     },
     "item_price_font": {
       "family": "Lato",
       "weight": "700",
       "color": "#f0e68c",
-      "size": "40px"
+      "size": 1.25
     },
     "variation_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#8ab8cc",
-      "size": "30px"
+      "size": 0.938
     },
     "divider_color": "#1a4a5e",
     "area_background": "transparent"
@@ -101,7 +101,7 @@
           "id": "gear",
           "title": "Gear & Accessories",
           "column_count": 2,
-          "gutter": 48,
+          "gutter": 1.25,
           "items": [
             { "id": "wetsuits", "name": "Wetsuits", "description": "3/2mm and 4/3mm", "variations": [{ "id": "var-15", "name": "3/2", "price": "189.00" }, { "id": "var-16", "name": "4/3", "price": "249.00" }] },
             { "id": "leash", "name": "Board Leash", "price": "24.00" },

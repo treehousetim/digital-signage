@@ -3,6 +3,11 @@
  * A standalone, framework-free rendering engine that takes a JSON menu definition
  * and produces a pixel-perfect, full-screen display suitable for TVs and monitors.
  *
+ * Unit system:
+ *   - Spatial values (padding, gutter, gap, position): % of viewport width or height
+ *   - Font sizes: em (multiplier of resolution-scaled base font size)
+ *   - Backward compat: strings ending in "px" are used as raw CSS values
+ *
  * Usage:
  *   MenuRenderer.render(jsonObject, targetElement)
  *   MenuRenderer.loadFromUrl(url, targetElement)
@@ -22,6 +27,12 @@ var MenuRenderer = (function () {
     '4k':   { w: 3840, h: 2160 }
   };
 
+  var BASE_FONT_MAP = {
+    '1080': 16,
+    '2k':   21,
+    '4k':   32
+  };
+
   var GOOGLE_FONTS = [
     'Montserrat', 'Lato', 'Roboto', 'Open Sans', 'Oswald',
     'Raleway', 'Poppins', 'Playfair Display', 'Merriweather', 'Nunito'
@@ -29,29 +40,56 @@ var MenuRenderer = (function () {
 
   var MAX_NESTING_DEPTH = 4;
 
+  // Defaults in the new unit system: spatial = %, fonts = em
   var DEFAULTS = {
     layout: {
       resolution: '4k',
       orientation: 'landscape',
       mode: 'display',
       background_color: '#1a1a1a',
-      x_spacer: 48,
-      y_spacer: 64,
+      x_spacer: 1.25,
+      y_spacer: 3,
       viewport_padding: null,
       area_gap: null,
       container: { columns: 1, gutter: null }
     },
     theme: {
-      area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: '56px' },
-      item_name_font: { family: 'Lato', weight: '400', color: '#ffffff', size: '44px' },
-      item_price_font: { family: 'Lato', weight: '700', color: '#ffffff', size: '44px' },
-      variation_font: { family: 'Lato', weight: '400', color: '#cccccc', size: '32px' },
+      area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: 1.75 },
+      item_name_font: { family: 'Lato', weight: '400', color: '#ffffff', size: 1.375 },
+      item_price_font: { family: 'Lato', weight: '700', color: '#ffffff', size: 1.375 },
+      variation_font: { family: 'Lato', weight: '400', color: '#cccccc', size: 1 },
       divider_color: '#444444',
       area_background: 'transparent'
     }
   };
 
-  // ── Utilities ──────────────────────────────────────────────────────────
+  // ── Unit Resolution Utilities ──────────────────────────────────────────
+
+  function resolveH(val, vpW) {
+    if (val == null) return 0;
+    if (typeof val === 'string') {
+      if (val.indexOf('px') !== -1) return parseFloat(val);
+      return parseFloat(val);
+    }
+    return val / 100 * vpW;
+  }
+
+  function resolveV(val, vpH) {
+    if (val == null) return 0;
+    if (typeof val === 'string') {
+      if (val.indexOf('px') !== -1) return parseFloat(val);
+      return parseFloat(val);
+    }
+    return val / 100 * vpH;
+  }
+
+  function resolveFont(val, baseFontSize) {
+    if (val == null) return undefined;
+    if (typeof val === 'string') return val; // backward compat: "44px" used as-is
+    return (val * baseFontSize) + 'px';
+  }
+
+  // ── General Utilities ──────────────────────────────────────────────────
 
   function merge(defaults, overrides) {
     if (!overrides) return JSON.parse(JSON.stringify(defaults));
@@ -82,6 +120,15 @@ var MenuRenderer = (function () {
       right: val.right || 0,
       bottom: val.bottom || 0,
       left: val.left || 0
+    };
+  }
+
+  function resolvePaddingPx(pad, vpW, vpH) {
+    return {
+      top: resolveV(pad.top, vpH),
+      right: resolveH(pad.right, vpW),
+      bottom: resolveV(pad.bottom, vpH),
+      left: resolveH(pad.left, vpW)
     };
   }
 
@@ -157,34 +204,17 @@ var MenuRenderer = (function () {
 
   // ── CSS Custom Properties ──────────────────────────────────────────────
 
-  function buildCSSVars(layout, theme, resolvedSpacing) {
+  function buildCSSVars(layout, theme, vpW, vpH, baseFontSize) {
     var vars = [];
-    var vp = resolvedSpacing.viewportPadding;
-    var containerGutter = resolvedSpacing.containerGutter;
-    var areaGap = resolvedSpacing.areaGap;
 
     vars.push('--ds-background-color: ' + layout.background_color);
-
-    // Legacy spacers (backward compat)
-    vars.push('--ds-x-spacer: ' + layout.x_spacer + 'px');
-    vars.push('--ds-y-spacer: ' + layout.y_spacer + 'px');
-
-    // Viewport padding
-    vars.push('--ds-viewport-padding-top: ' + vp.top + 'px');
-    vars.push('--ds-viewport-padding-right: ' + vp.right + 'px');
-    vars.push('--ds-viewport-padding-bottom: ' + vp.bottom + 'px');
-    vars.push('--ds-viewport-padding-left: ' + vp.left + 'px');
-
-    // Container gutter and area gap
-    vars.push('--ds-container-gutter: ' + containerGutter + 'px');
-    vars.push('--ds-area-gap: ' + areaGap + 'px');
 
     if (layout.title && layout.title.font) {
       var tf = layout.title.font;
       if (tf.family) vars.push("--ds-title-font-family: '" + tf.family + "', sans-serif");
       if (tf.weight) vars.push('--ds-title-font-weight: ' + tf.weight);
       if (tf.color) vars.push('--ds-title-font-color: ' + tf.color);
-      if (tf.size) vars.push('--ds-title-font-size: ' + tf.size);
+      if (tf.size != null) vars.push('--ds-title-font-size: ' + resolveFont(tf.size, baseFontSize));
     }
 
     var fontKeys = ['area_title', 'item_name', 'item_price', 'variation'];
@@ -195,7 +225,7 @@ var MenuRenderer = (function () {
       if (fontObj.family) vars.push(prefix + "-family: '" + fontObj.family + "', sans-serif");
       if (fontObj.weight) vars.push(prefix + '-weight: ' + fontObj.weight);
       if (fontObj.color) vars.push(prefix + '-color: ' + fontObj.color);
-      if (fontObj.size) vars.push(prefix + '-size: ' + fontObj.size);
+      if (fontObj.size != null) vars.push(prefix + '-size: ' + resolveFont(fontObj.size, baseFontSize));
     });
 
     if (theme.divider_color) vars.push('--ds-divider-color: ' + theme.divider_color);
@@ -217,22 +247,30 @@ var MenuRenderer = (function () {
 
   // ── Spacing Resolution ─────────────────────────────────────────────────
 
-  function resolveSpacing(layout) {
+  function resolveSpacing(layout, vpW, vpH) {
     var xSp = layout.x_spacer;
     var ySp = layout.y_spacer;
 
     var viewportPadding;
     if (layout.viewport_padding != null) {
-      viewportPadding = normalizePadding(layout.viewport_padding);
+      var rawPad = normalizePadding(layout.viewport_padding);
+      viewportPadding = resolvePaddingPx(rawPad, vpW, vpH);
     } else {
-      viewportPadding = { top: ySp, right: xSp, bottom: ySp, left: xSp };
+      viewportPadding = {
+        top: resolveV(ySp, vpH),
+        right: resolveH(xSp, vpW),
+        bottom: resolveV(ySp, vpH),
+        left: resolveH(xSp, vpW)
+      };
     }
 
     var containerGutter = (layout.container && layout.container.gutter != null)
-      ? layout.container.gutter
-      : xSp;
+      ? resolveH(layout.container.gutter, vpW)
+      : resolveH(xSp, vpW);
 
-    var areaGap = (layout.area_gap != null) ? layout.area_gap : ySp;
+    var areaGap = (layout.area_gap != null)
+      ? resolveV(layout.area_gap, vpH)
+      : resolveV(ySp, vpH);
 
     return {
       viewportPadding: viewportPadding,
@@ -243,15 +281,15 @@ var MenuRenderer = (function () {
 
   // ── DOM Builders ───────────────────────────────────────────────────────
 
-  function buildHeader(layout) {
+  function buildHeader(layout, vpW, vpH, baseFontSize, spacing) {
     var header = el('div', 'ds-header');
-    var vp = resolveSpacing(layout).viewportPadding;
+    var vp = spacing.viewportPadding;
 
     // Logo
     if (layout.logo && layout.logo.src) {
       var logo = layout.logo;
       var logoWrap = el('div', 'ds-logo ds-logo--' + (logo.x_align || 'left'));
-      logoWrap.style.top = (logo.top_padding || 20) + 'px';
+      logoWrap.style.top = resolveV(logo.top_padding || 1, vpH) + 'px';
       if (logo.x_align === 'right') {
         logoWrap.style.right = vp.right + 'px';
       } else {
@@ -261,7 +299,7 @@ var MenuRenderer = (function () {
         src: logo.src,
         alt: 'Logo'
       });
-      img.style.maxHeight = (logo.max_height || 80) + 'px';
+      img.style.maxHeight = resolveV(logo.max_height || 3.7, vpH) + 'px';
       logoWrap.appendChild(img);
       header.appendChild(logoWrap);
     }
@@ -273,16 +311,19 @@ var MenuRenderer = (function () {
       var align = pos.x_align || 'center';
       var titleEl = el('div', 'ds-title ds-title--' + align);
       titleEl.textContent = titleCfg.text;
-      titleEl.style.paddingTop = (pos.top_padding || 40) + 'px';
+      titleEl.style.paddingTop = resolveV(pos.top_padding || 1.85, vpH) + 'px';
       titleEl.style.paddingLeft = vp.left + 'px';
       titleEl.style.paddingRight = vp.right + 'px';
+      if (titleCfg.font && titleCfg.font.size != null) {
+        titleEl.style.fontSize = resolveFont(titleCfg.font.size, baseFontSize);
+      }
       header.appendChild(titleEl);
     }
 
     return header;
   }
 
-  function buildItem(item, areaDefaults) {
+  function buildItem(item, areaDefaults, vpW, vpH) {
     var hasPrice = item.price != null && item.price !== '';
     var hasVariations = item.variations && item.variations.length > 0;
 
@@ -290,10 +331,8 @@ var MenuRenderer = (function () {
       return null;
     }
 
-    var itemPadding = normalizePadding(
-      item.padding,
-      { top: 16, right: 0, bottom: 16, left: 0 }
-    );
+    var rawPad = normalizePadding(item.padding, { top: 0.4, right: 0, bottom: 0.4, left: 0 });
+    var itemPadding = resolvePaddingPx(rawPad, vpW, vpH);
 
     var itemAlign = item.align || areaDefaults.itemAlign || 'left';
     var priceAlign = areaDefaults.priceAlign || 'right';
@@ -304,7 +343,7 @@ var MenuRenderer = (function () {
     var row = el('div', 'ds-item__row');
     if (priceAlign === 'left') {
       row.style.justifyContent = 'flex-start';
-      row.style.gap = '16px';
+      row.style.gap = resolveH(0.4, vpW) + 'px';
     }
 
     var nameEl = el('span', 'ds-item__name');
@@ -354,12 +393,13 @@ var MenuRenderer = (function () {
     return wrap;
   }
 
-  function buildLeafArea(area, spacing) {
+  function buildLeafArea(area, spacing, vpW, vpH) {
     var section = el('div', 'ds-area');
     if (area.id) section.setAttribute('data-area-id', area.id);
 
     // Area padding
-    var areaPad = normalizePadding(area.padding, 0);
+    var rawPad = normalizePadding(area.padding, 0);
+    var areaPad = resolvePaddingPx(rawPad, vpW, vpH);
     section.style.padding = paddingCSS(areaPad);
 
     // Vertical alignment in parent grid
@@ -382,7 +422,7 @@ var MenuRenderer = (function () {
     // Item grid
     var cols = area.column_count || 1;
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(cols, 3));
-    var gutter = (area.gutter != null) ? area.gutter : 16;
+    var gutter = (area.gutter != null) ? resolveH(area.gutter, vpW) : resolveH(0.4, vpW);
     grid.style.columnGap = gutter + 'px';
     grid.style.rowGap = '0px';
 
@@ -392,7 +432,7 @@ var MenuRenderer = (function () {
     };
 
     (area.items || []).forEach(function (item) {
-      var node = buildItem(item, areaDefaults);
+      var node = buildItem(item, areaDefaults, vpW, vpH);
       if (node) grid.appendChild(node);
     });
 
@@ -400,12 +440,13 @@ var MenuRenderer = (function () {
     return section;
   }
 
-  function buildAreaGroup(area, spacing, depth) {
+  function buildAreaGroup(area, spacing, depth, vpW, vpH) {
     var section = el('div', 'ds-area ds-area-group');
     if (area.id) section.setAttribute('data-area-id', area.id);
 
     // Area padding
-    var areaPad = normalizePadding(area.padding, 0);
+    var rawPad = normalizePadding(area.padding, 0);
+    var areaPad = resolvePaddingPx(rawPad, vpW, vpH);
     section.style.padding = paddingCSS(areaPad);
 
     // Vertical alignment in parent grid
@@ -427,7 +468,7 @@ var MenuRenderer = (function () {
 
     // Sub-areas grid
     var subCols = area.columns || 1;
-    var subGutter = (area.gutter != null) ? area.gutter : spacing.containerGutter;
+    var subGutter = (area.gutter != null) ? resolveH(area.gutter, vpW) : spacing.containerGutter;
     var subGap = spacing.areaGap;
 
     var grid = el('div', 'ds-area-group__grid');
@@ -437,14 +478,14 @@ var MenuRenderer = (function () {
     grid.style.rowGap = subGap + 'px';
 
     (area.areas || []).forEach(function (subArea) {
-      grid.appendChild(buildArea(subArea, spacing, depth + 1));
+      grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH));
     });
 
     section.appendChild(grid);
     return section;
   }
 
-  function buildArea(area, spacing, depth) {
+  function buildArea(area, spacing, depth, vpW, vpH) {
     depth = depth || 0;
     if (depth > MAX_NESTING_DEPTH) {
       console.warn('[MenuRenderer] Max nesting depth exceeded, skipping area:', area.id);
@@ -452,9 +493,9 @@ var MenuRenderer = (function () {
     }
 
     if (area.areas && area.areas.length > 0) {
-      return buildAreaGroup(area, spacing, depth);
+      return buildAreaGroup(area, spacing, depth, vpW, vpH);
     }
-    return buildLeafArea(area, spacing);
+    return buildLeafArea(area, spacing, vpW, vpH);
   }
 
   // ── Preview Mode ───────────────────────────────────────────────────────
@@ -508,32 +549,38 @@ var MenuRenderer = (function () {
     var theme = merge(DEFAULTS.theme, data.theme);
     var areas = data.areas || [];
 
-    // Resolve spacing
-    var spacing = resolveSpacing(layout);
+    // Resolve viewport dimensions
+    var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];
+    var isPortrait = layout.orientation === 'portrait';
+    var vpW = isPortrait ? res.h : res.w;
+    var vpH = isPortrait ? res.w : res.h;
+
+    // Base font size for em resolution
+    var baseFontSize = BASE_FONT_MAP[layout.resolution] || BASE_FONT_MAP['4k'];
+
+    // Resolve spacing (% → px)
+    var spacing = resolveSpacing(layout, vpW, vpH);
 
     // Inject Google Fonts
     var fontMap = collectFonts(data);
     injectGoogleFonts(fontMap);
 
-    // Inject CSS custom property overrides
-    var cssVars = buildCSSVars(layout, theme, spacing);
+    // Inject CSS custom property overrides (resolved to px)
+    var cssVars = buildCSSVars(layout, theme, vpW, vpH, baseFontSize);
     injectThemeStyle(cssVars);
 
     // Clear target
     target.innerHTML = '';
     target.removeAttribute('style');
 
-    // Viewport — resolution sets the container pixel size directly
-    var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];
-    var isPortrait = layout.orientation === 'portrait';
-    var vpW = isPortrait ? res.h : res.w;
-    var vpH = isPortrait ? res.w : res.h;
+    // Viewport
     var viewport = el('div', 'ds-viewport');
     viewport.style.width = vpW + 'px';
     viewport.style.height = vpH + 'px';
+    viewport.style.fontSize = baseFontSize + 'px';
 
     // Header
-    var header = buildHeader(layout);
+    var header = buildHeader(layout, vpW, vpH, baseFontSize, spacing);
     viewport.appendChild(header);
 
     // Areas container — CSS grid
@@ -546,7 +593,7 @@ var MenuRenderer = (function () {
     areasWrap.style.padding = paddingCSS(spacing.viewportPadding);
 
     areas.forEach(function (area) {
-      areasWrap.appendChild(buildArea(area, spacing, 0));
+      areasWrap.appendChild(buildArea(area, spacing, 0, vpW, vpH));
     });
 
     viewport.appendChild(areasWrap);
@@ -631,7 +678,6 @@ var MenuRenderer = (function () {
       return { valid: false, errors: errors, warnings: warnings };
     }
 
-    // areas is required
     if (!data.areas) {
       errors.push({ path: 'areas', message: 'Required field missing' });
     } else if (!Array.isArray(data.areas)) {
@@ -644,7 +690,6 @@ var MenuRenderer = (function () {
       });
     }
 
-    // layout checks
     if (data.layout) {
       var lo = data.layout;
       if (lo.resolution && VALID_RESOLUTIONS.indexOf(lo.resolution) === -1) {
@@ -659,7 +704,6 @@ var MenuRenderer = (function () {
       if (lo.viewport_padding != null) {
         validatePadding(lo.viewport_padding, 'layout.viewport_padding', errors);
       }
-      // unknown keys
       Object.keys(lo).forEach(function (k) {
         if (KNOWN_LAYOUT_KEYS.indexOf(k) === -1) {
           warnings.push({ path: 'layout.' + k, message: 'Unknown field' });
@@ -713,14 +757,12 @@ var MenuRenderer = (function () {
       validatePadding(area.padding, path + '.padding', errors);
     }
 
-    // Unknown keys
     Object.keys(area).forEach(function (k) {
       if (KNOWN_AREA_KEYS.indexOf(k) === -1) {
         warnings.push({ path: path + '.' + k, message: 'Unknown field' });
       }
     });
 
-    // Nested areas (group)
     if (area.areas && Array.isArray(area.areas)) {
       if (area.items && area.items.length > 0) {
         warnings.push({ path: path, message: 'Has both items and areas — items will be ignored' });
@@ -732,7 +774,6 @@ var MenuRenderer = (function () {
         validateArea(sub, path + '.areas[' + j + ']', errors, warnings);
       });
     } else if (area.items) {
-      // Leaf area — validate items
       if (!Array.isArray(area.items)) {
         errors.push({ path: path + '.items', message: 'Must be an array' });
       } else {
@@ -770,7 +811,6 @@ var MenuRenderer = (function () {
     if (item.align && VALID_ALIGNS.indexOf(item.align) === -1) {
       errors.push({ path: path + '.align', message: 'Must be one of: ' + VALID_ALIGNS.join(', ') });
     }
-    // Unknown keys
     Object.keys(item).forEach(function (k) {
       if (KNOWN_ITEM_KEYS.indexOf(k) === -1) {
         warnings.push({ path: path + '.' + k, message: 'Unknown field' });
@@ -781,7 +821,6 @@ var MenuRenderer = (function () {
   // Store last validation result for external access
   var lastValidation = null;
 
-  // Patch render to run validation
   var _origRender = render;
   function renderWithValidation(data, target) {
     if (typeof data === 'string') data = JSON.parse(data);

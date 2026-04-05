@@ -3,8 +3,8 @@
     "resolution": "4k",
     "orientation": "portrait",
     "background_color": "#faf3eb",
-    "viewport_padding": { "top": 48, "right": 72, "bottom": 48, "left": 72 },
-    "area_gap": 56,
+    "viewport_padding": { "top": 1.25, "right": 3.333, "bottom": 1.25, "left": 3.333 },
+    "area_gap": 1.458,
     "container": {
       "columns": 1
     },
@@ -14,11 +14,11 @@
         "family": "Playfair Display",
         "weight": "700",
         "color": "#3d2b1f",
-        "size": "112px"
+        "size": 3.5
       },
       "position": {
         "x_align": "center",
-        "top_padding": 72
+        "top_padding": 1.875
       }
     }
   },
@@ -27,25 +27,25 @@
       "family": "Playfair Display",
       "weight": "600",
       "color": "#8b5e3c",
-      "size": "60px"
+      "size": 1.875
     },
     "item_name_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#3d2b1f",
-      "size": "44px"
+      "size": 1.375
     },
     "item_price_font": {
       "family": "Lato",
       "weight": "700",
       "color": "#3d2b1f",
-      "size": "44px"
+      "size": 1.375
     },
     "variation_font": {
       "family": "Lato",
       "weight": "400",
       "color": "#7a6455",
-      "size": "32px"
+      "size": 1
     },
     "divider_color": "#d9cec3",
     "area_background": "transparent"
@@ -55,7 +55,7 @@
       "id": "breads",
       "title": "Fresh Breads",
       "column_count": 2,
-      "gutter": 64,
+      "gutter": 2.963,
       "items": [
         { "id": "sourdough", "name": "Sourdough Loaf", "description": "24-hour ferment, stone-baked", "price": "8.50" },
         { "id": "baguette", "name": "French Baguette", "description": "Crispy crust, soft crumb", "price": "5.00" },
@@ -69,7 +69,7 @@
       "id": "pastries",
       "title": "Pastries",
       "column_count": 2,
-      "gutter": 64,
+      "gutter": 2.963,
       "items": [
         { "id": "croissant", "name": "Butter Croissant", "price": "4.00" },
         { "id": "pain-choc", "name": "Pain au Chocolat", "price": "4.50" },
@@ -83,7 +83,7 @@
       "id": "cakes",
       "title": "Cakes & Tarts",
       "column_count": 2,
-      "gutter": 64,
+      "gutter": 2.963,
       "items": [
         { "id": "carrot-cake", "name": "Carrot Cake", "description": "Cream cheese frosting, walnuts", "variations": [{ "id": "var-1", "name": "Slice", "price": "6.00" }, { "id": "var-2", "name": "Whole", "price": "38.00" }] },
         { "id": "choc-torte", "name": "Chocolate Torte", "description": "Flourless, raspberry coulis", "variations": [{ "id": "var-3", "name": "Slice", "price": "7.00" }, { "id": "var-4", "name": "Whole", "price": "42.00" }] },
@@ -95,7 +95,7 @@
       "id": "drinks",
       "title": "Drinks",
       "column_count": 3,
-      "gutter": 48,
+      "gutter": 2.222,
       "items": [
         { "id": "drip", "name": "Coffee", "price": "3.50" },
         { "id": "latte", "name": "Latte", "price": "5.00" },

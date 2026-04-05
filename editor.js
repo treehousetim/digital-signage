@@ -26,7 +26,9 @@ var MenuEditor = (function () {
       resolution: '4k',
       orientation: 'landscape',
       background_color: '#1a1a1a',
-      container: { columns: 1 }
+      viewport_padding: { top: 3, right: 1.25, bottom: 3, left: 1.25 },
+      area_gap: 3,
+      container: { columns: 1, gutter: 1.25 }
     },
     theme: {},
     areas: [
@@ -355,23 +357,23 @@ var MenuEditor = (function () {
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
       { key: 'background_color', type: 'color', label: 'Background Color' },
-      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding' },
-      { key: 'area_gap', type: 'number', label: 'Area Gap (px)' },
+      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
+      { key: 'area_gap', type: 'number', label: 'Area Gap (%)', step: 0.25 },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
-        { key: 'container.gutter', type: 'number', label: 'Gutter (px)' }
+        { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
       ]},
       { group: 'Title', fields: [
         { key: 'title.text', type: 'text', label: 'Text' },
         { key: 'title.font', type: 'font', label: 'Font' },
         { key: 'title.position.x_align', type: 'select', options: ['left', 'center', 'right'], label: 'Alignment' },
-        { key: 'title.position.top_padding', type: 'number', label: 'Top Padding (px)' }
+        { key: 'title.position.top_padding', type: 'number', label: 'Top Padding (%)', step: 0.25 }
       ]},
       { group: 'Logo', fields: [
         { key: 'logo.src', type: 'text', label: 'Image URL' },
         { key: 'logo.x_align', type: 'select', options: ['left', 'right'], label: 'Alignment' },
-        { key: 'logo.top_padding', type: 'number', label: 'Top Padding (px)' },
-        { key: 'logo.max_height', type: 'number', label: 'Max Height (px)' }
+        { key: 'logo.top_padding', type: 'number', label: 'Top Padding (%)', step: 0.25 },
+        { key: 'logo.max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
       ]}
     ],
     theme: [
@@ -389,10 +391,10 @@ var MenuEditor = (function () {
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
       { key: 'columns', type: 'number', label: 'Sub-Area Columns' },
-      { key: 'gutter', type: 'number', label: 'Gutter (px)' },
+      { key: 'gutter', type: 'number', label: 'Gutter (%)', step: 0.25 },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-      { key: 'padding', type: 'padding', label: 'Padding' }
+      { key: 'padding', type: 'padding', label: 'Padding (%)' }
     ],
     item: [
       { key: 'id', type: 'text', label: 'ID' },
@@ -401,7 +403,7 @@ var MenuEditor = (function () {
       { key: 'price', type: 'text', label: 'Price' },
       { key: 'align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
-      { key: 'padding', type: 'padding', label: 'Padding' }
+      { key: 'padding', type: 'padding', label: 'Padding (%)' }
     ],
     variation: [
       { key: 'id', type: 'text', label: 'ID' },
@@ -434,7 +436,9 @@ var MenuEditor = (function () {
       wrapper.appendChild(input);
 
     } else if (fieldDef.type === 'number') {
-      var input = el('input', 'me-field__input', { type: 'number' });
+      var numAttrs = { type: 'number' };
+      if (fieldDef.step) numAttrs.step = String(fieldDef.step);
+      var input = el('input', 'me-field__input', numAttrs);
       input.value = value != null ? value : '';
       input.addEventListener('input', function () {
         var v = input.value === '' ? undefined : parseFloat(input.value);
@@ -643,14 +647,15 @@ var MenuEditor = (function () {
       // Size
       var szWrap = el('div', 'me-field');
       var szLabel = el('label', 'me-field__label');
-      szLabel.textContent = 'Size';
-      var szInput = el('input', 'me-field__input', { type: 'text', placeholder: '22px' });
-      szInput.value = fontVal.size || '';
+      szLabel.textContent = 'Size (em)';
+      var szInput = el('input', 'me-field__input', { type: 'number', step: '0.125', placeholder: '1.375' });
+      szInput.value = fontVal.size != null ? fontVal.size : '';
       var szTimer;
       szInput.addEventListener('input', function () {
         clearTimeout(szTimer);
         szTimer = setTimeout(function () {
-          store.update(fullPath + '.size', szInput.value || undefined);
+          var v = szInput.value === '' ? undefined : parseFloat(szInput.value);
+          store.update(fullPath + '.size', v);
         }, 300);
       });
       szWrap.appendChild(szLabel);

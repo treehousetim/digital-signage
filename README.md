@@ -166,7 +166,10 @@ Creates a GUI editor instance. Returns an editor controller.
 - **Toolbar**: New, Import, Export, Export PNG, Undo/Redo (Ctrl+Z), Grid overlay, Examples dropdown
 - **Hover highlight**: Hovering a tree node highlights the corresponding element in the preview
 - **Click-to-select in preview**: Click any element in the preview to select it in the tree and inspector
-- **Drag padding handles**: Selected elements show draggable handles on their padding edges — drag to resize padding visually, values update in real-time as `%`
+- **Two resize modes** (toggle in toolbar):
+  - **Element mode**: drag handles on the selected element's padding edges — resizes that element's padding
+  - **Layout mode**: drag handles on viewport padding (orange) and area gaps (green) — resizes global layout properties, updating all elements that inherit them
+- Drag values convert from px to `%` in real-time with undo/redo support (single undo per drag)
 - **IDs**: Every entity (area, item, variation) gets an auto-generated ID for external system addressing
 
 ### Embedding without the renderer

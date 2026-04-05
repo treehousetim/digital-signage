@@ -1377,58 +1377,84 @@ var MenuEditor = (function () {
           '<div id="display" style="width:100%;height:100%"></div>' +
           '<script src="renderer.js"><\/script>' +
           '<script>' +
-          'var gridOn=false;var selectedId=null;' +
-          // Message handler
+          'var gridOn=false,selectedId=null,rMode="element";' +
+
           'window.addEventListener("message",function(e){' +
-          'if(e.data&&e.data.type==="render"){' +
-          'MenuRenderer.render(e.data.data,document.getElementById("display"));' +
+          'var d=e.data;if(!d||!d.type)return;' +
+          'if(d.type==="render"){MenuRenderer.render(d.data,document.getElementById("display"));' +
           'if(gridOn){var v=document.querySelector(".ds-viewport");if(v)v.classList.add("ds-debug-grid");}' +
-          'bindClicks();if(selectedId)markSelected(selectedId);}' +
-          'if(e.data&&e.data.type==="grid"){' +
-          'gridOn=e.data.enabled;var v=document.querySelector(".ds-viewport");' +
-          'if(v){if(gridOn)v.classList.add("ds-debug-grid");else v.classList.remove("ds-debug-grid");}}' +
-          'if(e.data&&e.data.type==="highlight"){' +
-          'document.querySelectorAll(".ds-highlight").forEach(function(x){x.classList.remove("ds-highlight");});' +
-          'if(e.data.id){var el=document.querySelector("[data-ds-id=\\""+e.data.id+"\\"]");' +
-          'if(el)el.classList.add("ds-highlight");}}' +
-          'if(e.data&&e.data.type==="select"){selectedId=e.data.id;markSelected(e.data.id);}' +
+          'bindClicks();if(rMode==="layout")showLayoutHandles();' +
+          'else if(selectedId)markSelected(selectedId);}' +
+          'if(d.type==="grid"){gridOn=d.enabled;var v=document.querySelector(".ds-viewport");' +
+          'if(v){v.classList.toggle("ds-debug-grid",gridOn);}}' +
+          'if(d.type==="highlight"){clearCls("ds-highlight");' +
+          'if(d.id){var el=byId(d.id);if(el)el.classList.add("ds-highlight");}}' +
+          'if(d.type==="select"){selectedId=d.id;if(rMode==="element")markSelected(d.id);}' +
+          'if(d.type==="resize-mode"){rMode=d.mode;clearHandles();clearCls("ds-selected");' +
+          'if(rMode==="layout")showLayoutHandles();else if(selectedId)markSelected(selectedId);}' +
           '});' +
+
+          'function byId(id){return document.querySelector("[data-ds-id=\\""+id+"\\"]");}' +
+          'function clearCls(c){document.querySelectorAll("."+c).forEach(function(x){x.classList.remove(c);});}' +
+          'function clearHandles(){document.querySelectorAll(".ds-pad-handle").forEach(function(h){h.remove();});}' +
+
           // Click-to-select
           'function bindClicks(){' +
           'document.querySelectorAll("[data-ds-id]").forEach(function(el){' +
-          'el.addEventListener("click",function(ev){' +
-          'ev.stopPropagation();' +
-          'var id=el.getAttribute("data-ds-id");' +
-          'selectedId=id;markSelected(id);' +
-          'window.parent.postMessage({type:"preview-select",id:id},"*");' +
-          '});});}' +
-          // Mark selected
-          'function markSelected(id){' +
-          'document.querySelectorAll(".ds-selected").forEach(function(x){x.classList.remove("ds-selected");});' +
-          'if(id){var el=document.querySelector("[data-ds-id=\\""+id+"\\"]");' +
-          'if(el){el.classList.add("ds-selected");showPadHandles(el,id);}}}' +
-          // Padding drag handles
-          'function showPadHandles(el,id){' +
-          'document.querySelectorAll(".ds-pad-handle").forEach(function(h){h.remove();});' +
+          'el.addEventListener("click",function(ev){ev.stopPropagation();' +
+          'if(rMode!=="element")return;' +
+          'var id=el.getAttribute("data-ds-id");selectedId=id;markSelected(id);' +
+          'window.parent.postMessage({type:"preview-select",id:id},"*");});});}' +
+
+          // Element mode: select + pad handles on element
+          'function markSelected(id){clearCls("ds-selected");clearHandles();' +
+          'if(id){var el=byId(id);if(el){el.classList.add("ds-selected");' +
           'el.style.position="relative";' +
-          '["top","bottom","left","right"].forEach(function(side){makeHandle(el,id,side);});}' +
-          // Create a drag handle
-          'function makeHandle(parent,id,side){' +
+          '["top","bottom","left","right"].forEach(function(s){makeDragHandle(el,"preview-pad-drag",id,s);});}}}' +
+
+          // Layout mode: handles on viewport padding, area gaps, gutters
+          'function showLayoutHandles(){clearHandles();' +
+          'var vp=document.querySelector(".ds-viewport");if(!vp)return;' +
+          'var areas=document.querySelector(".ds-areas");if(!areas)return;' +
+          // Viewport padding handles
+          'vp.style.position="relative";' +
+          '["top","bottom","left","right"].forEach(function(s){' +
+          'makeDragHandle(areas,"preview-layout-drag",null,s,"viewport_padding."+s);});' +
+          // Area gap handles — between area rows
+          'var areaEls=areas.children;' +
+          'for(var i=1;i<areaEls.length;i++){' +
+          'var prev=areaEls[i-1];prev.style.position="relative";' +
+          'var h=document.createElement("div");h.className="ds-pad-handle ds-pad-handle--bottom ds-pad-handle--gap";' +
+          'h.style.background="rgba(76,175,80,0.3)";' +
+          'h.addEventListener("mousedown",makeGapDragger(prev,"area_gap"));prev.appendChild(h);}' +
+          '}' +
+
+          // Drag handle factory for padding
+          'function makeDragHandle(parent,msgType,id,side,prop){' +
           'var d=document.createElement("div");d.className="ds-pad-handle ds-pad-handle--"+side;' +
-          'd.addEventListener("mousedown",function(ev){' +
-          'ev.stopPropagation();ev.preventDefault();' +
+          'if(msgType==="preview-layout-drag")d.style.background="rgba(255,152,0,0.3)";' +
+          'd.addEventListener("mousedown",function(ev){ev.stopPropagation();ev.preventDefault();' +
           'window.parent.postMessage({type:"preview-pad-start"},"*");' +
-          'var startY=ev.clientY;var startX=ev.clientX;' +
+          'var startY=ev.clientY,startX=ev.clientX;' +
           'var cs=getComputedStyle(parent);var startVal=parseFloat(cs["padding-"+side])||0;' +
           'function onMove(mv){' +
           'var delta=(side==="top"||side==="bottom")?(mv.clientY-startY):(mv.clientX-startX);' +
           'if(side==="top"||side==="left")delta=-delta;' +
-          'var newVal=Math.max(0,startVal+delta);' +
-          'parent.style["padding-"+side]=newVal+"px";' +
-          'window.parent.postMessage({type:"preview-pad-drag",id:id,side:side,px:newVal},"*");}' +
+          'var nv=Math.max(0,startVal+delta);parent.style["padding-"+side]=nv+"px";' +
+          'window.parent.postMessage({type:msgType,id:id,side:side,px:nv,prop:prop},"*");}' +
           'function onUp(){document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}' +
           'document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);});' +
           'parent.appendChild(d);}' +
+
+          // Gap drag handler
+          'function makeGapDragger(el,prop){return function(ev){ev.stopPropagation();ev.preventDefault();' +
+          'window.parent.postMessage({type:"preview-pad-start"},"*");' +
+          'var startY=ev.clientY;var cs=getComputedStyle(el);var startVal=parseFloat(cs.marginBottom)||0;' +
+          'function onMove(mv){var delta=mv.clientY-startY;var nv=Math.max(0,startVal+delta);' +
+          'window.parent.postMessage({type:"preview-layout-drag",prop:prop,px:nv,side:"gap"},"*");}' +
+          'function onUp(){document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}' +
+          'document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);};}' +
+
           '<\/script></body></html>';
         iframe.srcdoc = html;
         iframe.onload = function () {
@@ -1646,10 +1672,25 @@ var MenuEditor = (function () {
       }
     });
 
+    // Resize mode toggle
+    var resizeMode = 'element'; // 'element' or 'layout'
+    var resizeModeBtn = el('button', 'me-toolbar__btn', { title: 'Toggle resize mode' });
+    resizeModeBtn.textContent = 'Resize: Element';
+    resizeModeBtn.addEventListener('click', function () {
+      resizeMode = resizeMode === 'element' ? 'layout' : 'element';
+      resizeModeBtn.textContent = 'Resize: ' + resizeMode.charAt(0).toUpperCase() + resizeMode.slice(1);
+      resizeModeBtn.classList.toggle('me-toolbar__btn--active', resizeMode === 'layout');
+      var iframeEl = root.querySelector('.me-preview-iframe');
+      if (iframeEl && iframeEl.contentWindow) {
+        iframeEl.contentWindow.postMessage({ type: 'resize-mode', mode: resizeMode }, '*');
+      }
+    });
+
     var sep2 = el('span', 'me-toolbar__sep');
     toolbar.appendChild(sep2);
     toolbar.appendChild(gridBtn);
     toolbar.appendChild(pngBtn);
+    toolbar.appendChild(resizeModeBtn);
 
     // Examples dropdown
     var sep3 = el('span', 'me-toolbar__sep');
@@ -1792,6 +1833,44 @@ var MenuEditor = (function () {
         }
         padObj[side] = pct;
         store.updateSilent(path + '.padding', padObj);
+      }
+
+      if (e.data.type === 'preview-layout-drag') {
+        // Layout drag: convert px to % and update a layout property
+        var prop = e.data.prop;
+        var side = e.data.side;
+        var px = e.data.px;
+
+        var data = store.getData();
+        var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
+        var lo = data.layout || {};
+        var res = resMap[lo.resolution] || resMap['4k'];
+        var isPort = lo.orientation === 'portrait';
+        var vpW = isPort ? res.h : res.w;
+        var vpH = isPort ? res.w : res.h;
+
+        if (prop === 'area_gap') {
+          var pct = Math.round((px / vpH) * 10000) / 100;
+          store.updateSilent('layout.area_gap', pct);
+        } else if (prop && prop.indexOf('viewport_padding.') === 0) {
+          var padSide = prop.split('.')[1];
+          var pct;
+          if (padSide === 'top' || padSide === 'bottom') {
+            pct = Math.round((px / vpH) * 10000) / 100;
+          } else {
+            pct = Math.round((px / vpW) * 10000) / 100;
+          }
+          var currentPad = getAtPath(data, 'layout.viewport_padding');
+          var padObj;
+          if (currentPad == null || typeof currentPad === 'number') {
+            var u = currentPad || 0;
+            padObj = { top: u, right: u, bottom: u, left: u };
+          } else {
+            padObj = { top: currentPad.top || 0, right: currentPad.right || 0, bottom: currentPad.bottom || 0, left: currentPad.left || 0 };
+          }
+          padObj[padSide] = pct;
+          store.updateSilent('layout.viewport_padding', padObj);
+        }
       }
     }
 

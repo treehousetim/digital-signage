@@ -165,6 +165,8 @@ Creates a GUI editor instance. Returns an editor controller.
 - **JSON output**: Syntax-highlighted, copy/download buttons
 - **Toolbar**: New, Import, Export, Export PNG, Undo/Redo (Ctrl+Z), Grid overlay, Examples dropdown
 - **Hover highlight**: Hovering a tree node highlights the corresponding element in the preview
+- **Click-to-select in preview**: Click any element in the preview to select it in the tree and inspector
+- **Drag padding handles**: Selected elements show draggable handles on their padding edges — drag to resize padding visually, values update in real-time as `%`
 - **IDs**: Every entity (area, item, variation) gets an auto-generated ID for external system addressing
 
 ### Embedding without the renderer

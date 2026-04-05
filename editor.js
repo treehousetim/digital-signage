@@ -1347,23 +1347,76 @@ var MenuEditor = (function () {
         currentVpH = isPort ? res.w : res.h;
         var html = '<!DOCTYPE html><html><head>' +
           '<link rel="stylesheet" href="theme.css">' +
-          '<style>html,body{margin:0;padding:0;overflow:hidden;background:#000}</style>' +
+          '<style>' +
+          'html,body{margin:0;padding:0;overflow:hidden;background:#000}' +
+          '[data-ds-id]{cursor:pointer}' +
+          '[data-ds-id]:hover{outline:2px solid rgba(66,165,245,0.4);outline-offset:1px}' +
+          '.ds-selected{outline:2px solid rgba(66,165,245,0.8)!important;outline-offset:2px;background:rgba(66,165,245,0.06)!important}' +
+          '.ds-pad-handle{position:absolute;background:rgba(66,165,245,0.3);z-index:1000;cursor:ns-resize}' +
+          '.ds-pad-handle--h{cursor:ew-resize}' +
+          '.ds-pad-handle:hover{background:rgba(66,165,245,0.6)}' +
+          '</style>' +
           '</head><body>' +
           '<div id="display" style="width:100%;height:100%"></div>' +
           '<script src="renderer.js"><\/script>' +
           '<script>' +
-          'var gridOn=false;' +
+          'var gridOn=false;var selectedId=null;' +
+          // Message handler
           'window.addEventListener("message",function(e){' +
           'if(e.data&&e.data.type==="render"){' +
           'MenuRenderer.render(e.data.data,document.getElementById("display"));' +
-          'if(gridOn){var v=document.querySelector(".ds-viewport");if(v)v.classList.add("ds-debug-grid");}}' +
+          'if(gridOn){var v=document.querySelector(".ds-viewport");if(v)v.classList.add("ds-debug-grid");}' +
+          'bindClicks();if(selectedId)markSelected(selectedId);}' +
           'if(e.data&&e.data.type==="grid"){' +
           'gridOn=e.data.enabled;var v=document.querySelector(".ds-viewport");' +
           'if(v){if(gridOn)v.classList.add("ds-debug-grid");else v.classList.remove("ds-debug-grid");}}' +
           'if(e.data&&e.data.type==="highlight"){' +
           'document.querySelectorAll(".ds-highlight").forEach(function(x){x.classList.remove("ds-highlight");});' +
           'if(e.data.id){var el=document.querySelector("[data-ds-id=\\""+e.data.id+"\\"]");' +
-          'if(el)el.classList.add("ds-highlight");}}});' +
+          'if(el)el.classList.add("ds-highlight");}}' +
+          'if(e.data&&e.data.type==="select"){selectedId=e.data.id;markSelected(e.data.id);}' +
+          '});' +
+          // Click-to-select
+          'function bindClicks(){' +
+          'document.querySelectorAll("[data-ds-id]").forEach(function(el){' +
+          'el.addEventListener("click",function(ev){' +
+          'ev.stopPropagation();' +
+          'var id=el.getAttribute("data-ds-id");' +
+          'selectedId=id;markSelected(id);' +
+          'window.parent.postMessage({type:"preview-select",id:id},"*");' +
+          '});});}' +
+          // Mark selected
+          'function markSelected(id){' +
+          'document.querySelectorAll(".ds-selected").forEach(function(x){x.classList.remove("ds-selected");});' +
+          'if(id){var el=document.querySelector("[data-ds-id=\\""+id+"\\"]");' +
+          'if(el){el.classList.add("ds-selected");showPadHandles(el,id);}}}' +
+          // Padding drag handles
+          'function showPadHandles(el,id){' +
+          'document.querySelectorAll(".ds-pad-handle").forEach(function(h){h.remove();});' +
+          'var r=el.getBoundingClientRect();var cs=getComputedStyle(el);' +
+          'var pt=parseFloat(cs.paddingTop)||0;var pr=parseFloat(cs.paddingRight)||0;' +
+          'var pb=parseFloat(cs.paddingBottom)||0;var pl=parseFloat(cs.paddingLeft)||0;' +
+          'if(pt>2)makeHandle(el,id,"top",0,0,r.width,Math.max(pt,6));' +
+          'if(pb>2)makeHandle(el,id,"bottom",0,r.height-Math.max(pb,6),r.width,Math.max(pb,6));' +
+          'if(pl>2)makeHandle(el,id,"left",0,0,Math.max(pl,6),r.height);' +
+          'if(pr>2)makeHandle(el,id,"right",r.width-Math.max(pr,6),0,Math.max(pr,6),r.height);}' +
+          // Create a drag handle
+          'function makeHandle(parent,id,side,x,y,w,h){' +
+          'var d=document.createElement("div");d.className="ds-pad-handle"+(side==="left"||side==="right"?" ds-pad-handle--h":"");' +
+          'parent.style.position="relative";' +
+          'd.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";d.style.height=h+"px";' +
+          'var startY,startX,startVal;' +
+          'd.addEventListener("mousedown",function(ev){' +
+          'ev.stopPropagation();ev.preventDefault();startY=ev.clientY;startX=ev.clientX;' +
+          'var cs=getComputedStyle(parent);startVal=parseFloat(cs["padding-"+side])||0;' +
+          'function onMove(mv){' +
+          'var delta=(side==="top"||side==="bottom")?(mv.clientY-startY):(mv.clientX-startX);' +
+          'if(side==="top"||side==="left")delta=-delta;' +
+          'var newVal=Math.max(0,startVal+delta);' +
+          'window.parent.postMessage({type:"preview-pad-drag",id:id,side:side,px:newVal},"*");}' +
+          'function onUp(){document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}' +
+          'document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);});' +
+          'parent.appendChild(d);}' +
           '<\/script></body></html>';
         iframe.srcdoc = html;
         iframe.onload = function () {
@@ -1651,6 +1704,94 @@ var MenuEditor = (function () {
     createInspectorPanel(inspContent, store);
     createPreviewPanel(prevContent, store, rendererAvailable, function () { return gridActive; });
 
+    // Listen for messages from preview iframe
+    function findPathById(id, obj, prefix) {
+      if (!obj) return null;
+      if (Array.isArray(obj)) {
+        for (var i = 0; i < obj.length; i++) {
+          var p = findPathById(id, obj[i], prefix + '[' + i + ']');
+          if (p) return p;
+        }
+        return null;
+      }
+      if (obj.id === id) return prefix;
+      if (obj.areas) {
+        var p = findPathById(id, obj.areas, prefix + '.areas');
+        if (p) return p;
+      }
+      if (obj.items) {
+        var p = findPathById(id, obj.items, prefix + '.items');
+        if (p) return p;
+      }
+      if (obj.variations) {
+        var p = findPathById(id, obj.variations, prefix + '.variations');
+        if (p) return p;
+      }
+      return null;
+    }
+
+    function messageHandler(e) {
+      if (!e.data || !e.data.type) return;
+
+      if (e.data.type === 'preview-select') {
+        // Click-to-select: find the path for this ID and select it
+        var path = findPathById(e.data.id, store.getData().areas, 'areas');
+        if (path) {
+          store.select(path);
+        }
+      }
+
+      if (e.data.type === 'preview-pad-drag') {
+        // Padding drag: convert px to % and update
+        var id = e.data.id;
+        var side = e.data.side;
+        var px = e.data.px;
+        var path = findPathById(id, store.getData().areas, 'areas');
+        if (!path) return;
+
+        // Convert px to % based on side orientation
+        var data = store.getData();
+        var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
+        var lo = data.layout || {};
+        var res = resMap[lo.resolution] || resMap['4k'];
+        var isPort = lo.orientation === 'portrait';
+        var vpW = isPort ? res.h : res.w;
+        var vpH = isPort ? res.w : res.h;
+
+        var pct;
+        if (side === 'top' || side === 'bottom') {
+          pct = Math.round((px / vpH) * 10000) / 100;
+        } else {
+          pct = Math.round((px / vpW) * 10000) / 100;
+        }
+
+        // Get current padding, update the side
+        var currentPad = getAtPath(store.getData(), path + '.padding');
+        var padObj;
+        if (currentPad == null || typeof currentPad === 'number') {
+          var uniform = currentPad || 0;
+          padObj = { top: uniform, right: uniform, bottom: uniform, left: uniform };
+        } else {
+          padObj = { top: currentPad.top || 0, right: currentPad.right || 0, bottom: currentPad.bottom || 0, left: currentPad.left || 0 };
+        }
+        padObj[side] = pct;
+        store.update(path + '.padding', padObj);
+      }
+    }
+
+    window.addEventListener('message', messageHandler);
+
+    // Sync selection to iframe
+    store.on('select', function () {
+      var path = store.getSelectedPath();
+      var obj = getAtPath(store.getData(), path);
+      var id = obj && obj.id ? obj.id : null;
+      var iframeEl = root.querySelector('.me-preview-iframe');
+      if (iframeEl && iframeEl.contentWindow) {
+        iframeEl.contentWindow.postMessage({ type: 'select', id: id }, '*');
+      }
+    });
+
     // Keyboard shortcuts
     root.setAttribute('tabindex', '0');
     root.addEventListener('keydown', function (e) {
@@ -1670,7 +1811,7 @@ var MenuEditor = (function () {
     return {
       getData: function () { return store.getClone(); },
       setData: function (data) { store.replaceData(data, true); },
-      destroy: function () { targetElement.innerHTML = ''; },
+      destroy: function () { window.removeEventListener('message', messageHandler); targetElement.innerHTML = ''; },
       on: function (event, handler) { store.on(event, handler); }
     };
   }

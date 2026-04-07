@@ -12,18 +12,18 @@
       "loose": 4
     }
   },
-  "layout": {
-    "container": {
-      "columns": 2
-    },
-    "viewport_padding": {
-      "top": "$tight",
-      "right": "$loose",
-      "bottom": "$tight",
-      "left": "$loose"
-    }
-  },
   "theme": {
+    "layout": {
+      "container": {
+        "columns": 2
+      },
+      "viewport_padding": {
+        "top": "$tight",
+        "right": "$loose",
+        "bottom": "$tight",
+        "left": "$loose"
+      }
+    },
     "fonts": {
       "title": {
         "family": "Playfair Display",

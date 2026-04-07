@@ -1,9 +1,11 @@
 {
   "uses": "themes/dark.json",
-  "layout": {
-    "orientation": "portrait",
-    "container": {
-      "columns": 1
+  "theme": {
+    "layout": {
+      "orientation": "portrait",
+      "container": {
+        "columns": 1
+      }
     }
   },
   "header": {

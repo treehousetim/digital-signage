@@ -869,7 +869,7 @@ var MenuEditor = (function () {
     container.appendChild(dropIndicator);
 
     function getNodeType(path) {
-      if (path === 'layout') return 'layout';
+      if (path === 'theme.layout') return 'layout';
       if (path === 'theme' || path.indexOf('theme') === 0) return 'theme';
       var obj = getAtPath(store.getData(), path);
       if (!obj) return 'unknown';
@@ -887,7 +887,7 @@ var MenuEditor = (function () {
 
     function getNodeLabel(path, obj) {
       if (path === '') return 'Menu';
-      if (path === 'layout') return 'Layout';
+      if (path === 'theme.layout') return 'Layout';
       if (path === 'theme') return 'Theme';
       if (path === 'vars') return 'Vars';
       if (obj.title) return obj.title;
@@ -1124,7 +1124,7 @@ var MenuEditor = (function () {
       container.appendChild(buildNode('vars', data.vars || {}, 'vars', 0));
 
       // Layout node
-      container.appendChild(buildNode('layout', data.layout || {}, 'layout', 0));
+      container.appendChild(buildNode('theme.layout', (data.theme && data.theme.layout) || {}, 'layout', 0));
 
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
@@ -1231,7 +1231,7 @@ var MenuEditor = (function () {
       var value = getAtPath(data, path);
 
       // Tree sections (Header, Areas) and unselectable nodes get empty inspector
-      if (value == null && path !== 'layout' && path !== 'theme' && path !== '' && path !== 'vars') {
+      if (value == null && path !== 'theme.layout' && path !== 'theme' && path !== '' && path !== 'vars') {
         // Empty inspector — no message
         return;
       }
@@ -1239,7 +1239,7 @@ var MenuEditor = (function () {
       // Determine type
       var type;
       if (path === '') type = 'root';
-      else if (path === 'layout') type = 'layout';
+      else if (path === 'theme.layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
       else if (path === 'vars') type = 'vars';
       else if (path.indexOf('header.elements[') === 0) {

@@ -9,8 +9,10 @@
       "divider": "#d9cec3"
     }
   },
-  "layout": {
-    "orientation": "portrait"
+  "theme": {
+    "layout": {
+      "orientation": "portrait"
+    }
   },
   "header": {
     "elements": [

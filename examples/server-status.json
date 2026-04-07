@@ -1,10 +1,5 @@
 {
   "uses": "themes/mono.json",
-  "layout": {
-    "container": {
-      "columns": 3
-    }
-  },
   "vars": {
     "palette": {
       "background": "#0d1117",
@@ -16,6 +11,11 @@
     }
   },
   "theme": {
+    "layout": {
+      "container": {
+        "columns": 3
+      }
+    },
     "fonts": {
       "emphasis": {
         "color": "$accent"

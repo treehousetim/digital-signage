@@ -94,6 +94,14 @@ var MenuRenderer = (function () {
   // (or on top of a preset, which is merged on top of this).
 
   var DEFAULT_THEME = {
+    layout: {
+      resolution: '4k',
+      orientation: 'landscape',
+      mode: 'display',
+      viewport_padding: { top: '$md', right: '$md', bottom: '$md', left: '$md' },
+      area_gap: '$lg',
+      container: { columns: 1, gutter: '$md' }
+    },
     colors: {
       background: '$background',
       surface:    '$surface',
@@ -143,15 +151,6 @@ var MenuRenderer = (function () {
       divider: null,
       columns: null
     }
-  };
-
-  var DEFAULT_LAYOUT = {
-    resolution: '4k',
-    orientation: 'landscape',
-    mode: 'display',
-    viewport_padding: { top: '$md', right: '$md', bottom: '$md', left: '$md' },
-    area_gap: '$lg',
-    container: { columns: 1, gutter: '$md' }
   };
 
   // ── General Utilities ──────────────────────────────────────────────────
@@ -829,9 +828,10 @@ var MenuRenderer = (function () {
         'use MenuRenderer.loadFromUrl() or MenuRenderer.resolve() to apply it.');
     }
 
-    var vars   = deepMerge({},             data.vars   || {});
-    var theme  = deepMerge(DEFAULT_THEME,  data.theme  || {});
-    var layout = deepMerge(DEFAULT_LAYOUT, data.layout || {});
+    var vars  = deepMerge({},            data.vars  || {});
+    var theme = deepMerge(DEFAULT_THEME, data.theme || {});
+    // Layout is now a section of theme — extract it for the rest of the pipeline
+    var layout = theme.layout || {};
 
     // Auto-assign IDs in-place on a clone so caller's data isn't mutated
     var workingData = JSON.parse(JSON.stringify(data));
@@ -1020,16 +1020,16 @@ var MenuRenderer = (function () {
       });
     }
 
-    if (data.layout) {
-      var lo = data.layout;
+    if (data.theme && data.theme.layout) {
+      var lo = data.theme.layout;
       if (lo.resolution && VALID_RESOLUTIONS.indexOf(lo.resolution) === -1) {
-        errors.push({ path: 'layout.resolution', message: 'Must be one of: ' + VALID_RESOLUTIONS.join(', ') });
+        errors.push({ path: 'theme.layout.resolution', message: 'Must be one of: ' + VALID_RESOLUTIONS.join(', ') });
       }
       if (lo.orientation && VALID_ORIENTATIONS.indexOf(lo.orientation) === -1) {
-        errors.push({ path: 'layout.orientation', message: 'Must be one of: ' + VALID_ORIENTATIONS.join(', ') });
+        errors.push({ path: 'theme.layout.orientation', message: 'Must be one of: ' + VALID_ORIENTATIONS.join(', ') });
       }
       if (lo.mode && VALID_MODES.indexOf(lo.mode) === -1) {
-        errors.push({ path: 'layout.mode', message: 'Must be one of: ' + VALID_MODES.join(', ') });
+        errors.push({ path: 'theme.layout.mode', message: 'Must be one of: ' + VALID_MODES.join(', ') });
       }
     }
 

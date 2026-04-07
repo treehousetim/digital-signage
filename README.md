@@ -59,9 +59,15 @@ The design system has six top-level concepts. All are optional except `areas`.
 {
   "uses":   "themes/warm.json",  // import external theme JSON file(s)
   "vars":   { ... },        // design vars (palette, spacing, type_scale)
-  "layout": { ... },        // canvas + content arrangement
-  "theme":  { ... },        // visual contract (colors, fonts, dividers, etc.)
-  "header": { ... },        // header content (visuals live in theme.header)
+  "theme":  {               // visual contract — layout, colors, fonts, ...
+    "layout": { ... },      //   canvas + arrangement (resolution, container, etc.)
+    "colors": { ... },
+    "fonts":  { ... },
+    "areas":  { ... },      //   defaults for all areas
+    "items":  { ... },      //   defaults for all items
+    "header": { ... }       //   visual properties of the header region
+  },
+  "header": { ... },        // header content (the actual elements)
   "areas":  [ ... ]         // the menu content
 }
 ```

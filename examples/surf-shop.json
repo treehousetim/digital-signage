@@ -5,12 +5,12 @@
       "sun": "#f0e68c"
     }
   },
-  "layout": {
-    "container": {
-      "columns": 2
-    }
-  },
   "theme": {
+    "layout": {
+      "container": {
+        "columns": 2
+      }
+    },
     "fonts": {
       "title": {
         "color": "$sun"

@@ -34,24 +34,6 @@
         }
       }
     },
-    "layout": {
-      "type": "object",
-      "description": "Canvas dimensions and content arrangement.",
-      "properties": {
-        "resolution": { "type": "string", "enum": ["1080", "2k", "4k"], "default": "4k" },
-        "orientation": { "type": "string", "enum": ["landscape", "portrait"], "default": "landscape" },
-        "mode": { "type": "string", "enum": ["display", "preview"], "default": "display" },
-        "viewport_padding": { "$ref": "#/$defs/padding" },
-        "area_gap": { "$ref": "#/$defs/spacing_value" },
-        "container": {
-          "type": "object",
-          "properties": {
-            "columns": { "type": "integer", "enum": [1, 2, 3], "default": 1 },
-            "gutter": { "$ref": "#/$defs/spacing_value" }
-          }
-        }
-      }
-    },
     "theme": { "$ref": "#/$defs/theme" },
     "header": {
       "type": "object",
@@ -112,8 +94,26 @@
     },
     "theme": {
       "type": "object",
-      "description": "Visual definitions. Every group has sensible defaults and can be partially overridden.",
+      "description": "Visual contract: layout, colors, fonts, dividers, and per-element defaults. Every group has sensible defaults and can be partially overridden.",
       "properties": {
+        "layout": {
+          "type": "object",
+          "description": "Canvas dimensions and content arrangement.",
+          "properties": {
+            "resolution": { "type": "string", "enum": ["1080", "2k", "4k"], "default": "4k" },
+            "orientation": { "type": "string", "enum": ["landscape", "portrait"], "default": "landscape" },
+            "mode": { "type": "string", "enum": ["display", "preview"], "default": "display" },
+            "viewport_padding": { "$ref": "#/$defs/padding" },
+            "area_gap": { "$ref": "#/$defs/spacing_value" },
+            "container": {
+              "type": "object",
+              "properties": {
+                "columns": { "type": "integer", "enum": [1, 2, 3], "default": 1 },
+                "gutter": { "$ref": "#/$defs/spacing_value" }
+              }
+            }
+          }
+        },
         "colors": {
           "type": "object",
           "description": "Semantic color slots. Each defaults to a $palette reference.",

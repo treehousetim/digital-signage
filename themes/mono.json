@@ -1,0 +1,21 @@
+{
+  "vars": {
+    "palette": {
+      "background": "#000000",
+      "surface":    "#0a0a0a",
+      "text":       "#ffffff",
+      "muted":      "#888888",
+      "accent":     "#ffffff",
+      "divider":    "#333333"
+    }
+  },
+  "theme": {
+    "fonts": {
+      "title":    { "family": "Roboto", "weight": "700" },
+      "heading":  { "family": "Roboto", "weight": "700" },
+      "body":     { "family": "Roboto" },
+      "emphasis": { "family": "Roboto" },
+      "caption":  { "family": "Roboto" }
+    }
+  }
+}

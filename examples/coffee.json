@@ -1,12 +1,17 @@
 {
-  "preset": "dark",
+  "uses": "themes/dark.json",
   "layout": {
     "orientation": "portrait",
-    "container": { "columns": 1 }
+    "container": {
+      "columns": 1
+    }
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "Coffee" }
+      {
+        "type": "text",
+        "text": "Coffee"
+      }
     ]
   },
   "areas": [
@@ -14,24 +19,150 @@
       "title": "Hot Drinks",
       "column_count": 2,
       "items": [
-        { "name": "Latte", "description": "Espresso with steamed milk", "variations": [{ "name": "Sm", "price": "4.50" }, { "name": "Lg", "price": "5.50" }] },
-        { "name": "Cappuccino", "description": "Equal parts espresso, steamed milk, foam", "variations": [{ "name": "Sm", "price": "4.50" }, { "name": "Lg", "price": "5.50" }] },
-        { "name": "Americano", "description": "Espresso with hot water", "variations": [{ "name": "Sm", "price": "3.50" }, { "name": "Lg", "price": "4.50" }] },
-        { "name": "Flat White", "description": "Double ristretto, velvety milk", "price": "5.00" },
-        { "name": "Mocha", "description": "Espresso, chocolate, steamed milk", "variations": [{ "name": "Sm", "price": "5.00" }, { "name": "Lg", "price": "6.00" }] },
-        { "name": "Drip Coffee", "description": "House blend, fresh brewed", "variations": [{ "name": "Sm", "price": "2.50" }, { "name": "Lg", "price": "3.50" }] },
-        { "name": "Espresso", "variations": [{ "name": "Single", "price": "2.50" }, { "name": "Double", "price": "3.50" }] },
-        { "name": "Hot Chocolate", "description": "Rich cocoa, whipped cream", "price": "4.50" }
+        {
+          "name": "Latte",
+          "description": "Espresso with steamed milk",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "4.50"
+            },
+            {
+              "name": "Lg",
+              "price": "5.50"
+            }
+          ]
+        },
+        {
+          "name": "Cappuccino",
+          "description": "Equal parts espresso, steamed milk, foam",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "4.50"
+            },
+            {
+              "name": "Lg",
+              "price": "5.50"
+            }
+          ]
+        },
+        {
+          "name": "Americano",
+          "description": "Espresso with hot water",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "3.50"
+            },
+            {
+              "name": "Lg",
+              "price": "4.50"
+            }
+          ]
+        },
+        {
+          "name": "Flat White",
+          "description": "Double ristretto, velvety milk",
+          "price": "5.00"
+        },
+        {
+          "name": "Mocha",
+          "description": "Espresso, chocolate, steamed milk",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "5.00"
+            },
+            {
+              "name": "Lg",
+              "price": "6.00"
+            }
+          ]
+        },
+        {
+          "name": "Drip Coffee",
+          "description": "House blend, fresh brewed",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "2.50"
+            },
+            {
+              "name": "Lg",
+              "price": "3.50"
+            }
+          ]
+        },
+        {
+          "name": "Espresso",
+          "variations": [
+            {
+              "name": "Single",
+              "price": "2.50"
+            },
+            {
+              "name": "Double",
+              "price": "3.50"
+            }
+          ]
+        },
+        {
+          "name": "Hot Chocolate",
+          "description": "Rich cocoa, whipped cream",
+          "price": "4.50"
+        }
       ]
     },
     {
       "title": "Cold Drinks",
       "column_count": 2,
       "items": [
-        { "name": "Iced Latte", "variations": [{ "name": "Sm", "price": "5.00" }, { "name": "Lg", "price": "6.00" }] },
-        { "name": "Cold Brew", "description": "18-hour slow steep", "variations": [{ "name": "Sm", "price": "4.50" }, { "name": "Lg", "price": "5.50" }] },
-        { "name": "Iced Mocha", "variations": [{ "name": "Sm", "price": "5.50" }, { "name": "Lg", "price": "6.50" }] },
-        { "name": "Fresh Lemonade", "description": "House-squeezed, hint of mint", "price": "3.50" }
+        {
+          "name": "Iced Latte",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "5.00"
+            },
+            {
+              "name": "Lg",
+              "price": "6.00"
+            }
+          ]
+        },
+        {
+          "name": "Cold Brew",
+          "description": "18-hour slow steep",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "4.50"
+            },
+            {
+              "name": "Lg",
+              "price": "5.50"
+            }
+          ]
+        },
+        {
+          "name": "Iced Mocha",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "5.50"
+            },
+            {
+              "name": "Lg",
+              "price": "6.50"
+            }
+          ]
+        },
+        {
+          "name": "Fresh Lemonade",
+          "description": "House-squeezed, hint of mint",
+          "price": "3.50"
+        }
       ]
     }
   ]

@@ -6,10 +6,12 @@
   "type": "object",
   "required": ["areas"],
   "properties": {
-    "preset": {
-      "type": "string",
-      "enum": ["dark", "light", "warm", "cool", "mono"],
-      "description": "Built-in theme preset. Sets palette and font families. User overrides take precedence."
+    "uses": {
+      "description": "External JSON file(s) to import as defaults. String for one file, array for multiple (layered in order, later wins). User inline values override all imports.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
     },
     "vars": {
       "type": "object",

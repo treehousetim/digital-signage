@@ -1,5 +1,5 @@
 {
-  "preset": "mono",
+  "uses": "themes/mono.json",
   "layout": {
     "container": {
       "columns": 3

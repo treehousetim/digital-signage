@@ -23,7 +23,7 @@ var MenuEditor = (function () {
 
   // Minimal blank template — relies on defaults for almost everything
   var BLANK_TEMPLATE = {
-    preset: 'dark',
+    uses: 'themes/dark.json',
     header: {
       elements: [
         { type: 'text', text: 'Menu' }
@@ -388,11 +388,18 @@ var MenuEditor = (function () {
   // ── Field Definitions ──────────────────────────────────────────────────
 
   var FONT_ROLES = ['', 'title', 'heading', 'body', 'emphasis', 'caption'];
-  var PRESET_OPTIONS = ['', 'dark', 'light', 'warm', 'cool', 'mono'];
+  var BUILT_IN_THEMES = [
+    '',
+    'themes/dark.json',
+    'themes/light.json',
+    'themes/warm.json',
+    'themes/cool.json',
+    'themes/mono.json'
+  ];
 
   var FIELD_DEFS = {
     root: [
-      { key: 'preset', type: 'select', options: PRESET_OPTIONS, label: 'Preset' }
+      { key: 'uses', type: 'select', options: BUILT_IN_THEMES, label: 'Theme (uses)' }
     ],
     layout: [
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
@@ -1110,7 +1117,7 @@ var MenuEditor = (function () {
 
       var data = store.getData();
 
-      // Root (Menu) — shows preset selector
+      // Root (Menu) — shows theme `uses` selector
       container.appendChild(buildNode('', data, 'root', 0));
 
       // Tokens
@@ -1797,13 +1804,26 @@ var MenuEditor = (function () {
 
     function sendDataToIframe(data) {
       if (!iframe || !iframe.contentWindow) return;
-      iframe.contentWindow.postMessage({ type: 'render', data: data }, '*');
-      setTimeout(function () {
-        if (iframe.contentWindow && getGridActive) {
-          iframe.contentWindow.postMessage({ type: 'grid', enabled: getGridActive() }, '*');
-        }
-        applyZoom();
-      }, 50);
+      // Resolve external `uses` references before sending to iframe.
+      // If MenuRenderer.resolve isn't available or there's no uses, posts immediately.
+      var p;
+      if (data.uses && typeof MenuRenderer !== 'undefined' && MenuRenderer.resolve) {
+        p = MenuRenderer.resolve(data, window.location.href).catch(function (err) {
+          console.warn('[MenuEditor] Failed to resolve uses:', err.message);
+          return data;
+        });
+      } else {
+        p = Promise.resolve(data);
+      }
+      p.then(function (resolved) {
+        iframe.contentWindow.postMessage({ type: 'render', data: resolved }, '*');
+        setTimeout(function () {
+          if (iframe.contentWindow && getGridActive) {
+            iframe.contentWindow.postMessage({ type: 'grid', enabled: getGridActive() }, '*');
+          }
+          applyZoom();
+        }, 50);
+      });
     }
 
     function updatePreview() {
@@ -2189,7 +2209,7 @@ var MenuEditor = (function () {
       { value: 'examples/bakery.json', label: 'Bakery' },
       { value: 'examples/surf-shop.json', label: 'Surf Shop' },
       { value: 'examples/server-status.json', label: 'Server Status' },
-      { value: 'examples/themed.json', label: 'Themed (preset + refs)' },
+      { value: 'examples/themed.json', label: 'Themed (uses + refs)' },
       { value: 'examples/minimal.json', label: 'Minimal' }
     ];
     exOpts.forEach(function (o) {

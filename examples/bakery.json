@@ -1,5 +1,5 @@
 {
-  "preset": "light",
+  "uses": "themes/light.json",
   "vars": {
     "palette": {
       "background": "#faf3eb",

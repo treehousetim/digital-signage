@@ -1,0 +1,18 @@
+{
+  "vars": {
+    "palette": {
+      "background": "#0a2a3a",
+      "surface":    "#1a3a4a",
+      "text":       "#e8f0f5",
+      "muted":      "#8ab8cc",
+      "accent":     "#5cc8e8",
+      "divider":    "#1a4a5e"
+    }
+  },
+  "theme": {
+    "fonts": {
+      "title":   { "family": "Oswald" },
+      "heading": { "family": "Oswald" }
+    }
+  }
+}

@@ -154,54 +154,6 @@ var MenuRenderer = (function () {
     container: { columns: 1, gutter: '$md' }
   };
 
-  // ── Theme Presets ──────────────────────────────────────────────────────
-  // Presets layer over DEFAULT_THEME. Users layer over presets.
-
-  var PRESETS = {
-    dark: {
-      vars: { palette: { background: '#1a1a1a', surface: '#222222', text: '#ffffff', muted: '#cccccc', accent: '#f0c040', divider: '#444444' } }
-    },
-    light: {
-      vars: { palette: { background: '#fafafa', surface: '#ffffff', text: '#1a1a1a', muted: '#666666', accent: '#c8501e', divider: '#dddddd' } },
-      theme: {
-        fonts: {
-          title:   { family: 'Playfair Display', weight: '700' },
-          heading: { family: 'Playfair Display', weight: '700' }
-        }
-      }
-    },
-    warm: {
-      vars: { palette: { background: '#2c1810', surface: '#3a2318', text: '#f5e6d3', muted: '#c4a882', accent: '#d4a574', divider: '#4a3528' } },
-      theme: {
-        fonts: {
-          title:   { family: 'Playfair Display' },
-          heading: { family: 'Playfair Display' }
-        }
-      }
-    },
-    cool: {
-      vars: { palette: { background: '#0a2a3a', surface: '#1a3a4a', text: '#e8f0f5', muted: '#8ab8cc', accent: '#5cc8e8', divider: '#1a4a5e' } },
-      theme: {
-        fonts: {
-          title:   { family: 'Oswald' },
-          heading: { family: 'Oswald' }
-        }
-      }
-    },
-    mono: {
-      vars: { palette: { background: '#000000', surface: '#0a0a0a', text: '#ffffff', muted: '#888888', accent: '#ffffff', divider: '#333333' } },
-      theme: {
-        fonts: {
-          title:   { family: 'Roboto', weight: '700' },
-          heading: { family: 'Roboto', weight: '700' },
-          body:    { family: 'Roboto' },
-          emphasis: { family: 'Roboto' },
-          caption: { family: 'Roboto' }
-        }
-      }
-    }
-  };
-
   // ── General Utilities ──────────────────────────────────────────────────
 
   function deepMerge(base, overrides) {
@@ -870,17 +822,16 @@ var MenuRenderer = (function () {
 
     cleanupPreview();
 
-    // Apply preset → defaults → user
-    var presetName = data.preset || (data.theme && data.theme.preset);
-    var preset = (presetName && PRESETS[presetName]) ? PRESETS[presetName] : null;
+    // If data has unresolved `uses` references, warn — they should be
+    // resolved with MenuRenderer.resolve() or loaded via loadFromUrl().
+    if (data.uses) {
+      console.warn('[MenuRenderer] data.uses is set but render() is synchronous; ' +
+        'use MenuRenderer.loadFromUrl() or MenuRenderer.resolve() to apply it.');
+    }
 
-    var baseVars = preset && preset.vars ? deepMerge({}, preset.vars) : {};
-    var baseTheme  = preset && preset.theme  ? deepMerge(DEFAULT_THEME, preset.theme) : DEFAULT_THEME;
-    var baseLayout = preset && preset.layout ? deepMerge(DEFAULT_LAYOUT, preset.layout) : DEFAULT_LAYOUT;
-
-    var vars = deepMerge(baseVars, data.vars || {});
-    var theme  = deepMerge(baseTheme,  data.theme  || {});
-    var layout = deepMerge(baseLayout, data.layout || {});
+    var vars   = deepMerge({},             data.vars   || {});
+    var theme  = deepMerge(DEFAULT_THEME,  data.theme  || {});
+    var layout = deepMerge(DEFAULT_LAYOUT, data.layout || {});
 
     // Auto-assign IDs in-place on a clone so caller's data isn't mutated
     var workingData = JSON.parse(JSON.stringify(data));
@@ -943,17 +894,77 @@ var MenuRenderer = (function () {
     }
   }
 
+  // ── External Imports (uses) ────────────────────────────────────────────
+  // Any data file may have a `uses` field referencing one or more other
+  // JSON files. Each referenced file is fetched, recursively resolved, and
+  // deep-merged in order under the data (later wins, user data wins over all).
+
+  function resolveUrl(ref, baseUrl) {
+    if (!baseUrl) return ref;
+    try {
+      return new URL(ref, baseUrl).href;
+    } catch (e) {
+      return ref;
+    }
+  }
+
+  /**
+   * Fetch a single JSON file. Returns Promise<data>.
+   */
+  function importUrl(url) {
+    return fetch(url).then(function (res) {
+      if (!res.ok) throw new Error('Failed to fetch ' + url + ': ' + res.status);
+      return res.json();
+    });
+  }
+
+  /**
+   * Recursively resolve all `uses` references in data, deep-merging them
+   * in order under the data. Later files override earlier ones, user data
+   * overrides all. Returns Promise<flatData> with `uses` removed.
+   *
+   * Cycle detection: if the same URL appears twice in the chain, throws.
+   */
+  function resolveData(data, baseUrl, visited) {
+    visited = visited || {};
+    if (!data || !data.uses) return Promise.resolve(data);
+
+    var refs = Array.isArray(data.uses) ? data.uses : [data.uses];
+    var promises = refs.map(function (ref) {
+      var url = resolveUrl(ref, baseUrl);
+      if (visited[url]) {
+        return Promise.reject(new Error('[MenuRenderer] Circular `uses` reference: ' + url));
+      }
+      visited[url] = true;
+      return importUrl(url).then(function (imported) {
+        return resolveData(imported, url, visited);
+      });
+    });
+
+    return Promise.all(promises).then(function (resolvedRefs) {
+      // Layer them in order: first ref is base, later refs override, user data overrides all
+      var merged = {};
+      resolvedRefs.forEach(function (r) {
+        merged = deepMerge(merged, r);
+      });
+      // Apply user data on top, but drop the `uses` field from the result
+      var clean = {};
+      for (var k in data) {
+        if (data.hasOwnProperty(k) && k !== 'uses') clean[k] = data[k];
+      }
+      merged = deepMerge(merged, clean);
+      return merged;
+    });
+  }
+
   // ── URL Loading ────────────────────────────────────────────────────────
 
   function loadFromUrl(url, target) {
-    return fetch(url)
-      .then(function (res) {
-        if (!res.ok) throw new Error('Failed to fetch menu JSON: ' + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        render(data, target);
-        return data;
+    return importUrl(url)
+      .then(function (data) { return resolveData(data, url); })
+      .then(function (resolved) {
+        render(resolved, target);
+        return resolved;
       });
   }
 
@@ -1022,10 +1033,6 @@ var MenuRenderer = (function () {
       }
     }
 
-    if (data.preset && !PRESETS[data.preset]) {
-      warnings.push({ path: 'preset', message: 'Unknown preset: ' + data.preset });
-    }
-
     return { valid: errors.length === 0, errors: errors, warnings: warnings };
   }
 
@@ -1090,7 +1097,10 @@ var MenuRenderer = (function () {
     watch: watch,
     validate: validate,
     formatPrice: formatPrice,
-    presets: Object.keys(PRESETS),
+    /** Fetch a single JSON file. Returns Promise<data>. */
+    import: importUrl,
+    /** Recursively resolve all `uses` references in data. Returns Promise<flatData>. */
+    resolve: resolveData,
     get lastValidation() { return lastValidation; }
   };
 

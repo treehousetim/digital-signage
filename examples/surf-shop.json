@@ -1,5 +1,5 @@
 {
-  "preset": "cool",
+  "uses": "themes/cool.json",
   "vars": {
     "palette": {
       "sun": "#f0e68c"

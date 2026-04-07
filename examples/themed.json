@@ -1,5 +1,5 @@
 {
-  "preset": "warm",
+  "uses": "themes/warm.json",
   "vars": {
     "palette": {
       "accent": "#ff8c42"

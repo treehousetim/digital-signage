@@ -1,0 +1,12 @@
+{
+  "vars": {
+    "palette": {
+      "background": "#1a1a1a",
+      "surface":    "#222222",
+      "text":       "#ffffff",
+      "muted":      "#cccccc",
+      "accent":     "#f0c040",
+      "divider":    "#444444"
+    }
+  }
+}

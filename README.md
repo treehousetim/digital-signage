@@ -16,6 +16,7 @@ No frameworks. No build step. No npm. Vanilla JavaScript. Embed it anywhere.
 | `editor.css` | Editor CSS (namespaced `.me-`) |
 | `schema.json` | JSON schema definition |
 | `examples/` | Sample menu definitions |
+| `themes/` | Built-in theme JSON files (dark, light, warm, cool, mono) |
 
 ## Quick start
 
@@ -56,7 +57,7 @@ The design system has six top-level concepts. All are optional except `areas`.
 
 ```json
 {
-  "preset": "warm",         // built-in theme preset
+  "uses":   "themes/warm.json",  // import external theme JSON file(s)
   "vars":   { ... },        // design vars (palette, spacing, type_scale)
   "layout": { ... },        // canvas + content arrangement
   "theme":  { ... },        // visual contract (colors, fonts, dividers, etc.)
@@ -87,15 +88,28 @@ Override or add vars at the top level:
 }
 ```
 
-### 2. Theme presets
+### 2. External theme imports (`uses`)
 
-A preset pre-fills the entire theme. Just pick one:
+The `uses` field imports one or more JSON files as defaults. Reference a string for one file, or an array for multiple (layered in order, later wins). Your inline values always override imports.
 
 ```json
-{ "preset": "warm" }
+{ "uses": "themes/warm.json" }
 ```
 
-Built-in presets: **dark** (default), **light**, **warm**, **cool**, **mono**. Each defines its own palette and font families. User overrides take precedence over presets.
+Or stack multiple:
+
+```json
+{
+  "uses": [
+    "themes/warm.json",
+    "themes/seasonal-summer.json"
+  ]
+}
+```
+
+**Built-in themes** ship in the `themes/` directory: `dark.json`, `light.json`, `warm.json`, `cool.json`, `mono.json`. Each is a small JSON file containing a `vars.palette` (the 6 semantic color slots) and a `theme.fonts` block with font family overrides. You can fork them, publish your own, or chain them.
+
+Themes can themselves use other themes — `uses` is recursive. Cycles are detected and rejected.
 
 ### 3. Theme
 
@@ -149,7 +163,7 @@ Or provide a full inline font object — the same shape as a theme font role.
 Properties cascade in this order, deepest wins:
 
 ```
-default → preset → theme → area defaults → item override
+default → uses (imported themes) → theme → area defaults → item override
 ```
 
 So you can:
@@ -192,8 +206,30 @@ Auto-refreshes on an interval. Returns `{ stop() }`. This is how live displays s
 ### `MenuRenderer.validate(data)`
 Returns `{ valid, errors[], warnings[] }` with JSON paths. Used internally by `render` — last result on `MenuRenderer.lastValidation`.
 
-### `MenuRenderer.presets`
-Array of available preset names.
+### `MenuRenderer.import(url)`
+Fetches a single JSON file. Returns `Promise<data>`. Use this to load a theme programmatically.
+
+### `MenuRenderer.resolve(data, baseUrl)`
+Recursively resolves all `uses` references in `data`, deep-merging imported files in order under your data. Returns `Promise<resolvedData>` with `uses` removed. `baseUrl` is used to resolve relative paths.
+
+```js
+MenuRenderer.import('themes/warm.json').then(function (theme) {
+  var data = Object.assign({}, theme, { areas: myMenu });
+  MenuRenderer.render(data, target);
+});
+```
+
+Or chain:
+```js
+MenuRenderer.resolve({
+  uses: 'themes/dark.json',
+  areas: myMenu
+}, window.location.href).then(function (resolved) {
+  MenuRenderer.render(resolved, target);
+});
+```
+
+`MenuRenderer.loadFromUrl()` already calls `resolve()` internally — use it for the simple "load + render" case.
 
 ## Editor API
 
@@ -286,11 +322,11 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | File | Description | Demonstrates |
 |---|---|---|
 | `minimal.json` | Smallest possible menu | Defaults handle everything |
-| `coffee.json` | Coffee shop with hot/cold drinks | Preset override, item variations |
+| `coffee.json` | Coffee shop with hot/cold drinks | Theme import, item variations |
 | `cafe.json` | Breakfast cafe with multi-column layout | Container columns, palette override |
-| `bakery.json` | Portrait bakery menu | Light preset, portrait orientation |
-| `surf-shop.json` | Lessons + retail | Cool preset, inline variations |
-| `server-status.json` | Infrastructure dashboard (non-menu) | Mono preset, semantic vars, area styling |
+| `bakery.json` | Portrait bakery menu | Light theme + custom palette overrides |
+| `surf-shop.json` | Lessons + retail | Cool theme, custom $sun var |
+| `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |
 | `themed.json` | Wine bar | Custom vars, font extension, full reference system |
 
 ## Schema

@@ -1,0 +1,18 @@
+{
+  "vars": {
+    "palette": {
+      "background": "#2c1810",
+      "surface":    "#3a2318",
+      "text":       "#f5e6d3",
+      "muted":      "#c4a882",
+      "accent":     "#d4a574",
+      "divider":    "#4a3528"
+    }
+  },
+  "theme": {
+    "fonts": {
+      "title":   { "family": "Playfair Display" },
+      "heading": { "family": "Playfair Display" }
+    }
+  }
+}

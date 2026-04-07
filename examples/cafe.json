@@ -1,38 +1,122 @@
 {
-  "preset": "warm",
+  "uses": "themes/warm.json",
   "layout": {
-    "container": { "columns": 2 }
+    "container": {
+      "columns": 2
+    }
   },
   "theme": {
-    "colors": { "accent": "#d4a574" },
-    "header": { "padding": { "top": "$lg", "right": "$lg", "bottom": "$sm", "left": "$lg" } }
+    "colors": {
+      "accent": "#d4a574"
+    },
+    "header": {
+      "padding": {
+        "top": "$lg",
+        "right": "$lg",
+        "bottom": "$sm",
+        "left": "$lg"
+      }
+    }
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "The Corner Cafe" }
+      {
+        "type": "text",
+        "text": "The Corner Cafe"
+      }
     ]
   },
   "areas": [
     {
       "title": "Breakfast",
       "items": [
-        { "name": "Eggs Benedict", "description": "Poached eggs, hollandaise, brioche", "price": "14.50" },
-        { "name": "Avocado Toast", "description": "Sourdough, feta, chili oil, radish", "price": "12.00" },
-        { "name": "French Toast", "description": "Brioche, berries, maple cream", "price": "13.00" },
-        { "name": "Garden Omelette", "description": "Free-range eggs, vegetables, gruyere", "price": "13.50" },
-        { "name": "Granola Bowl", "description": "House granola, Greek yogurt, honey, fruit", "price": "10.00" },
-        { "name": "Full Breakfast", "description": "Two eggs, bacon, toast, hash, tomato", "price": "16.00" }
+        {
+          "name": "Eggs Benedict",
+          "description": "Poached eggs, hollandaise, brioche",
+          "price": "14.50"
+        },
+        {
+          "name": "Avocado Toast",
+          "description": "Sourdough, feta, chili oil, radish",
+          "price": "12.00"
+        },
+        {
+          "name": "French Toast",
+          "description": "Brioche, berries, maple cream",
+          "price": "13.00"
+        },
+        {
+          "name": "Garden Omelette",
+          "description": "Free-range eggs, vegetables, gruyere",
+          "price": "13.50"
+        },
+        {
+          "name": "Granola Bowl",
+          "description": "House granola, Greek yogurt, honey, fruit",
+          "price": "10.00"
+        },
+        {
+          "name": "Full Breakfast",
+          "description": "Two eggs, bacon, toast, hash, tomato",
+          "price": "16.00"
+        }
       ]
     },
     {
       "title": "Coffee & Espresso",
       "items": [
-        { "name": "Drip Coffee", "variations": [{ "name": "Sm", "price": "3.00" }, { "name": "Lg", "price": "4.00" }] },
-        { "name": "Latte", "variations": [{ "name": "Sm", "price": "4.50" }, { "name": "Lg", "price": "5.50" }] },
-        { "name": "Cappuccino", "price": "4.50" },
-        { "name": "Espresso", "variations": [{ "name": "Single", "price": "3.00" }, { "name": "Double", "price": "3.75" }] },
-        { "name": "Mocha", "description": "Dark chocolate, espresso, milk", "price": "5.50" },
-        { "name": "Chai Latte", "price": "5.00" }
+        {
+          "name": "Drip Coffee",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "3.00"
+            },
+            {
+              "name": "Lg",
+              "price": "4.00"
+            }
+          ]
+        },
+        {
+          "name": "Latte",
+          "variations": [
+            {
+              "name": "Sm",
+              "price": "4.50"
+            },
+            {
+              "name": "Lg",
+              "price": "5.50"
+            }
+          ]
+        },
+        {
+          "name": "Cappuccino",
+          "price": "4.50"
+        },
+        {
+          "name": "Espresso",
+          "variations": [
+            {
+              "name": "Single",
+              "price": "3.00"
+            },
+            {
+              "name": "Double",
+              "price": "3.75"
+            }
+          ]
+        },
+        {
+          "name": "Mocha",
+          "description": "Dark chocolate, espresso, milk",
+          "price": "5.50"
+        },
+        {
+          "name": "Chai Latte",
+          "price": "5.00"
+        }
       ]
     }
   ]

@@ -8,25 +8,25 @@
     "container": {
       "columns": 3,
       "gutter": 3.704
-    },
-    "header": {
-      "height": 7,
-      "padding": { "top": 1.563, "right": 2, "bottom": 0.5, "left": 2 },
-      "elements": [
-        {
-          "id": "header-1",
-          "type": "text",
-          "text": "Coffee",
-          "font": {
-            "family": "Montserrat",
-            "weight": "700",
-            "color": "#ffffff",
-            "size": 3
-          },
-          "position": "center"
-        }
-      ]
     }
+  },
+  "header": {
+    "height": 7,
+    "padding": { "top": 1.563, "right": 2, "bottom": 0.5, "left": 2 },
+    "elements": [
+      {
+        "id": "header-1",
+        "type": "text",
+        "text": "Coffee",
+        "font": {
+          "family": "Montserrat",
+          "weight": "700",
+          "color": "#ffffff",
+          "size": 3
+        },
+        "position": "center"
+      }
+    ]
   },
   "theme": {
     "area_title_font": {

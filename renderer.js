@@ -174,9 +174,8 @@ var MenuRenderer = (function () {
       fonts[family][w] = true;
     }
 
-    var layout = data.layout || {};
-    if (layout.header && layout.header.elements) {
-      layout.header.elements.forEach(function (e) {
+    if (data.header && data.header.elements) {
+      data.header.elements.forEach(function (e) {
         if (e.type === 'text' && e.font) addFont(e.font);
       });
     }
@@ -326,6 +325,16 @@ var MenuRenderer = (function () {
     var leftCol = el('div', 'ds-header-col ds-header-col--left');
     var centerCol = el('div', 'ds-header-col ds-header-col--center');
     var rightCol = el('div', 'ds-header-col ds-header-col--right');
+
+    // Apply column flex values (0 = shrink to content, N = take that share of remaining space)
+    var cols = header.columns || {};
+    function flexFor(c) {
+      var f = c && c.flex != null ? c.flex : 1;
+      return f === 0 ? '0 0 auto' : (f + ' 1 0');
+    }
+    leftCol.style.flex = flexFor(cols.left);
+    centerCol.style.flex = flexFor(cols.center);
+    rightCol.style.flex = flexFor(cols.right);
 
     var elements = header.elements || [];
     elements.forEach(function (element) {
@@ -635,9 +644,9 @@ var MenuRenderer = (function () {
     viewport.style.height = vpH + 'px';
     viewport.style.fontSize = baseFontSize + 'px';
 
-    // Header (only rendered if layout.header is defined)
-    if (layout.header) {
-      var headerRegion = buildHeaderRegion(layout.header, vpW, vpH, baseFontSize);
+    // Header (only rendered if header is defined)
+    if (data.header) {
+      var headerRegion = buildHeaderRegion(data.header, vpW, vpH, baseFontSize);
       if (headerRegion) viewport.appendChild(headerRegion);
     }
 
@@ -715,7 +724,7 @@ var MenuRenderer = (function () {
   var KNOWN_LAYOUT_KEYS = [
     'resolution', 'orientation', 'mode', 'background_color',
     'x_spacer', 'y_spacer', 'viewport_padding', 'area_gap',
-    'container', 'header'
+    'container'
   ];
   var KNOWN_AREA_KEYS = [
     'id', 'title', 'padding', 'gutter', 'align', 'valign',

@@ -201,11 +201,9 @@ The editor works standalone for JSON authoring — the preview tab is hidden and
 | `area_gap` | number | `~3` | Vertical gap between areas (%) |
 | `container.columns` | `1` \| `2` \| `3` | `1` | Top-level area column layout |
 | `container.gutter` | number | `~1.25` | Gap between area columns (%) |
-| `header` | object | — | Header region with text and logo elements (see below) |
+### `header` (top-level, sibling of `layout`)
 
-### `header`
-
-The header is a 3-column flex region (left/center/right) that holds text and logo elements. Each element specifies which column it lives in via `position`. Multiple elements in the same column stack vertically.
+The header is a 3-column flex region (left/center/right) that holds text and logo elements. Each element specifies which column it lives in via `position`. Multiple elements in the same column stack vertically. `header` is a **top-level** field, not nested inside `layout`.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
@@ -214,7 +212,20 @@ The header is a 3-column flex region (left/center/right) that holds text and log
 | `background` | string | inherits `layout.background_color` | CSS background (color, gradient, or image) |
 | `divider.color` | string | — | Optional bottom border color |
 | `divider.width` | number | `1` | Border width (px) |
+| `columns.left.flex` | number | `1` | Left column flex (0 = shrink to content, 1+ = expand) |
+| `columns.center.flex` | number | `1` | Center column flex |
+| `columns.right.flex` | number | `1` | Right column flex |
 | `elements` | array | `[]` | Ordered list of header elements |
+
+**Column flex example** — full-width centered title:
+```json
+"columns": {
+  "left":   { "flex": 0 },
+  "center": { "flex": 1 },
+  "right":  { "flex": 0 }
+}
+```
+With `flex: 0` on left and right, those columns shrink to fit their content (or disappear if empty), letting the center column take the entire width.
 
 **Header text element:**
 

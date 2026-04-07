@@ -67,36 +67,45 @@
             }
           }
         },
-        "header": {
+      }
+    },
+    "header": {
+      "type": "object",
+      "description": "Top-level header region with multiple text and logo elements arranged in 3 columns (left/center/right).",
+      "properties": {
+        "height": {
+          "type": "number",
+          "description": "Header height as % of viewport height. Auto-sizes to content if omitted."
+        },
+        "padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Internal padding (% of viewport)."
+        },
+        "background": {
+          "type": "string",
+          "description": "CSS background value (color, gradient, or image URL)."
+        },
+        "divider": {
           "type": "object",
-          "description": "Header region with multiple text and logo elements arranged in 3 columns (left/center/right).",
+          "description": "Optional bottom border below the header.",
           "properties": {
-            "height": {
-              "type": "number",
-              "description": "Header height as % of viewport height. Auto-sizes to content if omitted."
-            },
-            "padding": {
-              "$ref": "#/$defs/padding",
-              "description": "Internal padding (% of viewport)."
-            },
-            "background": {
-              "type": "string",
-              "description": "CSS background value (color, gradient, or image URL)."
-            },
-            "divider": {
-              "type": "object",
-              "description": "Optional bottom border below the header.",
-              "properties": {
-                "color": { "type": "string", "description": "Border color." },
-                "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
-              }
-            },
-            "elements": {
-              "type": "array",
-              "description": "Ordered list of header elements (text labels and logos).",
-              "items": { "$ref": "#/$defs/header_element" }
-            }
+            "color": { "type": "string", "description": "Border color." },
+            "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
           }
+        },
+        "columns": {
+          "type": "object",
+          "description": "Per-column flex values. 0 = shrink to content, 1+ = take that share of remaining space.",
+          "properties": {
+            "left":   { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } },
+            "center": { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } },
+            "right":  { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } }
+          }
+        },
+        "elements": {
+          "type": "array",
+          "description": "Ordered list of header elements (text labels and logos).",
+          "items": { "$ref": "#/$defs/header_element" }
         }
       }
     },

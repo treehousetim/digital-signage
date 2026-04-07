@@ -28,20 +28,20 @@ var MenuEditor = (function () {
       background_color: '#1a1a1a',
       viewport_padding: { top: 3, right: 1.25, bottom: 3, left: 1.25 },
       area_gap: 3,
-      container: { columns: 1, gutter: 1.25 },
-      header: {
-        height: 8,
-        padding: { top: 1, right: 2, bottom: 1, left: 2 },
-        elements: [
-          {
-            id: 'title-1',
-            type: 'text',
-            text: 'Menu',
-            font: { family: 'Montserrat', weight: '700', color: '#ffffff', size: 3 },
-            position: 'center'
-          }
-        ]
-      }
+      container: { columns: 1, gutter: 1.25 }
+    },
+    header: {
+      height: 8,
+      padding: { top: 1, right: 2, bottom: 1, left: 2 },
+      elements: [
+        {
+          id: 'title-1',
+          type: 'text',
+          text: 'Menu',
+          font: { family: 'Montserrat', weight: '700', color: '#ffffff', size: 3 },
+          position: 'center'
+        }
+      ]
     },
     theme: {},
     areas: [
@@ -274,19 +274,18 @@ var MenuEditor = (function () {
         } else if (type === 'header_text' || type === 'header_logo') {
           if (!idCounters.header) idCounters.header = 0;
           idCounters.header++;
-          // Ensure layout.header.elements exists
-          if (!data.layout) data.layout = {};
-          if (!data.layout.header) data.layout.header = { elements: [] };
-          if (!data.layout.header.elements) data.layout.header.elements = [];
+          // Ensure header.elements exists
+          if (!data.header) data.header = { elements: [] };
+          if (!data.header.elements) data.header.elements = [];
           if (type === 'header_text') {
-            data.layout.header.elements.push({
+            data.header.elements.push({
               id: 'header-' + idCounters.header,
               type: 'text',
               text: 'New Text',
               position: 'center'
             });
           } else {
-            data.layout.header.elements.push({
+            data.header.elements.push({
               id: 'header-' + idCounters.header,
               type: 'logo',
               src: '',
@@ -410,13 +409,18 @@ var MenuEditor = (function () {
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
         { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
-      ]},
-      { group: 'Header', fields: [
-        { key: 'header.height', type: 'number', label: 'Height (%)', step: 0.25 },
-        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
-        { key: 'header.background', type: 'color', label: 'Background' },
-        { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
-        { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' }
+      ]}
+    ],
+    header: [
+      { key: 'height', type: 'number', label: 'Height (%)', step: 0.25 },
+      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { key: 'background', type: 'color', label: 'Background' },
+      { key: 'divider.color', type: 'color', label: 'Divider Color' },
+      { key: 'divider.width', type: 'number', label: 'Divider Width (px)' },
+      { group: 'Column Flex (0 = shrink, 1+ = expand)', fields: [
+        { key: 'columns.left.flex', type: 'number', label: 'Left', step: 1 },
+        { key: 'columns.center.flex', type: 'number', label: 'Center', step: 1 },
+        { key: 'columns.right.flex', type: 'number', label: 'Right', step: 1 }
       ]}
     ],
     header_text: [
@@ -1000,35 +1004,41 @@ var MenuEditor = (function () {
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
 
-      // Header section
+      // Header section (clickable to edit header properties)
       var headerSection = el('div', 'me-tree-node');
       var headerSecH = el('div', 'me-tree-node__header me-tree-node__header--section');
+      if ('header' === store.getSelectedPath()) {
+        headerSecH.classList.add('me-tree-node__header--selected');
+      }
       var headerLabel = el('span', 'me-tree-label me-tree-label--section');
       headerLabel.textContent = 'Header';
       var addTextBtn = el('button', 'me-tree-btn', { title: 'Add Text Element' });
       addTextBtn.textContent = 'T+';
       addTextBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        store.addEntity('layout.header.elements', 'header_text');
+        store.addEntity('header.elements', 'header_text');
         refresh();
       });
       var addLogoBtn = el('button', 'me-tree-btn', { title: 'Add Logo Element' });
       addLogoBtn.textContent = 'L+';
       addLogoBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        store.addEntity('layout.header.elements', 'header_logo');
+        store.addEntity('header.elements', 'header_logo');
         refresh();
       });
       headerSecH.appendChild(headerLabel);
       headerSecH.appendChild(addTextBtn);
       headerSecH.appendChild(addLogoBtn);
+      headerSecH.addEventListener('click', function () {
+        store.select('header');
+      });
       headerSection.appendChild(headerSecH);
       container.appendChild(headerSection);
 
       // Header element nodes
-      var headerElements = (data.layout && data.layout.header && data.layout.header.elements) || [];
+      var headerElements = (data.header && data.header.elements) || [];
       headerElements.forEach(function (he, i) {
-        var nodePath = 'layout.header.elements[' + i + ']';
+        var nodePath = 'header.elements[' + i + ']';
         var hNode = el('div', 'me-tree-node');
         hNode.style.paddingLeft = '16px';
         var hHeader = el('div', 'me-tree-node__header');
@@ -1111,7 +1121,8 @@ var MenuEditor = (function () {
       var type;
       if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
-      else if (path.indexOf('layout.header.elements[') === 0) {
+      else if (path === 'header') type = 'header';
+      else if (path.indexOf('header.elements[') === 0) {
         type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
       }
       else if (path.indexOf('.variations[') !== -1) type = 'variation';

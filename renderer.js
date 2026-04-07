@@ -491,16 +491,7 @@ var MenuRenderer = (function () {
     var centerCol = el('div', 'ds-header-col ds-header-col--center');
     var rightCol = el('div', 'ds-header-col ds-header-col--right');
 
-    // Column sizing: "fit" = wraps content, "fill" = takes available space
-    var cols = header.columns || {};
-    function colMode(c) {
-      var m = c && c.mode ? c.mode : 'fill';
-      return m === 'fit' ? '0 0 auto' : '1 1 0';
-    }
-    leftCol.style.flex = colMode(cols.left);
-    centerCol.style.flex = colMode(cols.center);
-    rightCol.style.flex = colMode(cols.right);
-
+    // Build elements first so we can detect which columns are empty
     var elements = header.elements || [];
     elements.forEach(function (element) {
       var node = null;
@@ -516,6 +507,24 @@ var MenuRenderer = (function () {
       else if (pos === 'right') rightCol.appendChild(node);
       else centerCol.appendChild(node);
     });
+
+    // Column sizing rules:
+    //   - explicit "fit" → wraps to content
+    //   - explicit "fill" → takes available space (flex: 1 1 0)
+    //   - no setting + empty column → collapses to zero (no wasted space)
+    //   - no setting + has content → flex: 1 1 auto (content width + share of remaining)
+    var cols = header.columns || {};
+    function colFlex(cfg, columnEl) {
+      var mode = cfg && cfg.mode;
+      if (mode === 'fit') return '0 0 auto';
+      if (mode === 'fill') return '1 1 0';
+      // No explicit setting
+      if (columnEl.children.length === 0) return '0 0 0';
+      return '1 1 auto';
+    }
+    leftCol.style.flex = colFlex(cols.left, leftCol);
+    centerCol.style.flex = colFlex(cols.center, centerCol);
+    rightCol.style.flex = colFlex(cols.right, rightCol);
 
     region.appendChild(leftCol);
     region.appendChild(centerCol);

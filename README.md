@@ -245,12 +245,14 @@ The header is a 3-column flex region (left/center/right) that holds text and log
 | `background` | string | inherits `layout.background_color` | CSS background (color, gradient, or image) |
 | `divider.color` | string | — | Optional bottom border color |
 | `divider.width` | number | `1` | Border width (px) |
-| `columns.left.mode` | `"fit"` \| `"fill"` | `"fill"` | Left column sizing |
-| `columns.center.mode` | `"fit"` \| `"fill"` | `"fill"` | Center column sizing |
-| `columns.right.mode` | `"fit"` \| `"fill"` | `"fill"` | Right column sizing |
+| `columns.left.mode` | `"fit"` \| `"fill"` | auto | Left column sizing |
+| `columns.center.mode` | `"fit"` \| `"fill"` | auto | Center column sizing |
+| `columns.right.mode` | `"fit"` \| `"fill"` | auto | Right column sizing |
 | `elements` | array | `[]` | Ordered list of header elements |
 
-`fit` = column wraps to its content width (or disappears if empty). `fill` = column expands to take available space, sharing equally with other `fill` columns.
+**Auto sizing** (when `mode` is not set): empty columns collapse to zero, columns with content take their natural width plus an equal share of remaining space. So a single centered title automatically gets the full header width.
+
+**Explicit modes**: `fit` = wraps to content (or 0 if empty). `fill` = takes available space, sharing equally with other `fill` columns.
 
 **Example** — full-width centered title with `fit` columns on the sides:
 ```json

@@ -2242,23 +2242,26 @@ var MenuEditor = (function () {
       }
     });
 
-    // Keyboard shortcuts
+    // Keyboard shortcuts — listen on document so they fire from anywhere on the page
     root.setAttribute('tabindex', '0');
-    root.addEventListener('keydown', function (e) {
+    var keyHandler = function (e) {
+      // Only handle if the editor root is in the DOM (it might not be if destroy() was called)
+      if (!root.isConnected) return;
+      var t = e.target;
+      var inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
       var isCtrl = e.ctrlKey || e.metaKey;
-      if (isCtrl && e.key === 'z' && !e.shiftKey) {
+      if (isCtrl && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        // Don't override native undo in text inputs
+        if (inField) return;
         e.preventDefault();
         store.undo();
-      } else if (isCtrl && e.key === 'z' && e.shiftKey) {
-        e.preventDefault();
-        store.redo();
-      } else if (isCtrl && e.key === 'Z') {
+      } else if (isCtrl && (e.key === 'z' || e.key === 'Z') && e.shiftKey) {
+        if (inField) return;
         e.preventDefault();
         store.redo();
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         // Don't hijack arrows when typing in inputs/textareas/contenteditable
-        var t = e.target;
-        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        if (inField) return;
         // Find all selectable nodes in the tree (anything with [data-path] in the tree, plus tree node headers)
         var selectables = Array.prototype.slice.call(treeContent.querySelectorAll('.me-tree-node__header'));
         // Filter out non-selectable section headers (Areas/Header labels)
@@ -2285,12 +2288,17 @@ var MenuEditor = (function () {
           selectables[nextIdx].scrollIntoView({ block: 'nearest' });
         }
       }
-    });
+    };
+    document.addEventListener('keydown', keyHandler);
 
     return {
       getData: function () { return store.getClone(); },
       setData: function (data) { store.replaceData(data, true); },
-      destroy: function () { window.removeEventListener('message', messageHandler); targetElement.innerHTML = ''; },
+      destroy: function () {
+        window.removeEventListener('message', messageHandler);
+        document.removeEventListener('keydown', keyHandler);
+        targetElement.innerHTML = '';
+      },
       on: function (event, handler) { store.on(event, handler); }
     };
   }

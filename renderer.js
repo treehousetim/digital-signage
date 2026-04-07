@@ -471,7 +471,8 @@ var MenuRenderer = (function () {
     var region = el('div', 'ds-header-region');
 
     if (header.height != null) {
-      region.style.height = resolveV(header.height, vpH, ctx) + 'px';
+      // min-height so the header grows if content is larger than the configured height
+      region.style.minHeight = resolveV(header.height, vpH, ctx) + 'px';
     }
     if (header.padding != null) {
       var rawPad = normalizePadding(header.padding);

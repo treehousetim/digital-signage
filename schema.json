@@ -52,7 +52,7 @@
   },
   "$defs": {
     "spacing_value": {
-      "description": "A number (% of viewport), a string with $name token reference, or a string with px (e.g. '12px').",
+      "description": "A length value. Strings: '12' or '12px' (pixels), '5%' (percent of viewport), '$name' (token reference). Bare numbers are pixels.",
       "oneOf": [
         { "type": "number" },
         { "type": "string" }

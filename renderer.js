@@ -79,13 +79,13 @@ var MenuRenderer = (function () {
       hero: 5
     },
     spacing: {
-      none: 0,
-      xs:   0.25,
-      sm:   0.5,
-      md:   1,
-      lg:   2,
-      xl:   3,
-      xxl:  5
+      none: '0%',
+      xs:   '0.25%',
+      sm:   '0.5%',
+      md:   '1%',
+      lg:   '2%',
+      xl:   '3%',
+      xxl:  '5%'
     }
   };
 
@@ -124,7 +124,7 @@ var MenuRenderer = (function () {
       style: 'solid'
     },
     areas: {
-      padding: 0,
+      padding: '0%',
       background: 'transparent',
       border: null,
       title_font: 'area_title',
@@ -134,7 +134,7 @@ var MenuRenderer = (function () {
       price_align: 'right'
     },
     items: {
-      padding: { top: '$xs', right: 0, bottom: '$xs', left: 0 },
+      padding: { top: '$xs', right: '0%', bottom: '$xs', left: '0%' },
       name_font: 'item_name',
       price_font: 'price',
       description_font: 'description',
@@ -226,24 +226,29 @@ var MenuRenderer = (function () {
 
   // ── Unit Resolution Utilities ──────────────────────────────────────────
 
+  // No unit = px. Use "%" suffix for viewport percent. Numbers are px.
   function toHorizontalPx(val, vpW, ctx) {
     if (ctx) val = resolveSpace(val, ctx);
     if (val == null) return 0;
     if (typeof val === 'string') {
-      if (val.indexOf('px') !== -1) return parseFloat(val);
-      return parseFloat(val);
+      var n = parseFloat(val);
+      if (isNaN(n)) return 0;
+      if (val.indexOf('%') !== -1) return n / 100 * vpW;
+      return n;
     }
-    return val / 100 * vpW;
+    return val;
   }
 
   function toVerticalPx(val, vpH, ctx) {
     if (ctx) val = resolveSpace(val, ctx);
     if (val == null) return 0;
     if (typeof val === 'string') {
-      if (val.indexOf('px') !== -1) return parseFloat(val);
-      return parseFloat(val);
+      var n = parseFloat(val);
+      if (isNaN(n)) return 0;
+      if (val.indexOf('%') !== -1) return n / 100 * vpH;
+      return n;
     }
-    return val / 100 * vpH;
+    return val;
   }
 
   function toFontSize(val, baseFontSize, ctx) {

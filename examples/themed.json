@@ -8,8 +8,8 @@
       "menu": 2
     },
     "spacing": {
-      "tight": 0.5,
-      "loose": 4
+      "tight": "0.5%",
+      "loose": "4%"
     }
   },
   "theme": {

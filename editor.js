@@ -421,10 +421,10 @@ var MenuEditor = (function () {
       { group: 'Layout', fields: [
         { key: 'layout.resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
         { key: 'layout.orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-        { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding' },
-        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter' },
+        { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
+        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter (% or $token)' },
         { key: 'layout.columns', type: 'select', options: ['1', '2', '3', '4', '5', '6'], label: 'Columns' },
-        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter' }
+        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter (% or $token)' }
       ]},
       { group: 'Colors', fields: [
         { key: 'colors.background', type: 'color', label: 'Background' },
@@ -441,16 +441,16 @@ var MenuEditor = (function () {
         { key: 'dividers.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' }
       ]},
       { group: 'Areas (defaults)', defaultCollapsed: true, fields: [
-        { key: 'areas.padding', type: 'padding', label: 'Padding' },
+        { key: 'areas.padding', type: 'padding', label: 'Padding (%)' },
         { key: 'areas.background', type: 'color', label: 'Background' },
         { key: 'areas.column_count', type: 'number', label: 'Item Columns' },
-        { key: 'areas.gutter', type: 'text', label: 'Item Gutter' },
+        { key: 'areas.gutter', type: 'text', label: 'Item Gutter (% or $token)' },
         { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
         { key: 'areas.price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
         { key: 'areas.title_font', type: 'font_role', label: 'Title Font Role' }
       ]},
       { group: 'Items (defaults)', defaultCollapsed: true, fields: [
-        { key: 'items.padding', type: 'padding', label: 'Padding' },
+        { key: 'items.padding', type: 'padding', label: 'Padding (%)' },
         { key: 'items.align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
         { key: 'items.name_font', type: 'font_role', label: 'Name Font Role' },
         { key: 'items.price_font', type: 'font_role', label: 'Price Font Role' },
@@ -463,7 +463,7 @@ var MenuEditor = (function () {
       ]},
       { group: 'Header', defaultCollapsed: true, fields: [
         { key: 'header.height', type: 'text', label: 'Height (% or $token)' },
-        { key: 'header.padding', type: 'padding', label: 'Padding' },
+        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
         { key: 'header.background', type: 'color', label: 'Background' },
         { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
         { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' },
@@ -491,10 +491,10 @@ var MenuEditor = (function () {
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
       { key: 'columns', type: 'number', label: 'Sub-Area Columns' },
-      { key: 'gutter', type: 'text', label: 'Gutter' },
+      { key: 'gutter', type: 'text', label: 'Gutter (% or $token)' },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-      { key: 'padding', type: 'padding', label: 'Padding' },
+      { key: 'padding', type: 'padding', label: 'Padding (%)' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.title_font', type: 'font', label: 'Title Font' },
         { key: 'style.background', type: 'color', label: 'Background' }
@@ -509,7 +509,7 @@ var MenuEditor = (function () {
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
       { key: 'variations_inline', type: 'checkbox', label: 'Variations Inline' },
       { key: 'show_variation_prices', type: 'checkbox', label: 'Show Variation Prices', defaultChecked: true },
-      { key: 'padding', type: 'padding', label: 'Padding' },
+      { key: 'padding', type: 'padding', label: 'Padding (%)' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.name_font', type: 'font', label: 'Name Font' },
         { key: 'style.price_font', type: 'font', label: 'Price Font' }
@@ -1919,12 +1919,13 @@ var MenuEditor = (function () {
       previewDebounce = setTimeout(function () {
         if (!iframe) return;
         var data = store.getClone();
-        data.layout = data.layout || {};
-        data.layout.mode = 'display';
+        data.theme = data.theme || {};
+        data.theme.layout = data.theme.layout || {};
+        data.theme.layout.mode = 'display';
         // Track viewport dimensions for zoom
         var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
-        var res = resMap[data.layout.resolution] || resMap['4k'];
-        var isPort = data.layout.orientation === 'portrait';
+        var res = resMap[data.theme.layout.resolution] || resMap['4k'];
+        var isPort = data.theme.layout.orientation === 'portrait';
         currentVpW = isPort ? res.h : res.w;
         currentVpH = isPort ? res.w : res.h;
 
@@ -2212,8 +2213,9 @@ var MenuEditor = (function () {
 
       // Render at full resolution with no preview scaling
       var data = store.getClone();
-      data.layout = data.layout || {};
-      data.layout.mode = 'display';
+      data.theme = data.theme || {};
+      data.theme.layout = data.theme.layout || {};
+      data.theme.layout.mode = 'display';
 
       // Load renderer styles
       var style = document.createElement('link');
@@ -2401,7 +2403,7 @@ var MenuEditor = (function () {
         // Convert px to % based on side orientation
         var data = store.getData();
         var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
-        var lo = data.layout || {};
+        var lo = (data.theme && data.theme.layout) || {};
         var res = resMap[lo.resolution] || resMap['4k'];
         var isPort = lo.orientation === 'portrait';
         var vpW = isPort ? res.h : res.w;
@@ -2435,7 +2437,7 @@ var MenuEditor = (function () {
 
         var data = store.getData();
         var resMap = { '1080': { w: 1920, h: 1080 }, '2k': { w: 2560, h: 1440 }, '4k': { w: 3840, h: 2160 } };
-        var lo = data.layout || {};
+        var lo = (data.theme && data.theme.layout) || {};
         var res = resMap[lo.resolution] || resMap['4k'];
         var isPort = lo.orientation === 'portrait';
         var vpW = isPort ? res.h : res.w;
@@ -2443,7 +2445,7 @@ var MenuEditor = (function () {
 
         if (prop === 'row_gutter') {
           var pct = Math.round((px / vpH) * 10000) / 100;
-          store.updateSilent('layout.row_gutter', pct);
+          store.updateSilent('theme.layout.row_gutter', pct);
         } else if (prop && prop.indexOf('viewport_padding.') === 0) {
           var padSide = prop.split('.')[1];
           var pct;
@@ -2452,7 +2454,7 @@ var MenuEditor = (function () {
           } else {
             pct = Math.round((px / vpW) * 10000) / 100;
           }
-          var currentPad = getAtPath(data, 'layout.viewport_padding');
+          var currentPad = getAtPath(data, 'theme.layout.viewport_padding');
           var padObj;
           if (currentPad == null || typeof currentPad === 'number') {
             var u = currentPad || 0;
@@ -2461,7 +2463,7 @@ var MenuEditor = (function () {
             padObj = { top: currentPad.top || 0, right: currentPad.right || 0, bottom: currentPad.bottom || 0, left: currentPad.left || 0 };
           }
           padObj[padSide] = pct;
-          store.updateSilent('layout.viewport_padding', padObj);
+          store.updateSilent('theme.layout.viewport_padding', padObj);
         }
       }
     }

@@ -40,32 +40,190 @@ var MenuRenderer = (function () {
 
   var MAX_NESTING_DEPTH = 4;
 
+  // Built-in design tokens — referenced via $name in JSON
+  var DEFAULT_PALETTE = {
+    background: '#1a1a1a',
+    surface:    '#222222',
+    text:       '#ffffff',
+    muted:      '#cccccc',
+    accent:     '#f0c040',
+    divider:    '#444444'
+  };
+
+  var DEFAULT_TYPE_SCALE = {
+    xs:   0.75,
+    sm:   1,
+    base: 1.375,
+    md:   1.75,
+    lg:   2.5,
+    xl:   3.5,
+    hero: 5
+  };
+
+  var DEFAULT_SPACING = {
+    none: 0,
+    xs:   0.25,
+    sm:   0.5,
+    md:   1,
+    lg:   2,
+    xl:   3,
+    xxl:  5
+  };
+
+  // Theme presets — merged as defaults under user theme/layout
+  var PRESETS = {
+    dark: {
+      theme: {
+        palette: { background: '#1a1a1a', surface: '#222222', text: '#ffffff', muted: '#cccccc', accent: '#f0c040', divider: '#444444' },
+        background: '$background',
+        text_color: '$text',
+        accent_color: '$accent',
+        area_title_font: { family: 'Montserrat', weight: '600', color: '$accent', size: '$md' },
+        item_name_font:  { family: 'Lato', weight: '400', color: '$text',  size: '$base' },
+        item_price_font: { family: 'Lato', weight: '700', color: '$text',  size: '$base' },
+        variation_font:  { family: 'Lato', weight: '400', color: '$muted', size: '$sm' },
+        divider_color: '$divider',
+        divider_width: 1,
+        divider_style: 'solid',
+        area_background: 'transparent'
+      }
+    },
+    light: {
+      theme: {
+        palette: { background: '#fafafa', surface: '#ffffff', text: '#1a1a1a', muted: '#666666', accent: '#c8501e', divider: '#dddddd' },
+        background: '$background',
+        text_color: '$text',
+        accent_color: '$accent',
+        area_title_font: { family: 'Playfair Display', weight: '700', color: '$accent', size: '$md' },
+        item_name_font:  { family: 'Lato', weight: '400', color: '$text',  size: '$base' },
+        item_price_font: { family: 'Lato', weight: '700', color: '$text',  size: '$base' },
+        variation_font:  { family: 'Lato', weight: '400', color: '$muted', size: '$sm' },
+        divider_color: '$divider',
+        divider_width: 1,
+        divider_style: 'solid',
+        area_background: 'transparent'
+      }
+    },
+    warm: {
+      theme: {
+        palette: { background: '#2c1810', surface: '#3a2318', text: '#f5e6d3', muted: '#c4a882', accent: '#d4a574', divider: '#4a3528' },
+        background: '$background',
+        text_color: '$text',
+        accent_color: '$accent',
+        area_title_font: { family: 'Playfair Display', weight: '600', color: '$accent', size: '$md' },
+        item_name_font:  { family: 'Lato', weight: '400', color: '$text',  size: '$base' },
+        item_price_font: { family: 'Lato', weight: '700', color: '$text',  size: '$base' },
+        variation_font:  { family: 'Lato', weight: '400', color: '$muted', size: '$sm' },
+        divider_color: '$divider',
+        divider_width: 1,
+        divider_style: 'solid',
+        area_background: 'transparent'
+      }
+    },
+    cool: {
+      theme: {
+        palette: { background: '#0a2a3a', surface: '#1a3a4a', text: '#e8f0f5', muted: '#8ab8cc', accent: '#5cc8e8', divider: '#1a4a5e' },
+        background: '$background',
+        text_color: '$text',
+        accent_color: '$accent',
+        area_title_font: { family: 'Oswald', weight: '600', color: '$accent', size: '$md' },
+        item_name_font:  { family: 'Lato', weight: '400', color: '$text',  size: '$base' },
+        item_price_font: { family: 'Lato', weight: '700', color: '$accent', size: '$base' },
+        variation_font:  { family: 'Lato', weight: '400', color: '$muted', size: '$sm' },
+        divider_color: '$divider',
+        divider_width: 1,
+        divider_style: 'solid',
+        area_background: 'transparent'
+      }
+    },
+    mono: {
+      theme: {
+        palette: { background: '#000000', surface: '#0a0a0a', text: '#ffffff', muted: '#888888', accent: '#ffffff', divider: '#333333' },
+        background: '$background',
+        text_color: '$text',
+        accent_color: '$accent',
+        area_title_font: { family: 'Roboto', weight: '700', color: '$accent', size: '$md' },
+        item_name_font:  { family: 'Roboto', weight: '400', color: '$text',  size: '$base' },
+        item_price_font: { family: 'Roboto', weight: '700', color: '$text',  size: '$base' },
+        variation_font:  { family: 'Roboto', weight: '400', color: '$muted', size: '$sm' },
+        divider_color: '$divider',
+        divider_width: 1,
+        divider_style: 'solid',
+        area_background: 'transparent'
+      }
+    }
+  };
+
   // Defaults in the new unit system: spatial = %, fonts = em
   var DEFAULTS = {
     layout: {
       resolution: '4k',
       orientation: 'landscape',
       mode: 'display',
-      background_color: '#1a1a1a',
       x_spacer: 1.25,
       y_spacer: 3,
       viewport_padding: null,
       area_gap: null,
+      area_padding: null,
+      item_padding: null,
+      item_gutter: null,
+      spacing: null,
       container: { columns: 1, gutter: null }
     },
     theme: {
+      preset: null,
+      palette: null,
+      type_scale: null,
+      background: null,
+      text_color: null,
+      accent_color: null,
       area_title_font: { family: 'Montserrat', weight: '600', color: '#f0c040', size: 1.75 },
-      item_name_font: { family: 'Lato', weight: '400', color: '#ffffff', size: 1.375 },
+      item_name_font:  { family: 'Lato', weight: '400', color: '#ffffff', size: 1.375 },
       item_price_font: { family: 'Lato', weight: '700', color: '#ffffff', size: 1.375 },
-      variation_font: { family: 'Lato', weight: '400', color: '#cccccc', size: 1 },
+      variation_font:  { family: 'Lato', weight: '400', color: '#cccccc', size: 1 },
+      description_font: null,
       divider_color: '#444444',
-      area_background: 'transparent'
+      divider_width: 1,
+      divider_style: 'solid',
+      area_background: 'transparent',
+      area_border: null
     }
   };
 
+  // ── Reference Resolution ───────────────────────────────────────────────
+  // Build a context object once per render holding palette/scale/spacing lookups,
+  // then resolve $name references against it.
+
+  function buildContext(layout, theme) {
+    return {
+      palette:    Object.assign({}, DEFAULT_PALETTE, theme.palette || {}),
+      typeScale:  Object.assign({}, DEFAULT_TYPE_SCALE, theme.type_scale || {}),
+      spacing:    Object.assign({}, DEFAULT_SPACING, layout.spacing || {})
+    };
+  }
+
+  function resolveColorRef(val, ctx) {
+    if (typeof val !== 'string' || val.charAt(0) !== '$') return val;
+    var key = val.slice(1);
+    return ctx.palette[key] != null ? ctx.palette[key] : val;
+  }
+
+  function resolveSpaceRef(val, ctx) {
+    if (typeof val !== 'string' || val.charAt(0) !== '$') return val;
+    var key = val.slice(1);
+    return ctx.spacing[key] != null ? ctx.spacing[key] : val;
+  }
+
+  function resolveSizeRef(val, ctx) {
+    if (typeof val !== 'string' || val.charAt(0) !== '$') return val;
+    var key = val.slice(1);
+    return ctx.typeScale[key] != null ? ctx.typeScale[key] : val;
+  }
+
   // ── Unit Resolution Utilities ──────────────────────────────────────────
 
-  function resolveH(val, vpW) {
+  function resolveH(val, vpW, ctx) {
+    if (ctx) val = resolveSpaceRef(val, ctx);
     if (val == null) return 0;
     if (typeof val === 'string') {
       if (val.indexOf('px') !== -1) return parseFloat(val);
@@ -74,7 +232,8 @@ var MenuRenderer = (function () {
     return val / 100 * vpW;
   }
 
-  function resolveV(val, vpH) {
+  function resolveV(val, vpH, ctx) {
+    if (ctx) val = resolveSpaceRef(val, ctx);
     if (val == null) return 0;
     if (typeof val === 'string') {
       if (val.indexOf('px') !== -1) return parseFloat(val);
@@ -83,9 +242,10 @@ var MenuRenderer = (function () {
     return val / 100 * vpH;
   }
 
-  function resolveFont(val, baseFontSize) {
+  function resolveFont(val, baseFontSize, ctx) {
+    if (ctx) val = resolveSizeRef(val, ctx);
     if (val == null) return undefined;
-    if (typeof val === 'string') return val; // backward compat: "44px" used as-is
+    if (typeof val === 'string') return val; // raw CSS like "44px"
     return (val * baseFontSize) + 'px';
   }
 
@@ -123,12 +283,12 @@ var MenuRenderer = (function () {
     };
   }
 
-  function resolvePaddingPx(pad, vpW, vpH) {
+  function resolvePaddingPx(pad, vpW, vpH, ctx) {
     return {
-      top: resolveV(pad.top, vpH),
-      right: resolveH(pad.right, vpW),
-      bottom: resolveV(pad.bottom, vpH),
-      left: resolveH(pad.left, vpW)
+      top: resolveV(pad.top, vpH, ctx),
+      right: resolveH(pad.right, vpW, ctx),
+      bottom: resolveV(pad.bottom, vpH, ctx),
+      left: resolveH(pad.left, vpW, ctx)
     };
   }
 
@@ -160,7 +320,7 @@ var MenuRenderer = (function () {
 
   var loadedFontFamilies = {};
 
-  function collectFonts(data) {
+  function collectFonts(data, themeArg) {
     var fonts = {};
     function addFont(fontObj) {
       if (!fontObj || !fontObj.family) return;
@@ -180,11 +340,12 @@ var MenuRenderer = (function () {
       });
     }
 
-    var theme = data.theme || {};
+    var theme = themeArg || data.theme || {};
     addFont(theme.area_title_font);
     addFont(theme.item_name_font);
     addFont(theme.item_price_font);
     addFont(theme.variation_font);
+    addFont(theme.description_font);
 
     return fonts;
   }
@@ -207,10 +368,11 @@ var MenuRenderer = (function () {
 
   // ── CSS Custom Properties ──────────────────────────────────────────────
 
-  function buildCSSVars(layout, theme, vpW, vpH, baseFontSize) {
+  function buildCSSVars(layout, theme, vpW, vpH, baseFontSize, ctx) {
     var vars = [];
 
-    vars.push('--ds-background-color: ' + layout.background_color);
+    var bg = resolveColorRef(theme.background, ctx);
+    if (bg) vars.push('--ds-background-color: ' + bg);
 
     var fontKeys = ['area_title', 'item_name', 'item_price', 'variation'];
     fontKeys.forEach(function (key) {
@@ -219,12 +381,14 @@ var MenuRenderer = (function () {
       var prefix = '--ds-' + key.replace(/_/g, '-') + '-font';
       if (fontObj.family) vars.push(prefix + "-family: '" + fontObj.family + "', sans-serif");
       if (fontObj.weight) vars.push(prefix + '-weight: ' + fontObj.weight);
-      if (fontObj.color) vars.push(prefix + '-color: ' + fontObj.color);
-      if (fontObj.size != null) vars.push(prefix + '-size: ' + resolveFont(fontObj.size, baseFontSize));
+      if (fontObj.color) vars.push(prefix + '-color: ' + resolveColorRef(fontObj.color, ctx));
+      if (fontObj.size != null) vars.push(prefix + '-size: ' + resolveFont(fontObj.size, baseFontSize, ctx));
     });
 
-    if (theme.divider_color) vars.push('--ds-divider-color: ' + theme.divider_color);
-    if (theme.area_background) vars.push('--ds-area-background: ' + theme.area_background);
+    if (theme.divider_color) vars.push('--ds-divider-color: ' + resolveColorRef(theme.divider_color, ctx));
+    if (theme.divider_width != null) vars.push('--ds-divider-width: ' + theme.divider_width + 'px');
+    if (theme.divider_style) vars.push('--ds-divider-style: ' + theme.divider_style);
+    if (theme.area_background) vars.push('--ds-area-background: ' + resolveColorRef(theme.area_background, ctx));
 
     return vars;
   }
@@ -242,30 +406,30 @@ var MenuRenderer = (function () {
 
   // ── Spacing Resolution ─────────────────────────────────────────────────
 
-  function resolveSpacing(layout, vpW, vpH) {
+  function resolveSpacing(layout, vpW, vpH, ctx) {
     var xSp = layout.x_spacer;
     var ySp = layout.y_spacer;
 
     var viewportPadding;
     if (layout.viewport_padding != null) {
       var rawPad = normalizePadding(layout.viewport_padding);
-      viewportPadding = resolvePaddingPx(rawPad, vpW, vpH);
+      viewportPadding = resolvePaddingPx(rawPad, vpW, vpH, ctx);
     } else {
       viewportPadding = {
-        top: resolveV(ySp, vpH),
-        right: resolveH(xSp, vpW),
-        bottom: resolveV(ySp, vpH),
-        left: resolveH(xSp, vpW)
+        top: resolveV(ySp, vpH, ctx),
+        right: resolveH(xSp, vpW, ctx),
+        bottom: resolveV(ySp, vpH, ctx),
+        left: resolveH(xSp, vpW, ctx)
       };
     }
 
     var containerGutter = (layout.container && layout.container.gutter != null)
-      ? resolveH(layout.container.gutter, vpW)
-      : resolveH(xSp, vpW);
+      ? resolveH(layout.container.gutter, vpW, ctx)
+      : resolveH(xSp, vpW, ctx);
 
     var areaGap = (layout.area_gap != null)
-      ? resolveV(layout.area_gap, vpH)
-      : resolveV(ySp, vpH);
+      ? resolveV(layout.area_gap, vpH, ctx)
+      : resolveV(ySp, vpH, ctx);
 
     return {
       viewportPadding: viewportPadding,
@@ -276,50 +440,50 @@ var MenuRenderer = (function () {
 
   // ── Style Override Utility ──────────────────────────────────────────────
 
-  function applyFontOverride(element, fontObj, baseFontSize) {
+  function applyFontOverride(element, fontObj, baseFontSize, ctx) {
     if (!fontObj) return;
     if (fontObj.family) element.style.fontFamily = "'" + fontObj.family + "', sans-serif";
     if (fontObj.weight) element.style.fontWeight = fontObj.weight;
-    if (fontObj.color) element.style.color = fontObj.color;
-    if (fontObj.size != null) element.style.fontSize = resolveFont(fontObj.size, baseFontSize);
+    if (fontObj.color) element.style.color = ctx ? resolveColorRef(fontObj.color, ctx) : fontObj.color;
+    if (fontObj.size != null) element.style.fontSize = resolveFont(fontObj.size, baseFontSize, ctx);
   }
 
   // ── DOM Builders ───────────────────────────────────────────────────────
 
-  function buildHeaderText(element, baseFontSize) {
+  function buildHeaderText(element, baseFontSize, ctx) {
     var div = el('div', 'ds-header-text');
     if (element.id) div.setAttribute('data-ds-id', element.id);
     div.textContent = element.text || '';
-    applyFontOverride(div, element.font, baseFontSize);
+    applyFontOverride(div, element.font, baseFontSize, ctx);
     return div;
   }
 
-  function buildHeaderLogo(element, vpH) {
+  function buildHeaderLogo(element, vpH, ctx) {
     var img = el('img', 'ds-header-logo', { src: element.src, alt: 'Logo' });
     if (element.id) img.setAttribute('data-ds-id', element.id);
     var maxH = element.max_height != null ? element.max_height : 4;
-    img.style.maxHeight = resolveV(maxH, vpH) + 'px';
+    img.style.maxHeight = resolveV(maxH, vpH, ctx) + 'px';
     return img;
   }
 
-  function buildHeaderRegion(header, vpW, vpH, baseFontSize) {
+  function buildHeaderRegion(header, vpW, vpH, baseFontSize, ctx) {
     if (!header) return null;
     var region = el('div', 'ds-header-region');
 
     if (header.height != null) {
-      region.style.height = resolveV(header.height, vpH) + 'px';
+      region.style.height = resolveV(header.height, vpH, ctx) + 'px';
     }
     if (header.padding != null) {
       var rawPad = normalizePadding(header.padding);
-      var pad = resolvePaddingPx(rawPad, vpW, vpH);
+      var pad = resolvePaddingPx(rawPad, vpW, vpH, ctx);
       region.style.padding = paddingCSS(pad);
     }
     if (header.background) {
-      region.style.background = header.background;
+      region.style.background = resolveColorRef(header.background, ctx);
     }
     if (header.divider && header.divider.color) {
       var w = (header.divider.width != null) ? header.divider.width : 1;
-      region.style.borderBottom = w + 'px solid ' + header.divider.color;
+      region.style.borderBottom = w + 'px solid ' + resolveColorRef(header.divider.color, ctx);
     }
 
     var leftCol = el('div', 'ds-header-col ds-header-col--left');
@@ -340,9 +504,9 @@ var MenuRenderer = (function () {
     elements.forEach(function (element) {
       var node = null;
       if (element.type === 'text') {
-        node = buildHeaderText(element, baseFontSize);
+        node = buildHeaderText(element, baseFontSize, ctx);
       } else if (element.type === 'logo' && element.src) {
-        node = buildHeaderLogo(element, vpH);
+        node = buildHeaderLogo(element, vpH, ctx);
       }
       if (!node) return;
 
@@ -359,7 +523,7 @@ var MenuRenderer = (function () {
     return region;
   }
 
-  function buildItem(item, areaDefaults, vpW, vpH, baseFontSize) {
+  function buildItem(item, areaDefaults, vpW, vpH, baseFontSize, ctx, layout) {
     var hasPrice = item.price != null && item.price !== '';
     var hasVariations = item.variations && item.variations.length > 0;
 
@@ -367,8 +531,11 @@ var MenuRenderer = (function () {
       return null;
     }
 
-    var rawPad = normalizePadding(item.padding, { top: 0.4, right: 0, bottom: 0.4, left: 0 });
-    var itemPadding = resolvePaddingPx(rawPad, vpW, vpH);
+    var defaultItemPad = (layout && layout.item_padding != null)
+      ? layout.item_padding
+      : { top: 0.4, right: 0, bottom: 0.4, left: 0 };
+    var rawPad = normalizePadding(item.padding, defaultItemPad);
+    var itemPadding = resolvePaddingPx(rawPad, vpW, vpH, ctx);
 
     var itemAlign = item.align || areaDefaults.itemAlign || 'left';
     var priceAlign = areaDefaults.priceAlign || 'right';
@@ -392,14 +559,14 @@ var MenuRenderer = (function () {
     if (itemAlign !== 'left') {
       nameEl.style.textAlign = itemAlign;
     }
-    applyFontOverride(nameEl, nameFont, baseFontSize);
+    applyFontOverride(nameEl, nameFont, baseFontSize, ctx);
     row.appendChild(nameEl);
 
     // Show base price if present (even when variations exist)
     if (hasPrice) {
       var priceEl = el('span', 'ds-item__price');
       priceEl.textContent = formatPrice(item.price);
-      applyFontOverride(priceEl, priceFont, baseFontSize);
+      applyFontOverride(priceEl, priceFont, baseFontSize, ctx);
       row.appendChild(priceEl);
     }
 
@@ -438,16 +605,17 @@ var MenuRenderer = (function () {
     return wrap;
   }
 
-  function buildLeafArea(area, spacing, vpW, vpH, baseFontSize) {
+  function buildLeafArea(area, spacing, vpW, vpH, baseFontSize, ctx, layout) {
     var section = el('div', 'ds-area');
     if (area.id) {
       section.setAttribute('data-area-id', area.id);
       section.setAttribute('data-ds-id', area.id);
     }
 
-    // Area padding
-    var rawPad = normalizePadding(area.padding, 0);
-    var areaPad = resolvePaddingPx(rawPad, vpW, vpH);
+    // Area padding (uses layout.area_padding as default if not set on area)
+    var defaultAreaPad = (layout && layout.area_padding != null) ? layout.area_padding : 0;
+    var rawPad = normalizePadding(area.padding, defaultAreaPad);
+    var areaPad = resolvePaddingPx(rawPad, vpW, vpH, ctx);
     section.style.padding = paddingCSS(areaPad);
 
     // Vertical alignment in parent grid
@@ -458,8 +626,8 @@ var MenuRenderer = (function () {
 
     // Area-level style overrides
     var areaStyle = area.style || {};
-    if (areaStyle.background) section.style.background = areaStyle.background;
-    if (areaStyle.divider_color) section.style.setProperty('--ds-divider-color', areaStyle.divider_color);
+    if (areaStyle.background) section.style.background = resolveColorRef(areaStyle.background, ctx);
+    if (areaStyle.divider_color) section.style.setProperty('--ds-divider-color', resolveColorRef(areaStyle.divider_color, ctx));
 
     // Area title
     if (area.title) {
@@ -469,14 +637,15 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') {
         titleEl.style.textAlign = titleAlign;
       }
-      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize);
+      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize, ctx);
       section.appendChild(titleEl);
     }
 
     // Item grid
     var cols = area.column_count || 1;
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(cols, 3));
-    var gutter = (area.gutter != null) ? resolveH(area.gutter, vpW) : resolveH(0.4, vpW);
+    var defaultItemGutter = (layout && layout.item_gutter != null) ? layout.item_gutter : 0.4;
+    var gutter = (area.gutter != null) ? resolveH(area.gutter, vpW, ctx) : resolveH(defaultItemGutter, vpW, ctx);
     grid.style.columnGap = gutter + 'px';
     grid.style.rowGap = '0px';
 
@@ -489,7 +658,7 @@ var MenuRenderer = (function () {
     };
 
     (area.items || []).forEach(function (item) {
-      var node = buildItem(item, areaDefaults, vpW, vpH, baseFontSize);
+      var node = buildItem(item, areaDefaults, vpW, vpH, baseFontSize, ctx, layout);
       if (node) grid.appendChild(node);
     });
 
@@ -497,7 +666,7 @@ var MenuRenderer = (function () {
     return section;
   }
 
-  function buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize) {
+  function buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize, ctx, layout) {
     var section = el('div', 'ds-area ds-area-group');
     if (area.id) {
       section.setAttribute('data-area-id', area.id);
@@ -505,8 +674,9 @@ var MenuRenderer = (function () {
     }
 
     // Area padding
-    var rawPad = normalizePadding(area.padding, 0);
-    var areaPad = resolvePaddingPx(rawPad, vpW, vpH);
+    var defaultAreaPad = (layout && layout.area_padding != null) ? layout.area_padding : 0;
+    var rawPad = normalizePadding(area.padding, defaultAreaPad);
+    var areaPad = resolvePaddingPx(rawPad, vpW, vpH, ctx);
     section.style.padding = paddingCSS(areaPad);
 
     // Vertical alignment in parent grid
@@ -517,7 +687,7 @@ var MenuRenderer = (function () {
 
     // Area-level style overrides
     var areaStyle = area.style || {};
-    if (areaStyle.background) section.style.background = areaStyle.background;
+    if (areaStyle.background) section.style.background = resolveColorRef(areaStyle.background, ctx);
 
     // Group title (optional)
     if (area.title) {
@@ -527,13 +697,13 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') {
         titleEl.style.textAlign = titleAlign;
       }
-      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize);
+      applyFontOverride(titleEl, areaStyle.title_font, baseFontSize, ctx);
       section.appendChild(titleEl);
     }
 
     // Sub-areas grid
     var subCols = area.columns || 1;
-    var subGutter = (area.gutter != null) ? resolveH(area.gutter, vpW) : spacing.containerGutter;
+    var subGutter = (area.gutter != null) ? resolveH(area.gutter, vpW, ctx) : spacing.containerGutter;
     var subGap = spacing.areaGap;
 
     var grid = el('div', 'ds-area-group__grid');
@@ -543,14 +713,14 @@ var MenuRenderer = (function () {
     grid.style.rowGap = subGap + 'px';
 
     (area.areas || []).forEach(function (subArea) {
-      grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH, baseFontSize));
+      grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH, baseFontSize, ctx, layout));
     });
 
     section.appendChild(grid);
     return section;
   }
 
-  function buildArea(area, spacing, depth, vpW, vpH, baseFontSize) {
+  function buildArea(area, spacing, depth, vpW, vpH, baseFontSize, ctx, layout) {
     depth = depth || 0;
     if (depth > MAX_NESTING_DEPTH) {
       console.warn('[MenuRenderer] Max nesting depth exceeded, skipping area:', area.id);
@@ -558,9 +728,9 @@ var MenuRenderer = (function () {
     }
 
     if (area.areas && area.areas.length > 0) {
-      return buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize);
+      return buildAreaGroup(area, spacing, depth, vpW, vpH, baseFontSize, ctx, layout);
     }
-    return buildLeafArea(area, spacing, vpW, vpH, baseFontSize);
+    return buildLeafArea(area, spacing, vpW, vpH, baseFontSize, ctx, layout);
   }
 
   // ── Preview Mode ───────────────────────────────────────────────────────
@@ -610,9 +780,19 @@ var MenuRenderer = (function () {
 
     cleanupPreview();
 
-    var layout = merge(DEFAULTS.layout, data.layout);
-    var theme = merge(DEFAULTS.theme, data.theme);
+    // Apply preset as defaults under user theme/layout (preset < user)
+    var presetName = data.theme && data.theme.preset;
+    var preset = presetName && PRESETS[presetName] ? PRESETS[presetName] : null;
+
+    var baseLayout = preset && preset.layout ? merge(DEFAULTS.layout, preset.layout) : DEFAULTS.layout;
+    var baseTheme  = preset && preset.theme  ? merge(DEFAULTS.theme,  preset.theme)  : DEFAULTS.theme;
+
+    var layout = merge(baseLayout, data.layout);
+    var theme  = merge(baseTheme,  data.theme);
     var areas = data.areas || [];
+
+    // Build resolution context (palette / type_scale / spacing lookups)
+    var ctx = buildContext(layout, theme);
 
     // Resolve viewport dimensions
     var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];
@@ -624,14 +804,14 @@ var MenuRenderer = (function () {
     var baseFontSize = BASE_FONT_MAP[layout.resolution] || BASE_FONT_MAP['4k'];
 
     // Resolve spacing (% → px)
-    var spacing = resolveSpacing(layout, vpW, vpH);
+    var spacing = resolveSpacing(layout, vpW, vpH, ctx);
 
     // Inject Google Fonts
-    var fontMap = collectFonts(data);
+    var fontMap = collectFonts(data, theme);
     injectGoogleFonts(fontMap);
 
-    // Inject CSS custom property overrides (resolved to px)
-    var cssVars = buildCSSVars(layout, theme, vpW, vpH, baseFontSize);
+    // Inject CSS custom property overrides (resolved to px and against ctx)
+    var cssVars = buildCSSVars(layout, theme, vpW, vpH, baseFontSize, ctx);
     injectThemeStyle(cssVars);
 
     // Clear target
@@ -643,10 +823,12 @@ var MenuRenderer = (function () {
     viewport.style.width = vpW + 'px';
     viewport.style.height = vpH + 'px';
     viewport.style.fontSize = baseFontSize + 'px';
+    var bg = resolveColorRef(theme.background, ctx);
+    if (bg) viewport.style.background = bg;
 
     // Header (only rendered if header is defined)
     if (data.header) {
-      var headerRegion = buildHeaderRegion(data.header, vpW, vpH, baseFontSize);
+      var headerRegion = buildHeaderRegion(data.header, vpW, vpH, baseFontSize, ctx);
       if (headerRegion) viewport.appendChild(headerRegion);
     }
 
@@ -660,7 +842,7 @@ var MenuRenderer = (function () {
     areasWrap.style.padding = paddingCSS(spacing.viewportPadding);
 
     areas.forEach(function (area) {
-      areasWrap.appendChild(buildArea(area, spacing, 0, vpW, vpH, baseFontSize));
+      areasWrap.appendChild(buildArea(area, spacing, 0, vpW, vpH, baseFontSize, ctx, layout));
     });
 
     viewport.appendChild(areasWrap);

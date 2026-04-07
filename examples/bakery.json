@@ -2,7 +2,6 @@
   "layout": {
     "resolution": "4k",
     "orientation": "portrait",
-    "background_color": "#faf3eb",
     "viewport_padding": { "top": 1.25, "right": 3.333, "bottom": 1.25, "left": 3.333 },
     "area_gap": 1.458,
     "container": {
@@ -28,6 +27,7 @@
     ]
   },
   "theme": {
+    "background": "#faf3eb",
     "area_title_font": {
       "family": "Playfair Display",
       "weight": "600",

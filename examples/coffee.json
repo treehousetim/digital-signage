@@ -2,7 +2,6 @@
   "layout": {
     "resolution": "4k",
     "orientation": "portrait",
-    "background_color": "#1a1a1a",
     "viewport_padding": { "top": 0.833, "right": 2.963, "bottom": 0.833, "left": 2.963 },
     "area_gap": 1.25,
     "container": {
@@ -29,6 +28,7 @@
     ]
   },
   "theme": {
+    "background": "#1a1a1a",
     "area_title_font": {
       "family": "Montserrat",
       "weight": "600",

@@ -2,7 +2,6 @@
   "layout": {
     "resolution": "4k",
     "orientation": "landscape",
-    "background_color": "#0d1117",
     "viewport_padding": { "top": 1.111, "right": 1.458, "bottom": 1.111, "left": 1.458 },
     "area_gap": 1.481,
     "container": {
@@ -29,6 +28,7 @@
     ]
   },
   "theme": {
+    "background": "#0d1117",
     "area_title_font": {
       "family": "Roboto",
       "weight": "600",

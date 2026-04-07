@@ -28,28 +28,40 @@
           "default": "display",
           "description": "Rendering mode. 'display' renders at native resolution with CSS scale. 'preview' scales to fit the browser viewport for previewing on any screen."
         },
-        "background_color": {
-          "type": "string",
-          "default": "#1a1a1a",
-          "description": "CSS color value for the full-screen background."
-        },
         "x_spacer": {
           "type": "number",
-          "default": 24,
-          "description": "Legacy horizontal spacing fallback (px). Use viewport_padding and container.gutter instead."
+          "default": 1.25,
+          "description": "Legacy horizontal spacing fallback (% of viewport width). Use viewport_padding and container.gutter instead."
         },
         "y_spacer": {
           "type": "number",
-          "default": 32,
-          "description": "Legacy vertical spacing fallback (px). Use viewport_padding and area_gap instead."
+          "default": 3,
+          "description": "Legacy vertical spacing fallback (% of viewport height)."
         },
         "viewport_padding": {
           "$ref": "#/$defs/padding",
-          "description": "Padding from the screen edges to the content area. Overrides x_spacer/y_spacer when present."
+          "description": "Padding from the screen edges to the content area (% of viewport)."
         },
         "area_gap": {
           "type": "number",
-          "description": "Vertical gap in pixels between area sections. Defaults to y_spacer value."
+          "description": "Vertical gap between area sections (% of viewport height)."
+        },
+        "area_padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Default internal padding for all areas (overridable per-area)."
+        },
+        "item_padding": {
+          "$ref": "#/$defs/padding",
+          "description": "Default padding for all items (overridable per-item)."
+        },
+        "item_gutter": {
+          "type": "number",
+          "description": "Default gap between item columns (% of viewport width)."
+        },
+        "spacing": {
+          "type": "object",
+          "description": "Custom spacing scale. Override token names like xs/sm/md/lg/xl. Reference with '$name' in any spatial value.",
+          "additionalProperties": { "type": "number" }
         },
         "container": {
           "type": "object",
@@ -63,10 +75,10 @@
             },
             "gutter": {
               "type": "number",
-              "description": "Gap in pixels between area columns. Defaults to x_spacer value."
+              "description": "Gap between area columns (% of viewport width)."
             }
           }
-        },
+        }
       }
     },
     "header": {
@@ -111,21 +123,70 @@
     },
     "theme": {
       "type": "object",
-      "description": "Font and color definitions applied globally via CSS custom properties. All values can be overridden at runtime.",
+      "description": "Visual definitions: colors, fonts, dividers, palette, type scale, and presets.",
       "properties": {
+        "preset": {
+          "type": "string",
+          "enum": ["dark", "light", "warm", "cool", "mono"],
+          "description": "Built-in theme preset. Loaded as defaults that the user can override."
+        },
+        "palette": {
+          "type": "object",
+          "description": "Named colors. Reference with '$name' in any color field. Common keys: background, surface, text, muted, accent, divider.",
+          "additionalProperties": { "type": "string" }
+        },
+        "type_scale": {
+          "type": "object",
+          "description": "Custom type scale (em values). Override token names like xs/sm/base/md/lg/xl/hero. Reference with '$name' in font sizes.",
+          "additionalProperties": { "type": "number" }
+        },
+        "background": {
+          "type": "string",
+          "description": "Full-screen background. Color, gradient, image, or '$name' palette reference."
+        },
+        "text_color": {
+          "type": "string",
+          "description": "Default text color. Can use '$name' palette reference."
+        },
+        "accent_color": {
+          "type": "string",
+          "description": "Accent color used by titles/prices by default. Can use '$name' palette reference."
+        },
         "area_title_font": { "$ref": "#/$defs/font" },
         "item_name_font": { "$ref": "#/$defs/font" },
         "item_price_font": { "$ref": "#/$defs/font" },
         "variation_font": { "$ref": "#/$defs/font" },
+        "description_font": { "$ref": "#/$defs/font" },
         "divider_color": {
           "type": "string",
           "default": "#444444",
-          "description": "CSS color for dividers between items."
+          "description": "CSS color (or '$name' ref) for item dividers."
+        },
+        "divider_width": {
+          "type": "number",
+          "default": 1,
+          "description": "Divider line width in pixels."
+        },
+        "divider_style": {
+          "type": "string",
+          "enum": ["solid", "dashed", "dotted"],
+          "default": "solid",
+          "description": "Divider line style."
         },
         "area_background": {
           "type": "string",
           "default": "transparent",
-          "description": "CSS color for the background of each area block."
+          "description": "Background for area blocks."
+        },
+        "area_border": {
+          "type": "object",
+          "description": "Optional border around area blocks.",
+          "properties": {
+            "color": { "type": "string" },
+            "width": { "type": "number", "default": 1 },
+            "style": { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" },
+            "radius": { "type": "number", "default": 0 }
+          }
         }
       }
     },

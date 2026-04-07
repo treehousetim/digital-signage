@@ -403,12 +403,16 @@ var MenuEditor = (function () {
     layout: [
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-      { key: 'background_color', type: 'color', label: 'Background Color' },
       { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
       { key: 'area_gap', type: 'number', label: 'Area Gap (%)', step: 0.25 },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
         { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
+      ]},
+      { group: 'Defaults', fields: [
+        { key: 'area_padding', type: 'padding', label: 'Area Padding (%)' },
+        { key: 'item_padding', type: 'padding', label: 'Item Padding (%)' },
+        { key: 'item_gutter', type: 'number', label: 'Item Gutter (%)', step: 0.25 }
       ]}
     ],
     header: [
@@ -438,12 +442,23 @@ var MenuEditor = (function () {
       { key: 'max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
     ],
     theme: [
-      { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
-      { key: 'item_name_font', type: 'font', label: 'Item Name Font' },
-      { key: 'item_price_font', type: 'font', label: 'Item Price Font' },
-      { key: 'variation_font', type: 'font', label: 'Variation Font' },
-      { key: 'divider_color', type: 'color', label: 'Divider Color' },
-      { key: 'area_background', type: 'color', label: 'Area Background' }
+      { key: 'preset', type: 'select', options: ['', 'dark', 'light', 'warm', 'cool', 'mono'], label: 'Preset' },
+      { key: 'background', type: 'color', label: 'Background' },
+      { key: 'text_color', type: 'color', label: 'Text Color' },
+      { key: 'accent_color', type: 'color', label: 'Accent Color' },
+      { group: 'Fonts', fields: [
+        { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
+        { key: 'item_name_font', type: 'font', label: 'Item Name Font' },
+        { key: 'item_price_font', type: 'font', label: 'Item Price Font' },
+        { key: 'variation_font', type: 'font', label: 'Variation Font' },
+        { key: 'description_font', type: 'font', label: 'Description Font' }
+      ]},
+      { group: 'Dividers & Borders', fields: [
+        { key: 'divider_color', type: 'color', label: 'Divider Color' },
+        { key: 'divider_width', type: 'number', label: 'Divider Width (px)', step: 1 },
+        { key: 'divider_style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Divider Style' },
+        { key: 'area_background', type: 'color', label: 'Area Background' }
+      ]}
     ],
     area: [
       { key: 'id', type: 'text', label: 'ID' },
@@ -1653,7 +1668,25 @@ var MenuEditor = (function () {
       ? options.rendererAvailable
       : (typeof MenuRenderer !== 'undefined' && typeof MenuRenderer.render === 'function');
 
-    var store = createDataStore(options.data, options.onChange);
+    // Persist editor state to localStorage. Restore on load if no explicit data passed.
+    var STORAGE_KEY = options.storageKey || 'menu-editor:last';
+    var initialData = options.data;
+    if (!initialData && options.persist !== false) {
+      try {
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) initialData = JSON.parse(saved);
+      } catch (e) { /* ignore */ }
+    }
+
+    var userOnChange = options.onChange;
+    var wrappedOnChange = function (data) {
+      if (options.persist !== false) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
+      }
+      if (userOnChange) userOnChange(data);
+    };
+
+    var store = createDataStore(initialData, wrappedOnChange);
 
     // Root
     var root = el('div', 'me-editor-root');
@@ -1825,6 +1858,7 @@ var MenuEditor = (function () {
       { value: 'examples/bakery.json', label: 'Bakery' },
       { value: 'examples/surf-shop.json', label: 'Surf Shop' },
       { value: 'examples/server-status.json', label: 'Server Status' },
+      { value: 'examples/themed.json', label: 'Themed (preset + refs)' },
       { value: 'examples/minimal.json', label: 'Minimal' }
     ];
     exOpts.forEach(function (o) {

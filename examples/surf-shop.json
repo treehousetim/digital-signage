@@ -2,7 +2,6 @@
   "layout": {
     "resolution": "4k",
     "orientation": "landscape",
-    "background_color": "#0a2a3a",
     "viewport_padding": { "top": 1.481, "right": 1.875, "bottom": 1.481, "left": 1.875 },
     "area_gap": 1.852,
     "container": {
@@ -29,6 +28,7 @@
     ]
   },
   "theme": {
+    "background": "#0a2a3a",
     "area_title_font": {
       "family": "Oswald",
       "weight": "600",

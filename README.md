@@ -145,6 +145,8 @@ Creates a GUI editor instance. Returns an editor controller.
 | `data` | object | Initial JSON data. If omitted, starts with a blank template. |
 | `onChange` | function | Callback `(data)` fired on every data change. |
 | `rendererAvailable` | boolean | Auto-detected. Set `false` to embed without renderer (JSON output only). |
+| `persist` | boolean | Auto-save state to `localStorage` (default `true`). Set `false` to disable. |
+| `storageKey` | string | localStorage key for auto-save (default `"menu-editor:last"`). |
 
 **Returned instance:**
 
@@ -171,6 +173,7 @@ Creates a GUI editor instance. Returns an editor controller.
   - **Layout mode**: drag handles on viewport padding (orange) and area gaps (green) — resizes global layout properties, updating all elements that inherit them
 - Drag values convert from px to `%` in real-time with undo/redo support (single undo per drag)
 - **IDs**: Every entity (area, item, variation) gets an auto-generated ID for external system addressing
+- **Auto-save to localStorage**: Editor state persists across page reloads. Disable with `persist: false` or change the storage key with `storageKey: "..."`.
 
 ### Embedding without the renderer
 
@@ -189,6 +192,33 @@ The editor works standalone for JSON authoring — the preview tab is hidden and
 
 ## JSON Schema
 
+## Design Tokens & Reference System
+
+The renderer supports **named tokens** for colors, spacing, and font sizes. Define them once, reference them with `$name` everywhere. Change a single token and every reference updates.
+
+### Color palette (`theme.palette`)
+Built-in tokens: `background`, `surface`, `text`, `muted`, `accent`, `divider`. Override or add your own. Reference with `"color": "$accent"`.
+
+### Spacing scale (`layout.spacing`)
+Built-in tokens: `none`, `xs` (0.25), `sm` (0.5), `md` (1), `lg` (2), `xl` (3), `xxl` (5) — all in `%` of viewport. Override or add your own. Reference with `"padding": "$md"` or `{ "top": "$lg", "left": "$sm" }`.
+
+### Type scale (`theme.type_scale`)
+Built-in tokens: `xs` (0.75), `sm` (1), `base` (1.375), `md` (1.75), `lg` (2.5), `xl` (3.5), `hero` (5) — all in `em`. Reference with `"size": "$lg"`.
+
+### Theme presets (`theme.preset`)
+Built-in presets pre-fill the entire theme. Set `"preset": "dark"` (or `light`, `warm`, `cool`, `mono`) and override any field. Presets define palette, fonts, dividers, and base colors.
+
+```json
+"theme": {
+  "preset": "warm",
+  "palette": { "accent": "#ff8c42" }
+}
+```
+
+This loads the warm preset, then overrides one palette color.
+
+## JSON Schema
+
 ### `layout`
 
 | Field | Type | Default | Description |
@@ -196,9 +226,12 @@ The editor works standalone for JSON authoring — the preview tab is hidden and
 | `resolution` | `"1080"` \| `"2k"` \| `"4k"` | `"4k"` | Sets viewport container size |
 | `orientation` | `"landscape"` \| `"portrait"` | `"landscape"` | Screen orientation |
 | `mode` | `"display"` \| `"preview"` | `"display"` | Preview mode scales to fit browser |
-| `background_color` | string | `"#1a1a1a"` | CSS background color |
 | `viewport_padding` | number or `{top,right,bottom,left}` | `~1.25/3` | Padding from screen edges (%) |
 | `area_gap` | number | `~3` | Vertical gap between areas (%) |
+| `area_padding` | padding | `0` | Default internal padding for all areas |
+| `item_padding` | padding | `~0.4` | Default padding for all items |
+| `item_gutter` | number | `~0.4` | Default gap between item columns (%) |
+| `spacing` | object | — | Custom spacing scale (token name → number) |
 | `container.columns` | `1` \| `2` \| `3` | `1` | Top-level area column layout |
 | `container.gutter` | number | `~1.25` | Gap between area columns (%) |
 ### `header` (top-level, sibling of `layout`)
@@ -267,16 +300,26 @@ Example:
 
 ### `theme`
 
-Global font and color definitions. All values can be overridden per-area or per-item via the `style` object.
+Global visual definitions. All values can be overridden per-area or per-item via the `style` object. Color and size fields accept `$name` references into the palette/type_scale.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `area_title_font` | Font | Montserrat 600 #f0c040 1.75em | Section heading font |
-| `item_name_font` | Font | Lato 400 #ffffff 1.375em | Item name font |
-| `item_price_font` | Font | Lato 700 #ffffff 1.375em | Price font |
-| `variation_font` | Font | Lato 400 #cccccc 1em | Variation text font |
+| `preset` | `"dark"` \| `"light"` \| `"warm"` \| `"cool"` \| `"mono"` | — | Built-in theme preset, loaded as defaults |
+| `palette` | object | built-in | Named colors. Override `background`, `surface`, `text`, `muted`, `accent`, `divider` or add your own |
+| `type_scale` | object | built-in | Custom font size tokens (em values) |
+| `background` | string | — | Full-screen background. Color or `$name` |
+| `text_color` | string | — | Default text color. Color or `$name` |
+| `accent_color` | string | — | Accent color. Color or `$name` |
+| `area_title_font` | Font | Montserrat 600 $accent $md | Section heading font |
+| `item_name_font` | Font | Lato 400 $text $base | Item name font |
+| `item_price_font` | Font | Lato 700 $text $base | Price font |
+| `variation_font` | Font | Lato 400 $muted $sm | Variation text font |
+| `description_font` | Font | inherits variation_font | Item description font |
 | `divider_color` | string | `"#444444"` | Divider between items |
+| `divider_width` | number | `1` | Divider line width (px) |
+| `divider_style` | `"solid"` \| `"dashed"` \| `"dotted"` | `"solid"` | Divider line style |
 | `area_background` | string | `"transparent"` | Area section background |
+| `area_border` | object | — | `{ color, width, style, radius }` for area borders |
 
 ### Font object
 
@@ -494,6 +537,7 @@ The editor auto-generates IDs (`area-1`, `item-1`, `var-1`) and validates unique
 | `bakery.json` | Bakery with breads, pastries, cakes | 4K portrait, 1-column |
 | `surf-shop.json` | Retail + lessons with inline variations | 4K landscape, 2-column nested |
 | `server-status.json` | Infrastructure monitoring dashboard | 4K landscape, 3-column |
+| `themed.json` | Wine bar — demos preset, palette refs, custom spacing/type tokens | 4K landscape |
 | `minimal.json` | Bare-bones 3-item menu | 4K landscape, 1-column |
 
 ## License

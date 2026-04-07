@@ -561,6 +561,20 @@
 .me-json-boolean { color: #569cd6; }
 .me-json-null { color: #808080; }
 
+.me-json-line {
+  white-space: pre;
+  display: block;
+}
+
+.me-json-line--selected {
+  background: rgba(66, 165, 245, 0.18);
+  box-shadow: inset 3px 0 0 #42a5f5;
+}
+
+.me-json-code:focus {
+  outline: none;
+}
+
 /* ── Import Modal ───────────────────────────────────────────────────── */
 
 .me-modal-overlay {

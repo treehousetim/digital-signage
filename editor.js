@@ -418,18 +418,6 @@ var MenuEditor = (function () {
         { key: 'item_gutter', type: 'number', label: 'Item Gutter (%)', step: 0.25 }
       ]}
     ],
-    theme_header: [
-      { key: 'height', type: 'number', label: 'Height (%)', step: 0.25 },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' },
-      { key: 'background', type: 'color', label: 'Background' },
-      { key: 'divider.color', type: 'color', label: 'Divider Color' },
-      { key: 'divider.width', type: 'number', label: 'Divider Width (px)' },
-      { group: 'Column Sizing', defaultCollapsed: true, fields: [
-        { key: 'columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left' },
-        { key: 'columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center' },
-        { key: 'columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right' }
-      ]}
-    ],
     header_text: [
       { key: 'id', type: 'text', label: 'ID' },
       { key: 'type', type: 'select', options: ['text'], label: 'Type' },
@@ -461,6 +449,16 @@ var MenuEditor = (function () {
         { key: 'divider_width', type: 'number', label: 'Divider Width (px)', step: 1 },
         { key: 'divider_style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Divider Style' },
         { key: 'area_background', type: 'color', label: 'Area Background' }
+      ]},
+      { group: 'Header', defaultCollapsed: true, fields: [
+        { key: 'header.height', type: 'number', label: 'Height (%)', step: 0.25 },
+        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'header.background', type: 'color', label: 'Background' },
+        { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
+        { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' },
+        { key: 'header.columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left Col' },
+        { key: 'header.columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center Col' },
+        { key: 'header.columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right Col' }
       ]}
     ],
     area: [
@@ -1022,12 +1020,9 @@ var MenuEditor = (function () {
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
 
-      // Header section (clickable to edit header visual properties via theme.header)
+      // Header section label (not selectable — like Areas)
       var headerSection = el('div', 'me-tree-node');
       var headerSecH = el('div', 'me-tree-node__header me-tree-node__header--section');
-      if ('theme.header' === store.getSelectedPath()) {
-        headerSecH.classList.add('me-tree-node__header--selected');
-      }
       var headerLabel = el('span', 'me-tree-label me-tree-label--section');
       headerLabel.textContent = 'Header';
       var addTextBtn = el('button', 'me-tree-btn', { title: 'Add Text Element' });
@@ -1047,9 +1042,6 @@ var MenuEditor = (function () {
       headerSecH.appendChild(headerLabel);
       headerSecH.appendChild(addTextBtn);
       headerSecH.appendChild(addLogoBtn);
-      headerSecH.addEventListener('click', function () {
-        store.select('theme.header');
-      });
       headerSection.appendChild(headerSecH);
       container.appendChild(headerSection);
 
@@ -1140,7 +1132,6 @@ var MenuEditor = (function () {
       var type;
       if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
-      else if (path === 'theme.header') type = 'theme_header';
       else if (path.indexOf('header.elements[') === 0) {
         type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
       }
@@ -1480,6 +1471,107 @@ var MenuEditor = (function () {
         });
     }
 
+    // Render JSON as line-wrapped HTML and build a path → line map.
+    // Walks the data tree producing the same output as JSON.stringify(d, null, 2)
+    // but with each line wrapped in <div data-line="N" data-path="..."> for tree-sync.
+    var jsonPathToLine = {};
+
+    function renderJsonWithPaths(data) {
+      jsonPathToLine = {};
+      var lines = [];
+      function emit(path, content) {
+        var lineIdx = lines.length;
+        if (path && jsonPathToLine[path] == null) jsonPathToLine[path] = lineIdx;
+        lines.push({ path: path, content: content });
+      }
+      function indent(n) { return new Array(n * 2 + 1).join(' '); }
+      function walk(value, path, depth, trailingComma) {
+        var pad = indent(depth);
+        var tail = trailingComma ? ',' : '';
+        if (value === null) { emit(path, pad + '<span class="me-json-null">null</span>' + tail); return; }
+        if (Array.isArray(value)) {
+          if (value.length === 0) { emit(path, pad + '[]' + tail); return; }
+          emit(path, pad + '[');
+          value.forEach(function (v, i) {
+            walk(v, path + '[' + i + ']', depth + 1, i < value.length - 1);
+          });
+          emit(null, pad + ']' + tail);
+          return;
+        }
+        if (typeof value === 'object') {
+          var keys = Object.keys(value);
+          if (keys.length === 0) { emit(path, pad + '{}' + tail); return; }
+          emit(path, pad + '{');
+          keys.forEach(function (k, i) {
+            var childPath = path ? (path + '.' + k) : k;
+            var childPad = indent(depth + 1);
+            var keyHtml = '<span class="me-json-key">"' + escapeHtml(k) + '"</span>: ';
+            var childVal = value[k];
+            var childTail = i < keys.length - 1 ? ',' : '';
+            if (childVal === null || typeof childVal !== 'object') {
+              // Inline simple value
+              var valHtml;
+              if (childVal === null) valHtml = '<span class="me-json-null">null</span>';
+              else if (typeof childVal === 'string') valHtml = '<span class="me-json-string">"' + escapeHtml(childVal) + '"</span>';
+              else if (typeof childVal === 'number') valHtml = '<span class="me-json-number">' + childVal + '</span>';
+              else if (typeof childVal === 'boolean') valHtml = '<span class="me-json-boolean">' + childVal + '</span>';
+              else valHtml = escapeHtml(String(childVal));
+              emit(childPath, childPad + keyHtml + valHtml + childTail);
+            } else if (Array.isArray(childVal) && childVal.length === 0) {
+              emit(childPath, childPad + keyHtml + '[]' + childTail);
+            } else if (typeof childVal === 'object' && Object.keys(childVal).length === 0) {
+              emit(childPath, childPad + keyHtml + '{}' + childTail);
+            } else if (Array.isArray(childVal)) {
+              emit(childPath, childPad + keyHtml + '[');
+              childVal.forEach(function (av, ai) {
+                walk(av, childPath + '[' + ai + ']', depth + 2, ai < childVal.length - 1);
+              });
+              emit(null, childPad + ']' + childTail);
+            } else {
+              emit(childPath, childPad + keyHtml + '{');
+              var subKeys = Object.keys(childVal);
+              subKeys.forEach(function (sk, si) {
+                var grandPath = childPath + '.' + sk;
+                var grandPad = indent(depth + 2);
+                var sv = childVal[sk];
+                var sTail = si < subKeys.length - 1 ? ',' : '';
+                var skKeyHtml = '<span class="me-json-key">"' + escapeHtml(sk) + '"</span>: ';
+                if (sv === null || typeof sv !== 'object') {
+                  var sValHtml;
+                  if (sv === null) sValHtml = '<span class="me-json-null">null</span>';
+                  else if (typeof sv === 'string') sValHtml = '<span class="me-json-string">"' + escapeHtml(sv) + '"</span>';
+                  else if (typeof sv === 'number') sValHtml = '<span class="me-json-number">' + sv + '</span>';
+                  else if (typeof sv === 'boolean') sValHtml = '<span class="me-json-boolean">' + sv + '</span>';
+                  else sValHtml = escapeHtml(String(sv));
+                  emit(grandPath, grandPad + skKeyHtml + sValHtml + sTail);
+                } else {
+                  // Recurse for deeper nesting
+                  var inner = JSON.stringify(sv, null, 2).split('\n');
+                  emit(grandPath, grandPad + skKeyHtml + inner[0]);
+                  for (var li = 1; li < inner.length; li++) {
+                    var line = grandPad + inner[li];
+                    if (li === inner.length - 1) line += sTail;
+                    emit(null, syntaxHighlight(line));
+                  }
+                }
+              });
+              emit(null, childPad + '}' + childTail);
+            }
+          });
+          emit(null, pad + '}' + tail);
+          return;
+        }
+      }
+      walk(data, '', 0, false);
+
+      var html = lines.map(function (line, idx) {
+        var attrs = ' data-line="' + idx + '"';
+        if (line.path) attrs += ' data-path="' + escapeHtml(line.path) + '"';
+        return '<div class="me-json-line"' + attrs + '>' + line.content + '</div>';
+      }).join('');
+      return html;
+    }
+
     function refreshContent() {
       if (activeTab === 'preview' && iframe) {
         previewScroll.style.display = '';
@@ -1491,10 +1583,62 @@ var MenuEditor = (function () {
         minimapWrap.style.display = 'none';
         jsonPre.style.display = '';
         zoomWrap.style.display = 'none';
-        var jsonStr = JSON.stringify(store.getData(), null, 2);
-        jsonCode.innerHTML = syntaxHighlight(escapeHtml(jsonStr));
+        jsonCode.innerHTML = renderJsonWithPaths(store.getData());
+        // Re-apply selection highlight if there is one
+        scrollToSelectedJsonLine(store.getSelectedPath());
       }
     }
+
+    function scrollToSelectedJsonLine(path) {
+      if (!path || activeTab !== 'json') return;
+      // Clear existing highlights
+      jsonCode.querySelectorAll('.me-json-line--selected').forEach(function (n) {
+        n.classList.remove('me-json-line--selected');
+      });
+      // Find the deepest matching path (selection paths can be longer than what's emitted)
+      var lineIdx = jsonPathToLine[path];
+      if (lineIdx == null) {
+        // Try parent paths progressively
+        var parts = path.replace(/\[/g, '.[').split('.').filter(Boolean);
+        for (var i = parts.length; i > 0; i--) {
+          var p = parts.slice(0, i).join('.').replace(/\.\[/g, '[');
+          if (jsonPathToLine[p] != null) { lineIdx = jsonPathToLine[p]; break; }
+        }
+      }
+      if (lineIdx == null) return;
+      var lineEl = jsonCode.querySelector('.me-json-line[data-line="' + lineIdx + '"]');
+      if (lineEl) {
+        lineEl.classList.add('me-json-line--selected');
+        lineEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }
+
+    // React to selection changes
+    store.on('select', function () {
+      if (activeTab === 'json') {
+        scrollToSelectedJsonLine(store.getSelectedPath());
+      }
+    });
+
+    // Cmd+A / Ctrl+A inside the JSON view selects only the JSON content
+    jsonCode.addEventListener('keydown', function (e) {
+      var isCtrl = e.ctrlKey || e.metaKey;
+      if (isCtrl && e.key === 'a') {
+        e.preventDefault();
+        e.stopPropagation();
+        var range = document.createRange();
+        range.selectNodeContents(jsonCode);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    });
+    // Make jsonCode focusable so it can receive keyboard events
+    jsonCode.setAttribute('tabindex', '0');
+    jsonCode.addEventListener('mousedown', function () {
+      // Focus on click so Cmd+A works
+      jsonCode.focus();
+    });
 
     var previewDebounce;
     function updatePreview() {

@@ -571,8 +571,16 @@
   box-shadow: inset 3px 0 0 #42a5f5;
 }
 
+.me-json-code {
+  cursor: text;
+}
+
 .me-json-code:focus {
   outline: none;
+}
+
+.me-json-code--error {
+  background: rgba(244, 67, 54, 0.06);
 }
 
 /* ── Import Modal ───────────────────────────────────────────────────── */

@@ -1587,9 +1587,11 @@ var MenuEditor = (function () {
         minimapWrap.style.display = 'none';
         jsonPre.style.display = '';
         zoomWrap.style.display = 'none';
-        jsonCode.innerHTML = renderJsonWithPaths(store.getData());
-        // Re-apply selection highlight if there is one
-        scrollToSelectedJsonLine(store.getSelectedPath());
+        // Don't clobber the view if the user is currently editing it
+        if (document.activeElement !== jsonCode) {
+          jsonCode.innerHTML = renderJsonWithPaths(store.getData());
+          scrollToSelectedJsonLine(store.getSelectedPath());
+        }
       }
     }
 
@@ -1624,7 +1626,29 @@ var MenuEditor = (function () {
       }
     });
 
-    // Cmd+A / Ctrl+A inside the JSON view selects only the JSON content
+    // Make jsonCode editable
+    jsonCode.setAttribute('contenteditable', 'plaintext-only');
+    jsonCode.setAttribute('spellcheck', 'false');
+
+    // Live edit: parse the textContent on input (debounced) and replace data
+    var jsonEditTimer = null;
+    jsonCode.addEventListener('input', function () {
+      clearTimeout(jsonEditTimer);
+      jsonEditTimer = setTimeout(function () {
+        var text = jsonCode.textContent;
+        try {
+          var parsed = JSON.parse(text);
+          jsonCode.classList.remove('me-json-code--error');
+          // Replace data without resetting undo (so user can ctrl-z to revert)
+          store.replaceData(parsed, false);
+        } catch (e) {
+          jsonCode.classList.add('me-json-code--error');
+        }
+      }, 500);
+    });
+
+    // Cmd+A / Ctrl+A inside the JSON view selects only the JSON content.
+    // Arrow keys (up/down) when not editing move the highlighted line and select that path.
     jsonCode.addEventListener('keydown', function (e) {
       var isCtrl = e.ctrlKey || e.metaKey;
       if (isCtrl && e.key === 'a') {
@@ -1635,13 +1659,24 @@ var MenuEditor = (function () {
         var sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
+        return;
       }
-    });
-    // Make jsonCode focusable so it can receive keyboard events
-    jsonCode.setAttribute('tabindex', '0');
-    jsonCode.addEventListener('mousedown', function () {
-      // Focus on click so Cmd+A works
-      jsonCode.focus();
+      // Arrow navigation between lines that have a path
+      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && (e.altKey || e.metaKey)) {
+        e.preventDefault();
+        var allLines = Array.prototype.slice.call(jsonCode.querySelectorAll('.me-json-line[data-path]'));
+        if (!allLines.length) return;
+        var current = jsonCode.querySelector('.me-json-line--selected');
+        var idx = current ? allLines.indexOf(current) : -1;
+        var nextIdx;
+        if (e.key === 'ArrowDown') nextIdx = Math.min(allLines.length - 1, idx + 1);
+        else nextIdx = Math.max(0, idx - 1);
+        var nextLine = allLines[nextIdx];
+        if (nextLine) {
+          var p = nextLine.getAttribute('data-path');
+          if (p) store.select(p);
+        }
+      }
     });
 
     var previewDebounce;
@@ -2220,6 +2255,35 @@ var MenuEditor = (function () {
       } else if (isCtrl && e.key === 'Z') {
         e.preventDefault();
         store.redo();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        // Don't hijack arrows when typing in inputs/textareas/contenteditable
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        // Find all selectable nodes in the tree (anything with [data-path] in the tree, plus tree node headers)
+        var selectables = Array.prototype.slice.call(treeContent.querySelectorAll('.me-tree-node__header'));
+        // Filter out non-selectable section headers (Areas/Header labels)
+        selectables = selectables.filter(function (el) {
+          // section headers are non-selectable; their parent text is "AREAS" / "HEADER"
+          return !el.classList.contains('me-tree-node__header--section') ||
+                 el.classList.contains('me-tree-node__header--selected');
+        });
+        if (!selectables.length) return;
+        var currentIdx = -1;
+        for (var i = 0; i < selectables.length; i++) {
+          if (selectables[i].classList.contains('me-tree-node__header--selected')) {
+            currentIdx = i;
+            break;
+          }
+        }
+        var nextIdx;
+        if (e.key === 'ArrowDown') nextIdx = Math.min(selectables.length - 1, currentIdx + 1);
+        else nextIdx = Math.max(0, currentIdx - 1);
+        if (nextIdx !== currentIdx && selectables[nextIdx]) {
+          e.preventDefault();
+          selectables[nextIdx].click();
+          // Scroll the selected node into view in the tree
+          selectables[nextIdx].scrollIntoView({ block: 'nearest' });
+        }
       }
     });
 

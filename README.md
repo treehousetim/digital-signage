@@ -57,7 +57,7 @@ The design system has six top-level concepts. All are optional except `areas`.
 ```json
 {
   "preset": "warm",         // built-in theme preset
-  "tokens": { ... },        // design tokens (palette, spacing, type_scale)
+  "vars":   { ... },        // design vars (palette, spacing, type_scale)
   "layout": { ... },        // canvas + content arrangement
   "theme":  { ... },        // visual contract (colors, fonts, dividers, etc.)
   "header": { ... },        // header content (visuals live in theme.header)
@@ -65,21 +65,21 @@ The design system has six top-level concepts. All are optional except `areas`.
 }
 ```
 
-### 1. Design tokens
+### 1. Design vars
 
-Tokens are named values you can reference anywhere with `$name`.
+Vars are named design tokens you can reference anywhere with `$name`.
 
-| Type | Built-in tokens | Use |
+| Type | Built-in names | Use |
 |---|---|---|
 | **Palette** (colors) | `background`, `surface`, `text`, `muted`, `accent`, `divider` | `"color": "$accent"` |
 | **Spacing** (% of viewport) | `none`, `xs` (.25), `sm` (.5), `md` (1), `lg` (2), `xl` (3), `xxl` (5) | `"padding": "$md"` |
 | **Type scale** (em) | `xs` (.75), `sm` (1), `base` (1.375), `md` (1.75), `lg` (2.5), `xl` (3.5), `hero` (5) | `"size": "$lg"` |
 
-Override or add tokens at the top level:
+Override or add vars at the top level:
 
 ```json
 {
-  "tokens": {
+  "vars": {
     "palette": { "accent": "#ff8c42" },
     "spacing": { "tight": 0.5, "loose": 4 },
     "type_scale": { "menu": 2 }
@@ -290,8 +290,8 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `cafe.json` | Breakfast cafe with multi-column layout | Container columns, palette override |
 | `bakery.json` | Portrait bakery menu | Light preset, portrait orientation |
 | `surf-shop.json` | Lessons + retail | Cool preset, inline variations |
-| `server-status.json` | Infrastructure dashboard (non-menu) | Mono preset, semantic tokens, area styling |
-| `themed.json` | Wine bar | Custom tokens, font extension, full token reference system |
+| `server-status.json` | Infrastructure dashboard (non-menu) | Mono preset, semantic vars, area styling |
+| `themed.json` | Wine bar | Custom vars, font extension, full reference system |
 
 ## Schema
 

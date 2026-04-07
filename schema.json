@@ -11,9 +11,9 @@
       "enum": ["dark", "light", "warm", "cool", "mono"],
       "description": "Built-in theme preset. Sets palette and font families. User overrides take precedence."
     },
-    "tokens": {
+    "vars": {
       "type": "object",
-      "description": "Design tokens. Reference any value with $name in spatial, color, or font size fields.",
+      "description": "Design vars (named tokens). Reference any value with $name in spatial, color, or font size fields.",
       "properties": {
         "palette": {
           "type": "object",

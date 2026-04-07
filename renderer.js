@@ -5,7 +5,7 @@
  *
  * ## Core concepts
  *
- *   tokens   — design tokens (palette, spacing, type_scale). Reference with $name.
+ *   vars     — design tokens (palette, spacing, type_scale). Reference with $name.
  *   layout   — canvas + arrangement (resolution, viewport_padding, container).
  *   theme    — semantic visual contract:
  *                colors   { background, surface, text, muted, accent, divider }
@@ -60,7 +60,7 @@ var MenuRenderer = (function () {
 
   // ── Built-in Design Tokens ─────────────────────────────────────────────
 
-  var DEFAULT_TOKENS = {
+  var DEFAULT_VARS = {
     palette: {
       background: '#1a1a1a',
       surface:    '#222222',
@@ -159,10 +159,10 @@ var MenuRenderer = (function () {
 
   var PRESETS = {
     dark: {
-      tokens: { palette: { background: '#1a1a1a', surface: '#222222', text: '#ffffff', muted: '#cccccc', accent: '#f0c040', divider: '#444444' } }
+      vars: { palette: { background: '#1a1a1a', surface: '#222222', text: '#ffffff', muted: '#cccccc', accent: '#f0c040', divider: '#444444' } }
     },
     light: {
-      tokens: { palette: { background: '#fafafa', surface: '#ffffff', text: '#1a1a1a', muted: '#666666', accent: '#c8501e', divider: '#dddddd' } },
+      vars: { palette: { background: '#fafafa', surface: '#ffffff', text: '#1a1a1a', muted: '#666666', accent: '#c8501e', divider: '#dddddd' } },
       theme: {
         fonts: {
           title:   { family: 'Playfair Display', weight: '700' },
@@ -171,7 +171,7 @@ var MenuRenderer = (function () {
       }
     },
     warm: {
-      tokens: { palette: { background: '#2c1810', surface: '#3a2318', text: '#f5e6d3', muted: '#c4a882', accent: '#d4a574', divider: '#4a3528' } },
+      vars: { palette: { background: '#2c1810', surface: '#3a2318', text: '#f5e6d3', muted: '#c4a882', accent: '#d4a574', divider: '#4a3528' } },
       theme: {
         fonts: {
           title:   { family: 'Playfair Display' },
@@ -180,7 +180,7 @@ var MenuRenderer = (function () {
       }
     },
     cool: {
-      tokens: { palette: { background: '#0a2a3a', surface: '#1a3a4a', text: '#e8f0f5', muted: '#8ab8cc', accent: '#5cc8e8', divider: '#1a4a5e' } },
+      vars: { palette: { background: '#0a2a3a', surface: '#1a3a4a', text: '#e8f0f5', muted: '#8ab8cc', accent: '#5cc8e8', divider: '#1a4a5e' } },
       theme: {
         fonts: {
           title:   { family: 'Oswald' },
@@ -189,7 +189,7 @@ var MenuRenderer = (function () {
       }
     },
     mono: {
-      tokens: { palette: { background: '#000000', surface: '#0a0a0a', text: '#ffffff', muted: '#888888', accent: '#ffffff', divider: '#333333' } },
+      vars: { palette: { background: '#000000', surface: '#0a0a0a', text: '#ffffff', muted: '#888888', accent: '#ffffff', divider: '#333333' } },
       theme: {
         fonts: {
           title:   { family: 'Roboto', weight: '700' },
@@ -243,11 +243,11 @@ var MenuRenderer = (function () {
   // Build a render context once per render holding token lookups + theme.
   // Resolve $name references against the appropriate token table.
 
-  function buildContext(tokens, theme) {
+  function buildContext(vars, theme) {
     return {
-      palette:   deepMerge(DEFAULT_TOKENS.palette,   tokens.palette || {}),
-      typeScale: deepMerge(DEFAULT_TOKENS.type_scale, tokens.type_scale || {}),
-      spacing:   deepMerge(DEFAULT_TOKENS.spacing,    tokens.spacing || {}),
+      palette:   deepMerge(DEFAULT_VARS.palette,   vars.palette || {}),
+      typeScale: deepMerge(DEFAULT_VARS.type_scale, vars.type_scale || {}),
+      spacing:   deepMerge(DEFAULT_VARS.spacing,    vars.spacing || {}),
       theme: theme,
       currencySymbol: (theme.pricing && theme.pricing.symbol != null) ? theme.pricing.symbol : '',
       priceFormat: (theme.pricing && theme.pricing.format) || 'full'
@@ -874,11 +874,11 @@ var MenuRenderer = (function () {
     var presetName = data.preset || (data.theme && data.theme.preset);
     var preset = (presetName && PRESETS[presetName]) ? PRESETS[presetName] : null;
 
-    var baseTokens = preset && preset.tokens ? deepMerge({}, preset.tokens) : {};
+    var baseVars = preset && preset.vars ? deepMerge({}, preset.vars) : {};
     var baseTheme  = preset && preset.theme  ? deepMerge(DEFAULT_THEME, preset.theme) : DEFAULT_THEME;
     var baseLayout = preset && preset.layout ? deepMerge(DEFAULT_LAYOUT, preset.layout) : DEFAULT_LAYOUT;
 
-    var tokens = deepMerge(baseTokens, data.tokens || {});
+    var vars = deepMerge(baseVars, data.vars || {});
     var theme  = deepMerge(baseTheme,  data.theme  || {});
     var layout = deepMerge(baseLayout, data.layout || {});
 
@@ -888,7 +888,7 @@ var MenuRenderer = (function () {
     var areas = workingData.areas || [];
 
     // Build context
-    var ctx = buildContext(tokens, theme);
+    var ctx = buildContext(vars, theme);
 
     // Resolve viewport dimensions
     var res = RESOLUTION_MAP[layout.resolution] || RESOLUTION_MAP['4k'];

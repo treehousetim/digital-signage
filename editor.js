@@ -404,11 +404,11 @@ var MenuEditor = (function () {
         { key: 'container.gutter', type: 'text', label: 'Gutter (% or $token)' }
       ]}
     ],
-    tokens: [
-      // Tokens are key/value tables; show a hint pointing to the JSON tab
-      { key: 'palette', type: 'tokens_palette', label: 'Palette (color tokens)' },
-      { key: 'spacing', type: 'tokens_map', label: 'Spacing tokens' },
-      { key: 'type_scale', type: 'tokens_map', label: 'Type scale tokens' }
+    vars: [
+      // Vars are key/value tables of design tokens
+      { key: 'palette', type: 'vars_palette', label: 'Palette (colors)' },
+      { key: 'spacing', type: 'vars_map', label: 'Spacing' },
+      { key: 'type_scale', type: 'vars_map', label: 'Type scale' }
     ],
     theme: [
       { group: 'Colors', fields: [
@@ -766,32 +766,32 @@ var MenuEditor = (function () {
       wrapper.appendChild(label);
       wrapper.appendChild(fontGroup);
 
-    } else if (fieldDef.type === 'tokens_palette' || fieldDef.type === 'tokens_map') {
-      // Inline key/value editor for tokens (palette: color, scale: number)
-      var isPalette = fieldDef.type === 'tokens_palette';
-      var tokens = (value && typeof value === 'object') ? value : {};
-      var tableWrap = el('div', 'me-tokens-editor');
-      var entries = Object.keys(tokens);
+    } else if (fieldDef.type === 'vars_palette' || fieldDef.type === 'vars_map') {
+      // Inline key/value editor for design vars (palette: color, scale: number)
+      var isPalette = fieldDef.type === 'vars_palette';
+      var vars = (value && typeof value === 'object') ? value : {};
+      var tableWrap = el('div', 'me-vars-editor');
+      var entries = Object.keys(vars);
 
-      function rebuildTokenRows() {
+      function rebuildVarRows() {
         tableWrap.innerHTML = '';
-        entries = Object.keys(tokens);
+        entries = Object.keys(vars);
         entries.forEach(function (k) {
           // Capture the current key in a closure variable so renames work
           // without rebuilding the row (which would destroy focus).
           var currentKey = k;
-          var row = el('div', 'me-tokens-row');
+          var row = el('div', 'me-vars-row');
           var keyInput = el('input', 'me-field__input me-field__input--short', { type: 'text' });
           keyInput.value = k;
           var valInput = el('input', 'me-field__input', { type: isPalette ? 'text' : 'number' });
-          valInput.value = tokens[k];
+          valInput.value = vars[k];
           if (isPalette) {
             var swatch = el('input', 'me-field__color', { type: 'color' });
-            swatch.value = (typeof tokens[k] === 'string' && tokens[k].charAt(0) === '#') ? tokens[k] : '#000000';
+            swatch.value = (typeof vars[k] === 'string' && vars[k].charAt(0) === '#') ? vars[k] : '#000000';
             swatch.addEventListener('input', function () {
-              tokens[currentKey] = swatch.value;
+              vars[currentKey] = swatch.value;
               valInput.value = swatch.value;
-              store.update(fullPath, tokens);
+              store.update(fullPath, vars);
             });
             row.appendChild(swatch);
           }
@@ -801,10 +801,10 @@ var MenuEditor = (function () {
             keyTimer = setTimeout(function () {
               var newKey = keyInput.value.trim();
               if (newKey && newKey !== currentKey) {
-                tokens[newKey] = tokens[currentKey];
-                delete tokens[currentKey];
+                vars[newKey] = vars[currentKey];
+                delete vars[currentKey];
                 currentKey = newKey;
-                store.update(fullPath, tokens);
+                store.update(fullPath, vars);
                 // No rebuild — the input keeps focus, currentKey points to new name
               }
             }, 400);
@@ -815,18 +815,17 @@ var MenuEditor = (function () {
             valTimer = setTimeout(function () {
               var v = isPalette ? valInput.value : parseFloat(valInput.value);
               if (isPalette || !isNaN(v)) {
-                tokens[currentKey] = v;
-                store.update(fullPath, tokens);
+                vars[currentKey] = v;
+                store.update(fullPath, vars);
               }
             }, 400);
           });
-          // Color swatch closure also needs currentKey
           var delBtn = el('button', 'me-tree-btn me-tree-btn--danger');
           delBtn.textContent = '\u2715';
           delBtn.addEventListener('click', function () {
-            delete tokens[currentKey];
-            store.update(fullPath, tokens);
-            rebuildTokenRows();
+            delete vars[currentKey];
+            store.update(fullPath, vars);
+            rebuildVarRows();
           });
           row.appendChild(keyInput);
           row.appendChild(valInput);
@@ -837,14 +836,14 @@ var MenuEditor = (function () {
         var addBtn = el('button', 'me-tree-btn');
         addBtn.textContent = '+ add';
         addBtn.addEventListener('click', function () {
-          var newKey = 'token-' + (entries.length + 1);
-          tokens[newKey] = isPalette ? '#000000' : 1;
-          store.update(fullPath, tokens);
-          rebuildTokenRows();
+          var newKey = 'var-' + (entries.length + 1);
+          vars[newKey] = isPalette ? '#000000' : 1;
+          store.update(fullPath, vars);
+          rebuildVarRows();
         });
         tableWrap.appendChild(addBtn);
       }
-      rebuildTokenRows();
+      rebuildVarRows();
 
       wrapper.appendChild(label);
       wrapper.appendChild(tableWrap);
@@ -883,7 +882,7 @@ var MenuEditor = (function () {
       if (path === '') return 'Menu';
       if (path === 'layout') return 'Layout';
       if (path === 'theme') return 'Theme';
-      if (path === 'tokens') return 'Tokens';
+      if (path === 'vars') return 'Vars';
       if (obj.title) return obj.title;
       if (obj.name) return obj.name;
       if (obj.id) return obj.id;
@@ -893,7 +892,7 @@ var MenuEditor = (function () {
     function getNodeIcon(type) {
       var icons = {
         root: '\u25C6',     // diamond
-        tokens: '\u269C',   // fleur
+        vars: '\u269C',     // fleur
         layout: '\u2630',   // trigram
         theme: '\u2726',    // star
         area: '\u25A1',     // square
@@ -1115,7 +1114,7 @@ var MenuEditor = (function () {
       container.appendChild(buildNode('', data, 'root', 0));
 
       // Tokens
-      container.appendChild(buildNode('tokens', data.tokens || {}, 'tokens', 0));
+      container.appendChild(buildNode('vars', data.vars || {}, 'vars', 0));
 
       // Layout node
       container.appendChild(buildNode('layout', data.layout || {}, 'layout', 0));
@@ -1225,7 +1224,7 @@ var MenuEditor = (function () {
       var value = getAtPath(data, path);
 
       // Tree sections (Header, Areas) and unselectable nodes get empty inspector
-      if (value == null && path !== 'layout' && path !== 'theme' && path !== '' && path !== 'tokens') {
+      if (value == null && path !== 'layout' && path !== 'theme' && path !== '' && path !== 'vars') {
         // Empty inspector — no message
         return;
       }
@@ -1235,7 +1234,7 @@ var MenuEditor = (function () {
       if (path === '') type = 'root';
       else if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
-      else if (path === 'tokens') type = 'tokens';
+      else if (path === 'vars') type = 'vars';
       else if (path.indexOf('header.elements[') === 0) {
         type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
       }

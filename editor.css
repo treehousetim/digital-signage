@@ -583,9 +583,9 @@
   background: rgba(244, 67, 54, 0.06);
 }
 
-/* ── Tokens editor ──────────────────────────────────────────────────── */
+/* ── Vars editor ────────────────────────────────────────────────────── */
 
-.me-tokens-editor {
+.me-vars-editor {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -595,17 +595,17 @@
   background: rgba(0, 0, 0, 0.15);
 }
 
-.me-tokens-row {
+.me-vars-row {
   display: flex;
   gap: 4px;
   align-items: center;
 }
 
-.me-tokens-row .me-field__input {
+.me-vars-row .me-field__input {
   flex: 1;
 }
 
-.me-tokens-row .me-field__color {
+.me-vars-row .me-field__color {
   flex-shrink: 0;
 }
 

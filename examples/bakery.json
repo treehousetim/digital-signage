@@ -1,12 +1,12 @@
 {
   "preset": "light",
-  "tokens": {
+  "vars": {
     "palette": {
       "background": "#faf3eb",
-      "text":       "#3d2b1f",
-      "muted":      "#7a6455",
-      "accent":     "#8b5e3c",
-      "divider":    "#d9cec3"
+      "text": "#3d2b1f",
+      "muted": "#7a6455",
+      "accent": "#8b5e3c",
+      "divider": "#d9cec3"
     }
   },
   "layout": {
@@ -14,7 +14,10 @@
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "Sunrise Bakery" }
+      {
+        "type": "text",
+        "text": "Sunrise Bakery"
+      }
     ]
   },
   "areas": [
@@ -22,34 +25,113 @@
       "title": "Fresh Breads",
       "column_count": 2,
       "items": [
-        { "name": "Sourdough Loaf", "description": "24-hour ferment, stone-baked", "price": "8.50" },
-        { "name": "French Baguette", "description": "Crispy crust, soft crumb", "price": "5.00" },
-        { "name": "Ciabatta", "description": "Italian olive oil bread", "price": "6.00" },
-        { "name": "Dark Rye", "description": "Caraway, molasses", "price": "7.50" },
-        { "name": "Brioche Loaf", "description": "Buttery, golden pull-apart", "price": "9.00" },
-        { "name": "Rosemary Focaccia", "description": "Sea salt, olive oil, herbs", "price": "7.00" }
+        {
+          "name": "Sourdough Loaf",
+          "description": "24-hour ferment, stone-baked",
+          "price": "8.50"
+        },
+        {
+          "name": "French Baguette",
+          "description": "Crispy crust, soft crumb",
+          "price": "5.00"
+        },
+        {
+          "name": "Ciabatta",
+          "description": "Italian olive oil bread",
+          "price": "6.00"
+        },
+        {
+          "name": "Dark Rye",
+          "description": "Caraway, molasses",
+          "price": "7.50"
+        },
+        {
+          "name": "Brioche Loaf",
+          "description": "Buttery, golden pull-apart",
+          "price": "9.00"
+        },
+        {
+          "name": "Rosemary Focaccia",
+          "description": "Sea salt, olive oil, herbs",
+          "price": "7.00"
+        }
       ]
     },
     {
       "title": "Pastries",
       "column_count": 2,
       "items": [
-        { "name": "Butter Croissant", "price": "4.00" },
-        { "name": "Pain au Chocolat", "price": "4.50" },
-        { "name": "Almond Croissant", "price": "5.00" },
-        { "name": "Fruit Danish", "description": "Seasonal fruit, cream cheese", "price": "4.50" },
-        { "name": "Cinnamon Roll", "description": "Cream cheese glaze", "price": "5.00" },
-        { "name": "Scone", "description": "Blueberry or cranberry-orange", "price": "3.50" }
+        {
+          "name": "Butter Croissant",
+          "price": "4.00"
+        },
+        {
+          "name": "Pain au Chocolat",
+          "price": "4.50"
+        },
+        {
+          "name": "Almond Croissant",
+          "price": "5.00"
+        },
+        {
+          "name": "Fruit Danish",
+          "description": "Seasonal fruit, cream cheese",
+          "price": "4.50"
+        },
+        {
+          "name": "Cinnamon Roll",
+          "description": "Cream cheese glaze",
+          "price": "5.00"
+        },
+        {
+          "name": "Scone",
+          "description": "Blueberry or cranberry-orange",
+          "price": "3.50"
+        }
       ]
     },
     {
       "title": "Cakes & Tarts",
       "column_count": 2,
       "items": [
-        { "name": "Carrot Cake", "description": "Cream cheese frosting, walnuts", "variations": [{ "name": "Slice", "price": "6.00" }, { "name": "Whole", "price": "38.00" }] },
-        { "name": "Chocolate Torte", "description": "Flourless, raspberry coulis", "variations": [{ "name": "Slice", "price": "7.00" }, { "name": "Whole", "price": "42.00" }] },
-        { "name": "Lemon Tart", "description": "Bruleed meringue top", "price": "6.50" },
-        { "name": "Seasonal Fruit Tart", "description": "Pastry cream, fresh fruit", "price": "6.50" }
+        {
+          "name": "Carrot Cake",
+          "description": "Cream cheese frosting, walnuts",
+          "variations": [
+            {
+              "name": "Slice",
+              "price": "6.00"
+            },
+            {
+              "name": "Whole",
+              "price": "38.00"
+            }
+          ]
+        },
+        {
+          "name": "Chocolate Torte",
+          "description": "Flourless, raspberry coulis",
+          "variations": [
+            {
+              "name": "Slice",
+              "price": "7.00"
+            },
+            {
+              "name": "Whole",
+              "price": "42.00"
+            }
+          ]
+        },
+        {
+          "name": "Lemon Tart",
+          "description": "Bruleed meringue top",
+          "price": "6.50"
+        },
+        {
+          "name": "Seasonal Fruit Tart",
+          "description": "Pastry cream, fresh fruit",
+          "price": "6.50"
+        }
       ]
     }
   ]

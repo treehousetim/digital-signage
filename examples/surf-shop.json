@@ -1,40 +1,110 @@
 {
   "preset": "cool",
-  "tokens": {
-    "palette": { "sun": "#f0e68c" }
+  "vars": {
+    "palette": {
+      "sun": "#f0e68c"
+    }
   },
   "layout": {
-    "container": { "columns": 2 }
+    "container": {
+      "columns": 2
+    }
   },
   "theme": {
     "fonts": {
-      "title":    { "color": "$sun" },
-      "emphasis": { "color": "$sun" }
+      "title": {
+        "color": "$sun"
+      },
+      "emphasis": {
+        "color": "$sun"
+      }
     }
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "Pacific Surf Co." }
+      {
+        "type": "text",
+        "text": "Pacific Surf Co."
+      }
     ]
   },
   "areas": [
     {
       "title": "Surf Lessons",
       "items": [
-        { "name": "Intro to Surfing", "description": "2 hours, board and wetsuit included", "variations": [{ "name": "Group", "price": "65.00" }, { "name": "Private", "price": "120.00" }] },
-        { "name": "Intermediate Session", "description": "Techniques, turns, and wave reading", "variations": [{ "name": "Group", "price": "75.00" }, { "name": "Private", "price": "140.00" }] },
-        { "name": "Kids Surf Camp", "description": "Ages 6-12, half day with snacks", "price": "85.00" },
-        { "name": "5-Lesson Pack", "description": "Any level, save 15%", "variations": [{ "name": "Group", "price": "275.00" }, { "name": "Private", "price": "510.00" }] }
+        {
+          "name": "Intro to Surfing",
+          "description": "2 hours, board and wetsuit included",
+          "variations": [
+            {
+              "name": "Group",
+              "price": "65.00"
+            },
+            {
+              "name": "Private",
+              "price": "120.00"
+            }
+          ]
+        },
+        {
+          "name": "Intermediate Session",
+          "description": "Techniques, turns, and wave reading",
+          "variations": [
+            {
+              "name": "Group",
+              "price": "75.00"
+            },
+            {
+              "name": "Private",
+              "price": "140.00"
+            }
+          ]
+        },
+        {
+          "name": "Kids Surf Camp",
+          "description": "Ages 6-12, half day with snacks",
+          "price": "85.00"
+        },
+        {
+          "name": "5-Lesson Pack",
+          "description": "Any level, save 15%",
+          "variations": [
+            {
+              "name": "Group",
+              "price": "275.00"
+            },
+            {
+              "name": "Private",
+              "price": "510.00"
+            }
+          ]
+        }
       ]
     },
     {
       "title": "Boards",
       "items": [
-        { "name": "Foam Top 8' (beginner)", "price": "289.00" },
-        { "name": "Retro Fish 5'10\"", "price": "549.00" },
-        { "name": "Performance Shortboard", "price": "649.00" },
-        { "name": "Classic Longboard 9'2\"", "price": "749.00" },
-        { "name": "Used Boards", "description": "Selection varies — ask staff", "price": "150.00" }
+        {
+          "name": "Foam Top 8' (beginner)",
+          "price": "289.00"
+        },
+        {
+          "name": "Retro Fish 5'10\"",
+          "price": "549.00"
+        },
+        {
+          "name": "Performance Shortboard",
+          "price": "649.00"
+        },
+        {
+          "name": "Classic Longboard 9'2\"",
+          "price": "749.00"
+        },
+        {
+          "name": "Used Boards",
+          "description": "Selection varies — ask staff",
+          "price": "150.00"
+        }
       ]
     }
   ]

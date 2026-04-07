@@ -1,21 +1,25 @@
 {
   "preset": "mono",
   "layout": {
-    "container": { "columns": 3 }
+    "container": {
+      "columns": 3
+    }
   },
-  "tokens": {
+  "vars": {
     "palette": {
       "background": "#0d1117",
-      "surface":    "#161b22",
-      "accent":     "#3fb950",
-      "text":       "#c9d1d9",
-      "muted":      "#8b949e",
-      "divider":    "#21262d"
+      "surface": "#161b22",
+      "accent": "#3fb950",
+      "text": "#c9d1d9",
+      "muted": "#8b949e",
+      "divider": "#21262d"
     }
   },
   "theme": {
     "fonts": {
-      "emphasis": { "color": "$accent" }
+      "emphasis": {
+        "color": "$accent"
+      }
     },
     "areas": {
       "background": "$surface",
@@ -24,43 +28,130 @@
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "Infrastructure Status", "font": { "extends": "title", "color": "#58a6ff" } }
+      {
+        "type": "text",
+        "text": "Infrastructure Status",
+        "font": {
+          "extends": "title",
+          "color": "#58a6ff"
+        }
+      }
     ]
   },
   "areas": [
     {
       "title": "Production Services",
       "items": [
-        { "name": "API Gateway", "description": "us-east-1, us-west-2", "price": "UP" },
-        { "name": "Auth Service", "description": "OAuth2 / SSO provider", "price": "UP" },
-        { "name": "Web Frontend", "description": "CDN-backed, 3 regions", "price": "UP" },
-        { "name": "Search API", "description": "Elasticsearch cluster", "price": "UP" },
-        { "name": "Payment Processing", "description": "Stripe integration", "price": "UP" },
-        { "name": "Notification Service", "description": "Email, SMS, push", "price": "UP" },
-        { "name": "File Storage", "description": "S3-compatible, 3 buckets", "price": "UP" }
+        {
+          "name": "API Gateway",
+          "description": "us-east-1, us-west-2",
+          "price": "UP"
+        },
+        {
+          "name": "Auth Service",
+          "description": "OAuth2 / SSO provider",
+          "price": "UP"
+        },
+        {
+          "name": "Web Frontend",
+          "description": "CDN-backed, 3 regions",
+          "price": "UP"
+        },
+        {
+          "name": "Search API",
+          "description": "Elasticsearch cluster",
+          "price": "UP"
+        },
+        {
+          "name": "Payment Processing",
+          "description": "Stripe integration",
+          "price": "UP"
+        },
+        {
+          "name": "Notification Service",
+          "description": "Email, SMS, push",
+          "price": "UP"
+        },
+        {
+          "name": "File Storage",
+          "description": "S3-compatible, 3 buckets",
+          "price": "UP"
+        }
       ]
     },
     {
       "title": "Databases",
       "items": [
-        { "name": "PostgreSQL Primary", "description": "db-prod-01, 64GB", "price": "UP" },
-        { "name": "PostgreSQL Replica", "description": "db-prod-02, read-only", "price": "UP" },
-        { "name": "Redis Cache", "description": "cache-prod-01, 16GB", "price": "UP" },
-        { "name": "Redis Queue", "description": "queue-prod-01, 8GB", "price": "UP" },
-        { "name": "MongoDB (Documents)", "description": "3-node replica set", "price": "UP" },
-        { "name": "Elasticsearch", "description": "3-node, 500GB index", "price": "UP" }
+        {
+          "name": "PostgreSQL Primary",
+          "description": "db-prod-01, 64GB",
+          "price": "UP"
+        },
+        {
+          "name": "PostgreSQL Replica",
+          "description": "db-prod-02, read-only",
+          "price": "UP"
+        },
+        {
+          "name": "Redis Cache",
+          "description": "cache-prod-01, 16GB",
+          "price": "UP"
+        },
+        {
+          "name": "Redis Queue",
+          "description": "queue-prod-01, 8GB",
+          "price": "UP"
+        },
+        {
+          "name": "MongoDB (Documents)",
+          "description": "3-node replica set",
+          "price": "UP"
+        },
+        {
+          "name": "Elasticsearch",
+          "description": "3-node, 500GB index",
+          "price": "UP"
+        }
       ]
     },
     {
       "title": "Infrastructure",
       "items": [
-        { "name": "K8s Cluster (prod)", "description": "12 nodes, auto-scaling", "price": "UP" },
-        { "name": "K8s Cluster (staging)", "description": "4 nodes", "price": "UP" },
-        { "name": "CI/CD Pipeline", "description": "GitHub Actions, 8 runners", "price": "UP" },
-        { "name": "Monitoring Stack", "description": "Grafana + Prometheus", "price": "UP" },
-        { "name": "Log Aggregation", "description": "Loki, 30-day retention", "price": "UP" },
-        { "name": "DNS", "description": "Cloudflare, 4 zones", "price": "UP" },
-        { "name": "VPN Gateway", "description": "WireGuard, internal access", "price": "UP" }
+        {
+          "name": "K8s Cluster (prod)",
+          "description": "12 nodes, auto-scaling",
+          "price": "UP"
+        },
+        {
+          "name": "K8s Cluster (staging)",
+          "description": "4 nodes",
+          "price": "UP"
+        },
+        {
+          "name": "CI/CD Pipeline",
+          "description": "GitHub Actions, 8 runners",
+          "price": "UP"
+        },
+        {
+          "name": "Monitoring Stack",
+          "description": "Grafana + Prometheus",
+          "price": "UP"
+        },
+        {
+          "name": "Log Aggregation",
+          "description": "Loki, 30-day retention",
+          "price": "UP"
+        },
+        {
+          "name": "DNS",
+          "description": "Cloudflare, 4 zones",
+          "price": "UP"
+        },
+        {
+          "name": "VPN Gateway",
+          "description": "WireGuard, internal access",
+          "price": "UP"
+        }
       ]
     }
   ]

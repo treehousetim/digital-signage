@@ -2,9 +2,7 @@
   "uses": "themes/warm.json",
   "theme": {
     "layout": {
-      "container": {
-        "columns": 2
-      }
+      "columns": 2
     },
     "colors": {
       "accent": "#d4a574"

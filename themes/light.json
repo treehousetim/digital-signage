@@ -2,17 +2,23 @@
   "vars": {
     "palette": {
       "background": "#fafafa",
-      "surface":    "#ffffff",
-      "text":       "#1a1a1a",
-      "muted":      "#666666",
-      "accent":     "#c8501e",
-      "divider":    "#dddddd"
+      "surface": "#ffffff",
+      "text": "#1a1a1a",
+      "muted": "#666666",
+      "accent": "#c8501e",
+      "divider": "#dddddd"
     }
   },
   "theme": {
     "fonts": {
-      "title":   { "family": "Playfair Display", "weight": "700" },
-      "heading": { "family": "Playfair Display", "weight": "700" }
+      "header": {
+        "family": "Playfair Display",
+        "weight": "700"
+      },
+      "area_title": {
+        "family": "Playfair Display",
+        "weight": "700"
+      }
     }
   }
 }

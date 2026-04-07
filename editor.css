@@ -266,6 +266,36 @@
 
 .me-inspector-group__header:hover { color: #ddd; }
 
+.me-inspector-group__clear {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+}
+.me-inspector-group__clear:hover { color: #fff; border-color: #888; }
+
+.me-font-details { margin: 6px 0; }
+.me-font-summary {
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #aaa;
+  padding: 4px 0;
+  list-style: none;
+}
+.me-font-summary::-webkit-details-marker { display: none; }
+.me-font-summary::before { content: '\25B6 '; font-size: 9px; color: #888; }
+.me-font-details[open] .me-font-summary::before { content: '\25BC '; }
+.me-font-details .me-font-editor { padding-left: 8px; border-left: 2px solid #333; margin-left: 4px; }
+
 .me-inspector-group__arrow {
   font-size: 9px;
   width: 12px;

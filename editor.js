@@ -387,7 +387,7 @@ var MenuEditor = (function () {
 
   // ── Field Definitions ──────────────────────────────────────────────────
 
-  var FONT_ROLES = ['', 'title', 'heading', 'body', 'emphasis', 'caption'];
+  var DEFAULT_FONT_ROLES = ['header', 'area_title', 'item_name', 'price', 'description'];
   var BUILT_IN_THEMES = [
     '',
     'themes/dark.json',
@@ -405,7 +405,7 @@ var MenuEditor = (function () {
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
       { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (% or $token)' },
-      { key: 'area_gap', type: 'text', label: 'Area Gap (% or $token)' },
+      { key: 'row_gutter', type: 'text', label: 'Area Gap (% or $token)' },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
         { key: 'container.gutter', type: 'text', label: 'Gutter (% or $token)' }
@@ -418,6 +418,14 @@ var MenuEditor = (function () {
       { key: 'type_scale', type: 'vars_map', label: 'Type scale' }
     ],
     theme: [
+      { group: 'Layout', fields: [
+        { key: 'layout.resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
+        { key: 'layout.orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
+        { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding' },
+        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter' },
+        { key: 'layout.columns', type: 'select', options: ['1', '2', '3', '4', '5', '6'], label: 'Columns' },
+        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter' }
+      ]},
       { group: 'Colors', fields: [
         { key: 'colors.background', type: 'color', label: 'Background' },
         { key: 'colors.surface', type: 'color', label: 'Surface' },
@@ -426,13 +434,7 @@ var MenuEditor = (function () {
         { key: 'colors.accent', type: 'color', label: 'Accent' },
         { key: 'colors.divider', type: 'color', label: 'Divider' }
       ]},
-      { group: 'Fonts', defaultCollapsed: true, fields: [
-        { key: 'fonts.title', type: 'font', label: 'Title (header)' },
-        { key: 'fonts.heading', type: 'font', label: 'Heading (area titles)' },
-        { key: 'fonts.body', type: 'font', label: 'Body (item names)' },
-        { key: 'fonts.emphasis', type: 'font', label: 'Emphasis (prices)' },
-        { key: 'fonts.caption', type: 'font', label: 'Caption (descriptions)' }
-      ]},
+      { group: 'Fonts', defaultCollapsed: true, type: 'fonts_editor', key: 'fonts' },
       { group: 'Dividers', defaultCollapsed: true, fields: [
         { key: 'dividers.color', type: 'color', label: 'Color' },
         { key: 'dividers.width', type: 'number', label: 'Width (px)', step: 1 },
@@ -445,15 +447,15 @@ var MenuEditor = (function () {
         { key: 'areas.gutter', type: 'text', label: 'Item Gutter' },
         { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
         { key: 'areas.price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-        { key: 'areas.title_font', type: 'select', options: FONT_ROLES, label: 'Title Font Role' }
+        { key: 'areas.title_font', type: 'font_role', label: 'Title Font Role' }
       ]},
       { group: 'Items (defaults)', defaultCollapsed: true, fields: [
         { key: 'items.padding', type: 'padding', label: 'Padding' },
         { key: 'items.align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
-        { key: 'items.name_font', type: 'select', options: FONT_ROLES, label: 'Name Font Role' },
-        { key: 'items.price_font', type: 'select', options: FONT_ROLES, label: 'Price Font Role' },
-        { key: 'items.description_font', type: 'select', options: FONT_ROLES, label: 'Description Font Role' },
-        { key: 'items.variation_font', type: 'select', options: FONT_ROLES, label: 'Variation Font Role' }
+        { key: 'items.name_font', type: 'font_role', label: 'Name Font Role' },
+        { key: 'items.price_font', type: 'font_role', label: 'Price Font Role' },
+        { key: 'items.description_font', type: 'font_role', label: 'Description Font Role' },
+        { key: 'items.variation_font', type: 'font_role', label: 'Variation Font Role' }
       ]},
       { group: 'Pricing', defaultCollapsed: true, fields: [
         { key: 'pricing.symbol', type: 'text', label: 'Currency Symbol' },
@@ -474,7 +476,7 @@ var MenuEditor = (function () {
       { key: 'id', type: 'text', label: 'ID (auto)' },
       { key: 'text', type: 'text', label: 'Text' },
       { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
-      { key: 'font', type: 'select', options: FONT_ROLES, label: 'Font Role' }
+      { key: 'font', type: 'font_role', label: 'Font Role' }
     ],
     header_logo: [
       { key: 'id', type: 'text', label: 'ID (auto)' },
@@ -554,6 +556,25 @@ var MenuEditor = (function () {
       });
       wrapper.appendChild(label);
       wrapper.appendChild(input);
+
+    } else if (fieldDef.type === 'font_role') {
+      var frSelect = el('select', 'me-field__select');
+      var frData = store.getData();
+      var frRoles = Object.keys((frData.theme && frData.theme.fonts) || {});
+      DEFAULT_FONT_ROLES.forEach(function (r) { if (frRoles.indexOf(r) === -1) frRoles.push(r); });
+      var frOpts = [''].concat(frRoles);
+      frOpts.forEach(function (opt) {
+        var option = el('option');
+        option.value = opt;
+        option.textContent = opt || '(default)';
+        if (String(value) === String(opt)) option.selected = true;
+        frSelect.appendChild(option);
+      });
+      frSelect.addEventListener('change', function () {
+        store.update(fullPath, frSelect.value || undefined);
+      });
+      wrapper.appendChild(label);
+      wrapper.appendChild(frSelect);
 
     } else if (fieldDef.type === 'select') {
       var select = el('select', 'me-field__select');
@@ -695,6 +716,24 @@ var MenuEditor = (function () {
 
     } else if (fieldDef.type === 'font') {
       var fontVal = value || {};
+      var fontDetails = document.createElement('details');
+      fontDetails.className = 'me-font-details';
+      var fontSummary = document.createElement('summary');
+      fontSummary.className = 'me-font-summary';
+      fontSummary.textContent = fieldDef.label || fieldDef.key;
+      if (fieldDef.removable) {
+        var rmBtn = el('button', 'me-inspector-group__clear', { title: 'Remove role' });
+        rmBtn.textContent = '\u2715';
+        rmBtn.style.marginLeft = '8px';
+        rmBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          store.deleteAtPath(fullPath);
+          store.select(store.getSelectedPath());
+        });
+        fontSummary.appendChild(rmBtn);
+      }
+      fontDetails.appendChild(fontSummary);
       var fontGroup = el('div', 'me-font-editor');
 
       // Family
@@ -770,8 +809,8 @@ var MenuEditor = (function () {
       szWrap.appendChild(szInput);
       fontGroup.appendChild(szWrap);
 
-      wrapper.appendChild(label);
-      wrapper.appendChild(fontGroup);
+      fontDetails.appendChild(fontGroup);
+      wrapper.appendChild(fontDetails);
 
     } else if (fieldDef.type === 'vars_palette' || fieldDef.type === 'vars_map') {
       // Inline key/value editor for design vars (palette: color, scale: number)
@@ -1123,9 +1162,6 @@ var MenuEditor = (function () {
       // Tokens
       container.appendChild(buildNode('vars', data.vars || {}, 'vars', 0));
 
-      // Layout node
-      container.appendChild(buildNode('theme.layout', (data.theme && data.theme.layout) || {}, 'layout', 0));
-
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
 
@@ -1221,8 +1257,19 @@ var MenuEditor = (function () {
   // ── Inspector Panel ────────────────────────────────────────────────────
 
   function createInspectorPanel(container, store) {
-    var collapsedGroups = new Set();
-    var expandedGroups = new Set(); // for default-collapsed groups
+    var GROUPS_KEY = 'me-editor:groups';
+    var groupsState = {};
+    try { groupsState = JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}'); } catch (e) {}
+    var collapsedGroups = new Set(groupsState.collapsed || []);
+    var expandedGroups = new Set(groupsState.expanded || []);
+    function saveGroups() {
+      try {
+        localStorage.setItem(GROUPS_KEY, JSON.stringify({
+          collapsed: Array.from(collapsedGroups),
+          expanded: Array.from(expandedGroups)
+        }));
+      } catch (e) {}
+    }
 
     function refresh() {
       container.innerHTML = '';
@@ -1279,6 +1326,23 @@ var MenuEditor = (function () {
           groupLabel.textContent = def.group;
           groupHeader.appendChild(groupArrow);
           groupHeader.appendChild(groupLabel);
+          if (def.inheritable) {
+            var hasOv = def.fields.some(function (f) {
+              return getAtPath(store.getData(), path + '.' + f.key) != null;
+            });
+            if (hasOv) {
+              var clearBtn = el('button', 'me-inspector-group__clear', { title: 'Revert to inherited' });
+              clearBtn.textContent = '\u2715';
+              clearBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                def.fields.forEach(function (f) {
+                  store.deleteAtPath(path + '.' + f.key);
+                });
+                refresh();
+              });
+              groupHeader.appendChild(clearBtn);
+            }
+          }
           groupHeader.addEventListener('click', function () {
             if (def.defaultCollapsed) {
               if (expandedGroups.has(groupKey)) {
@@ -1293,6 +1357,7 @@ var MenuEditor = (function () {
                 collapsedGroups.add(def.group);
               }
             }
+            saveGroups();
             refresh();
           });
           groupEl.appendChild(groupHeader);
@@ -1328,6 +1393,29 @@ var MenuEditor = (function () {
                   f.style.display = 'none';
                 });
               }
+            } else if (def.type === 'fonts_editor') {
+              var fontsPath = path ? path + '.' + def.key : def.key;
+              var fontsObj = getAtPath(store.getData(), fontsPath) || {};
+              var fontKeys = Object.keys(fontsObj);
+              DEFAULT_FONT_ROLES.forEach(function (r) {
+                if (fontKeys.indexOf(r) === -1) fontKeys.push(r);
+              });
+              fontKeys.forEach(function (roleName) {
+                renderField(groupBody, fontsPath, { key: roleName, type: 'font', label: roleName, removable: DEFAULT_FONT_ROLES.indexOf(roleName) === -1 }, store);
+              });
+              var addRow = el('div', 'me-font-add');
+              var addInput = el('input', 'me-field__input', { type: 'text', placeholder: 'new role name' });
+              var addBtn = el('button', 'me-toolbar__btn');
+              addBtn.textContent = '+ Add';
+              addBtn.addEventListener('click', function () {
+                var name = (addInput.value || '').trim().replace(/[^a-z0-9_]/gi, '_');
+                if (!name) return;
+                store.update(fontsPath + '.' + name, { family: '', weight: '400', color: '$text', size: 1 });
+                refresh();
+              });
+              addRow.appendChild(addInput);
+              addRow.appendChild(addBtn);
+              groupBody.appendChild(addRow);
             } else {
               def.fields.forEach(function (fieldDef) {
                 renderField(groupBody, path, fieldDef, store);
@@ -1916,7 +2004,7 @@ var MenuEditor = (function () {
           'var prev=areaEls[i-1];prev.style.position="relative";' +
           'var h=document.createElement("div");h.className="ds-pad-handle ds-pad-handle--bottom ds-pad-handle--gap";' +
           'h.style.background="rgba(76,175,80,0.3)";' +
-          'h.addEventListener("mousedown",makeGapDragger(prev,"area_gap"));prev.appendChild(h);}' +
+          'h.addEventListener("mousedown",makeGapDragger(prev,"row_gutter"));prev.appendChild(h);}' +
           '}' +
 
           // Drag handle factory for padding
@@ -2353,9 +2441,9 @@ var MenuEditor = (function () {
         var vpW = isPort ? res.h : res.w;
         var vpH = isPort ? res.w : res.h;
 
-        if (prop === 'area_gap') {
+        if (prop === 'row_gutter') {
           var pct = Math.round((px / vpH) * 10000) / 100;
-          store.updateSilent('layout.area_gap', pct);
+          store.updateSilent('layout.row_gutter', pct);
         } else if (prop && prop.indexOf('viewport_padding.') === 0) {
           var padSide = prop.split('.')[1];
           var pct;

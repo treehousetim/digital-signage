@@ -14,22 +14,20 @@
   },
   "theme": {
     "layout": {
-      "container": {
-        "columns": 2
-      },
       "viewport_padding": {
         "top": "$tight",
         "right": "$loose",
         "bottom": "$tight",
         "left": "$loose"
-      }
+      },
+      "columns": 2
     },
     "fonts": {
-      "title": {
+      "header": {
         "family": "Playfair Display",
         "size": "$hero"
       },
-      "heading": {
+      "area_title": {
         "family": "Playfair Display",
         "size": "$menu"
       }
@@ -63,7 +61,7 @@
           "price": "13"
         },
         {
-          "name": "Provence Rosé",
+          "name": "Provence Ros\u00e9",
           "description": "Strawberry, melon, dry",
           "price": "12"
         },
@@ -84,7 +82,7 @@
         },
         {
           "name": "Charcuterie Selection",
-          "description": "Prosciutto, soppressata, pâté",
+          "description": "Prosciutto, soppressata, p\u00e2t\u00e9",
           "price": "21"
         },
         {

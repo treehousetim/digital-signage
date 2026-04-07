@@ -125,11 +125,12 @@ The theme is a *semantic visual contract* — semantic groups of properties that
 theme: {
   colors:  { background, surface, text, muted, accent, divider },
   fonts: {
-    title:    { ... },   // header titles
-    heading:  { ... },   // area titles
-    body:     { ... },   // item names, default text
-    emphasis: { ... },   // prices
-    caption:  { ... }    // descriptions, variations
+    header:      { ... },   // header text elements
+    area_title:  { ... },   // area titles
+    item_name:   { ... },   // item names
+    price:       { ... },   // prices
+    description: { ... },   // descriptions, variations
+    // ...add any custom role name and reference it from any `font` field
   },
   dividers: { color, width, style },
   areas: {
@@ -152,14 +153,14 @@ Elements reference fonts by role name, not by full font definition:
 {
   "type": "text",
   "text": "Hello",
-  "font": "title"
+  "font": "header"
 }
 ```
 
 This pulls from `theme.fonts.title`. Override one field with `extends`:
 
 ```json
-{ "font": { "extends": "title", "color": "$accent" } }
+{ "font": { "extends": "header", "color": "$accent" } }
 ```
 
 Or provide a full inline font object — the same shape as a theme font role.
@@ -175,8 +176,8 @@ default → uses (imported themes) → theme → area defaults → item override
 So you can:
 - Set `theme.areas.column_count: 2` to make every area 2-column by default
 - Override one area with `column_count: 3`
-- Set `theme.items.name_font: "emphasis"` to make all item names bold
-- Override one item with `style: { name_font: "body" }`
+- Set `theme.items.name_font: "price"` to make all item names use the price (bold) font
+- Override one item with `style: { name_font: "item_name" }`
 
 ### 6. Auto-generated IDs
 

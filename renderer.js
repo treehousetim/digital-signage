@@ -9,7 +9,7 @@
  *   layout   — canvas + arrangement (resolution, viewport_padding, container).
  *   theme    — semantic visual contract:
  *                colors   { background, surface, text, muted, accent, divider }
- *                fonts    { title, heading, body, emphasis, caption }
+ *                fonts    { header, area_title, item_name, price, description, ... }
  *                dividers { color, width, style }
  *                areas    { padding, background, border, column_count, ... }
  *                items    { padding, name_font, price_font, ... }
@@ -21,7 +21,7 @@
  * ## Key principles
  *   - One required field on items: `name`. IDs auto-generated.
  *   - Areas, items, header elements all auto-ID if missing.
- *   - Element fonts can reference theme roles: `"font": "heading"`.
+ *   - Element fonts can reference theme roles: `"font": "area_title"`.
  *   - Spacing/sizes can reference token names: `"padding": "$md"`, `"size": "$lg"`.
  *   - Theme presets pre-fill the entire theme as defaults.
  *
@@ -99,8 +99,9 @@ var MenuRenderer = (function () {
       orientation: 'landscape',
       mode: 'display',
       viewport_padding: { top: '$md', right: '$md', bottom: '$md', left: '$md' },
-      area_gap: '$lg',
-      container: { columns: 1, gutter: '$md' }
+      row_gutter: '$lg',
+      columns: 1,
+      column_gutter: '$md'
     },
     colors: {
       background: '$background',
@@ -111,11 +112,11 @@ var MenuRenderer = (function () {
       divider:    '$divider'
     },
     fonts: {
-      title:    { family: 'Montserrat', weight: '700', color: '$text',   size: '$xl' },
-      heading:  { family: 'Montserrat', weight: '600', color: '$accent', size: '$md' },
-      body:     { family: 'Lato',       weight: '400', color: '$text',   size: '$base' },
-      emphasis: { family: 'Lato',       weight: '700', color: '$text',   size: '$base' },
-      caption:  { family: 'Lato',       weight: '400', color: '$muted',  size: '$sm' }
+      header:      { family: 'Montserrat', weight: '700', color: '$text',   size: '$xl' },
+      area_title:  { family: 'Montserrat', weight: '600', color: '$accent', size: '$md' },
+      item_name:   { family: 'Lato',       weight: '400', color: '$text',   size: '$base' },
+      price:       { family: 'Lato',       weight: '700', color: '$text',   size: '$base' },
+      description: { family: 'Lato',       weight: '400', color: '$muted',  size: '$sm' }
     },
     dividers: {
       color: '$divider',
@@ -126,7 +127,7 @@ var MenuRenderer = (function () {
       padding: 0,
       background: 'transparent',
       border: null,
-      title_font: 'heading',
+      title_font: 'area_title',
       column_count: 1,
       gutter: '$xs',
       item_align: 'left',
@@ -134,10 +135,10 @@ var MenuRenderer = (function () {
     },
     items: {
       padding: { top: '$xs', right: 0, bottom: '$xs', left: 0 },
-      name_font: 'body',
-      price_font: 'emphasis',
-      description_font: 'caption',
-      variation_font: 'caption',
+      name_font: 'item_name',
+      price_font: 'price',
+      description_font: 'description',
+      variation_font: 'description',
       align: 'left'
     },
     pricing: {
@@ -281,7 +282,7 @@ var MenuRenderer = (function () {
 
   // ── Font Resolution ────────────────────────────────────────────────────
   // A font value can be:
-  //   - a string referencing a theme role: "heading"
+  //   - a string referencing a theme role: "area_title"
   //   - a font object: { family, weight, color, size }
   //   - undefined (use default for the element)
 
@@ -293,7 +294,7 @@ var MenuRenderer = (function () {
       return role || null;
     }
     if (typeof val === 'object') {
-      // Allow extending a role: { extends: "heading", color: "$accent" }
+      // Allow extending a role: { extends: "area_title", color: "$accent" }
       if (val.extends && ctx.theme.fonts && ctx.theme.fonts[val.extends]) {
         var base = ctx.theme.fonts[val.extends];
         var merged = {};
@@ -483,7 +484,7 @@ var MenuRenderer = (function () {
     if (element.id) div.setAttribute('data-ds-id', element.id);
     div.textContent = element.text || '';
     // Default to title role if no font specified
-    var fontVal = element.font || 'title';
+    var fontVal = element.font || 'header';
     applyFont(div, fontVal, baseFontSize, ctx);
     return div;
   }
@@ -567,9 +568,9 @@ var MenuRenderer = (function () {
 
     // Resolve item-level config (item.style > theme.items)
     var padding   = item.padding != null ? item.padding : themeItems.padding;
-    var nameFont  = itemStyle.name_font  || themeItems.name_font  || 'body';
-    var priceFont = itemStyle.price_font || themeItems.price_font || 'emphasis';
-    var descFont  = itemStyle.description_font || themeItems.description_font || 'caption';
+    var nameFont  = itemStyle.name_font  || themeItems.name_font  || 'item_name';
+    var priceFont = itemStyle.price_font || themeItems.price_font || 'price';
+    var descFont  = itemStyle.description_font || themeItems.description_font || 'description';
     var align     = item.align || themeItems.align || areaConfig.item_align || 'left';
     var priceAlign = areaConfig.price_align || 'right';
 
@@ -612,7 +613,7 @@ var MenuRenderer = (function () {
       var showPrices = item.show_variation_prices !== false;
       var inline = item.variations_inline !== false;
       var varList = el('div', 'ds-variations' + (inline ? ' ds-variations--inline' : ''));
-      var varFont = itemStyle.variation_font || themeItems.variation_font || 'caption';
+      var varFont = itemStyle.variation_font || themeItems.variation_font || 'description';
 
       item.variations.forEach(function (v) {
         var vRow = el('div', 'ds-variation');
@@ -645,7 +646,7 @@ var MenuRenderer = (function () {
     var padding      = area.padding != null ? area.padding : themeAreas.padding;
     var background   = areaStyle.background || area.background || themeAreas.background;
     var border       = areaStyle.border     || themeAreas.border;
-    var titleFont    = areaStyle.title_font || area.title_font || themeAreas.title_font || 'heading';
+    var titleFont    = areaStyle.title_font || area.title_font || themeAreas.title_font || 'area_title';
     var columnCount  = area.column_count || themeAreas.column_count || 1;
     var gutter       = area.gutter != null ? area.gutter : themeAreas.gutter;
     var itemAlign    = area.item_align  || themeAreas.item_align  || 'left';
@@ -704,7 +705,7 @@ var MenuRenderer = (function () {
 
     var padding    = area.padding != null ? area.padding : themeAreas.padding;
     var background = areaStyle.background || area.background || themeAreas.background;
-    var titleFont  = areaStyle.title_font || area.title_font || themeAreas.title_font || 'heading';
+    var titleFont  = areaStyle.title_font || area.title_font || themeAreas.title_font || 'area_title';
 
     var section = el('div', 'ds-area ds-area-group');
     if (area.id) {
@@ -764,10 +765,10 @@ var MenuRenderer = (function () {
   function resolveSpacing(layout, vpW, vpH, ctx) {
     var rawVp = normalizePadding(layout.viewport_padding);
     var viewportPadding = resolvePaddingPx(rawVp, vpW, vpH, ctx);
-    var containerGutter = (layout.container && layout.container.gutter != null)
-      ? toHorizontalPx(layout.container.gutter, vpW, ctx)
+    var containerGutter = (layout.column_gutter != null)
+      ? toHorizontalPx(layout.column_gutter, vpW, ctx)
       : 0;
-    var areaGap = (layout.area_gap != null) ? toVerticalPx(layout.area_gap, vpH, ctx) : 0;
+    var areaGap = (layout.row_gutter != null) ? toVerticalPx(layout.row_gutter, vpH, ctx) : 0;
     return {
       viewportPadding: viewportPadding,
       containerGutter: containerGutter,
@@ -873,7 +874,7 @@ var MenuRenderer = (function () {
     }
 
     // Areas container
-    var containerCols = (layout.container && layout.container.columns) || 1;
+    var containerCols = layout.columns || 1;
     var areasWrap = el('div', 'ds-areas');
     areasWrap.style.display = 'grid';
     areasWrap.style.gridTemplateColumns = 'repeat(' + containerCols + ', 1fr)';

@@ -78,7 +78,7 @@
       "oneOf": [
         {
           "type": "string",
-          "description": "Reference to a theme font role: title, heading, body, emphasis, caption."
+          "description": "Reference to a theme font role. Built-in roles: header, area_title, item_name, price, description. Custom roles can be added by defining additional keys in theme.fonts."
         },
         {
           "type": "object",
@@ -104,14 +104,9 @@
             "orientation": { "type": "string", "enum": ["landscape", "portrait"], "default": "landscape" },
             "mode": { "type": "string", "enum": ["display", "preview"], "default": "display" },
             "viewport_padding": { "$ref": "#/$defs/padding" },
-            "area_gap": { "$ref": "#/$defs/spacing_value" },
-            "container": {
-              "type": "object",
-              "properties": {
-                "columns": { "type": "integer", "enum": [1, 2, 3], "default": 1 },
-                "gutter": { "$ref": "#/$defs/spacing_value" }
-              }
-            }
+            "row_gutter": { "$ref": "#/$defs/spacing_value" },
+            "columns": { "type": "integer", "minimum": 1, "maximum": 6, "default": 1 },
+            "column_gutter": { "$ref": "#/$defs/spacing_value" }
           }
         },
         "colors": {
@@ -128,14 +123,8 @@
         },
         "fonts": {
           "type": "object",
-          "description": "Semantic font roles referenced from elements.",
-          "properties": {
-            "title":    { "$ref": "#/$defs/font" },
-            "heading":  { "$ref": "#/$defs/font" },
-            "body":     { "$ref": "#/$defs/font" },
-            "emphasis": { "$ref": "#/$defs/font" },
-            "caption":  { "$ref": "#/$defs/font" }
-          }
+          "description": "Named font roles referenced from elements. Built-in roles: header, area_title, item_name, price, description. Add any number of custom roles.",
+          "additionalProperties": { "$ref": "#/$defs/font" }
         },
         "dividers": {
           "type": "object",

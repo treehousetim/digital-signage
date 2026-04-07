@@ -777,6 +777,9 @@ var MenuEditor = (function () {
         tableWrap.innerHTML = '';
         entries = Object.keys(tokens);
         entries.forEach(function (k) {
+          // Capture the current key in a closure variable so renames work
+          // without rebuilding the row (which would destroy focus).
+          var currentKey = k;
           var row = el('div', 'me-tokens-row');
           var keyInput = el('input', 'me-field__input me-field__input--short', { type: 'text' });
           keyInput.value = k;
@@ -786,7 +789,7 @@ var MenuEditor = (function () {
             var swatch = el('input', 'me-field__color', { type: 'color' });
             swatch.value = (typeof tokens[k] === 'string' && tokens[k].charAt(0) === '#') ? tokens[k] : '#000000';
             swatch.addEventListener('input', function () {
-              tokens[k] = swatch.value;
+              tokens[currentKey] = swatch.value;
               valInput.value = swatch.value;
               store.update(fullPath, tokens);
             });
@@ -797,11 +800,12 @@ var MenuEditor = (function () {
             clearTimeout(keyTimer);
             keyTimer = setTimeout(function () {
               var newKey = keyInput.value.trim();
-              if (newKey && newKey !== k) {
-                tokens[newKey] = tokens[k];
-                delete tokens[k];
+              if (newKey && newKey !== currentKey) {
+                tokens[newKey] = tokens[currentKey];
+                delete tokens[currentKey];
+                currentKey = newKey;
                 store.update(fullPath, tokens);
-                rebuildTokenRows();
+                // No rebuild — the input keeps focus, currentKey points to new name
               }
             }, 400);
           });
@@ -811,15 +815,16 @@ var MenuEditor = (function () {
             valTimer = setTimeout(function () {
               var v = isPalette ? valInput.value : parseFloat(valInput.value);
               if (isPalette || !isNaN(v)) {
-                tokens[k] = v;
+                tokens[currentKey] = v;
                 store.update(fullPath, tokens);
               }
             }, 400);
           });
+          // Color swatch closure also needs currentKey
           var delBtn = el('button', 'me-tree-btn me-tree-btn--danger');
           delBtn.textContent = '\u2715';
           delBtn.addEventListener('click', function () {
-            delete tokens[k];
+            delete tokens[currentKey];
             store.update(fullPath, tokens);
             rebuildTokenRows();
           });

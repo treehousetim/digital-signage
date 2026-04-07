@@ -41,16 +41,18 @@
       "size": 0.875
     },
     "divider_color": "#21262d",
-    "area_background": "#161b22"
+    "area_background": "#161b22",
+    "header": {
+      "height": 6.5,
+      "padding": {
+        "top": 1.852,
+        "right": 2,
+        "bottom": 0.5,
+        "left": 2
+      }
+    }
   },
   "header": {
-    "height": 6.5,
-    "padding": {
-      "top": 1.852,
-      "right": 2,
-      "bottom": 0.5,
-      "left": 2
-    },
     "elements": [
       {
         "id": "header-1",

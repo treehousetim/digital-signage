@@ -40,16 +40,18 @@
       "size": 1
     },
     "divider_color": "#d9cec3",
-    "area_background": "transparent"
+    "area_background": "transparent",
+    "header": {
+      "height": 7.5,
+      "padding": {
+        "top": 1.875,
+        "right": 2,
+        "bottom": 0.5,
+        "left": 2
+      }
+    }
   },
   "header": {
-    "height": 7.5,
-    "padding": {
-      "top": 1.875,
-      "right": 2,
-      "bottom": 0.5,
-      "left": 2
-    },
     "elements": [
       {
         "id": "header-1",

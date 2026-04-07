@@ -186,7 +186,8 @@ var MenuRenderer = (function () {
       divider_width: 1,
       divider_style: 'solid',
       area_background: 'transparent',
-      area_border: null
+      area_border: null,
+      header: null
     }
   };
 
@@ -836,9 +837,18 @@ var MenuRenderer = (function () {
     var bg = resolveColorRef(theme.background, ctx);
     if (bg) viewport.style.background = bg;
 
-    // Header (only rendered if header is defined)
-    if (data.header) {
-      var headerRegion = buildHeaderRegion(data.header, vpW, vpH, baseFontSize, ctx);
+    // Header — visual properties live in theme.header, elements live in data.header
+    if (data.header && data.header.elements && data.header.elements.length) {
+      var themeHeader = (theme.header) || {};
+      var headerCfg = {
+        height: themeHeader.height,
+        padding: themeHeader.padding,
+        background: themeHeader.background,
+        divider: themeHeader.divider,
+        columns: themeHeader.columns,
+        elements: data.header.elements
+      };
+      var headerRegion = buildHeaderRegion(headerCfg, vpW, vpH, baseFontSize, ctx);
       if (headerRegion) viewport.appendChild(headerRegion);
     }
 

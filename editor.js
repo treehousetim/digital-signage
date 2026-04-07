@@ -25,14 +25,18 @@ var MenuEditor = (function () {
     layout: {
       resolution: '4k',
       orientation: 'landscape',
-      background_color: '#1a1a1a',
       viewport_padding: { top: 3, right: 1.25, bottom: 3, left: 1.25 },
       area_gap: 3,
       container: { columns: 1, gutter: 1.25 }
     },
+    theme: {
+      background: '#1a1a1a',
+      header: {
+        height: 8,
+        padding: { top: 1, right: 2, bottom: 1, left: 2 }
+      }
+    },
     header: {
-      height: 8,
-      padding: { top: 1, right: 2, bottom: 1, left: 2 },
       elements: [
         {
           id: 'title-1',
@@ -43,7 +47,6 @@ var MenuEditor = (function () {
         }
       ]
     },
-    theme: {},
     areas: [
       { id: 'area-1', title: 'Menu', column_count: 1, items: [
         { id: 'item-1', name: 'Item 1', price: '0.00' }
@@ -409,19 +412,19 @@ var MenuEditor = (function () {
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
         { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
       ]},
-      { group: 'Defaults', fields: [
+      { group: 'Defaults', defaultCollapsed: true, fields: [
         { key: 'area_padding', type: 'padding', label: 'Area Padding (%)' },
         { key: 'item_padding', type: 'padding', label: 'Item Padding (%)' },
         { key: 'item_gutter', type: 'number', label: 'Item Gutter (%)', step: 0.25 }
       ]}
     ],
-    header: [
+    theme_header: [
       { key: 'height', type: 'number', label: 'Height (%)', step: 0.25 },
       { key: 'padding', type: 'padding', label: 'Padding (%)' },
       { key: 'background', type: 'color', label: 'Background' },
       { key: 'divider.color', type: 'color', label: 'Divider Color' },
       { key: 'divider.width', type: 'number', label: 'Divider Width (px)' },
-      { group: 'Column Sizing', fields: [
+      { group: 'Column Sizing', defaultCollapsed: true, fields: [
         { key: 'columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left' },
         { key: 'columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center' },
         { key: 'columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right' }
@@ -446,14 +449,14 @@ var MenuEditor = (function () {
       { key: 'background', type: 'color', label: 'Background' },
       { key: 'text_color', type: 'color', label: 'Text Color' },
       { key: 'accent_color', type: 'color', label: 'Accent Color' },
-      { group: 'Fonts', fields: [
+      { group: 'Fonts', defaultCollapsed: true, fields: [
         { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
         { key: 'item_name_font', type: 'font', label: 'Item Name Font' },
         { key: 'item_price_font', type: 'font', label: 'Item Price Font' },
         { key: 'variation_font', type: 'font', label: 'Variation Font' },
         { key: 'description_font', type: 'font', label: 'Description Font' }
       ]},
-      { group: 'Dividers & Borders', fields: [
+      { group: 'Dividers & Borders', defaultCollapsed: true, fields: [
         { key: 'divider_color', type: 'color', label: 'Divider Color' },
         { key: 'divider_width', type: 'number', label: 'Divider Width (px)', step: 1 },
         { key: 'divider_style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Divider Style' },
@@ -1019,10 +1022,10 @@ var MenuEditor = (function () {
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
 
-      // Header section (clickable to edit header properties)
+      // Header section (clickable to edit header visual properties via theme.header)
       var headerSection = el('div', 'me-tree-node');
       var headerSecH = el('div', 'me-tree-node__header me-tree-node__header--section');
-      if ('header' === store.getSelectedPath()) {
+      if ('theme.header' === store.getSelectedPath()) {
         headerSecH.classList.add('me-tree-node__header--selected');
       }
       var headerLabel = el('span', 'me-tree-label me-tree-label--section');
@@ -1045,7 +1048,7 @@ var MenuEditor = (function () {
       headerSecH.appendChild(addTextBtn);
       headerSecH.appendChild(addLogoBtn);
       headerSecH.addEventListener('click', function () {
-        store.select('header');
+        store.select('theme.header');
       });
       headerSection.appendChild(headerSecH);
       container.appendChild(headerSection);
@@ -1118,6 +1121,7 @@ var MenuEditor = (function () {
 
   function createInspectorPanel(container, store) {
     var collapsedGroups = new Set();
+    var expandedGroups = new Set(); // for default-collapsed groups
 
     function refresh() {
       container.innerHTML = '';
@@ -1136,7 +1140,7 @@ var MenuEditor = (function () {
       var type;
       if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
-      else if (path === 'header') type = 'header';
+      else if (path === 'theme.header') type = 'theme_header';
       else if (path.indexOf('header.elements[') === 0) {
         type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
       }
@@ -1161,17 +1165,32 @@ var MenuEditor = (function () {
           var groupEl = el('div', 'me-inspector-group');
           var groupHeader = el('div', 'me-inspector-group__header');
           var groupArrow = el('span', 'me-inspector-group__arrow');
-          var isCollapsed = collapsedGroups.has(def.group);
+          // Default-collapsed groups remain collapsed unless explicitly expanded
+          var groupKey = type + ':' + def.group;
+          var isCollapsed;
+          if (def.defaultCollapsed) {
+            isCollapsed = !expandedGroups.has(groupKey);
+          } else {
+            isCollapsed = collapsedGroups.has(def.group);
+          }
           groupArrow.textContent = isCollapsed ? '\u25B6' : '\u25BC';
           var groupLabel = el('span');
           groupLabel.textContent = def.group;
           groupHeader.appendChild(groupArrow);
           groupHeader.appendChild(groupLabel);
           groupHeader.addEventListener('click', function () {
-            if (collapsedGroups.has(def.group)) {
-              collapsedGroups.delete(def.group);
+            if (def.defaultCollapsed) {
+              if (expandedGroups.has(groupKey)) {
+                expandedGroups.delete(groupKey);
+              } else {
+                expandedGroups.add(groupKey);
+              }
             } else {
-              collapsedGroups.add(def.group);
+              if (collapsedGroups.has(def.group)) {
+                collapsedGroups.delete(def.group);
+              } else {
+                collapsedGroups.add(def.group);
+              }
             }
             refresh();
           });

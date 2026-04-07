@@ -47,16 +47,18 @@
       "family": "Lato",
       "weight": "400",
       "size": 1
+    },
+    "header": {
+      "height": 14,
+      "padding": {
+        "top": 2,
+        "right": 2,
+        "bottom": 1,
+        "left": 2
+      }
     }
   },
   "header": {
-    "height": 14,
-    "padding": {
-      "top": 2,
-      "right": 2,
-      "bottom": 1,
-      "left": 2
-    },
     "elements": [
       {
         "id": "header-1",

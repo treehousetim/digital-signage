@@ -83,37 +83,8 @@
     },
     "header": {
       "type": "object",
-      "description": "Top-level header region with multiple text and logo elements arranged in 3 columns (left/center/right).",
+      "description": "Top-level header content. Holds the elements (text labels, logos). Visual properties live in theme.header.",
       "properties": {
-        "height": {
-          "type": "number",
-          "description": "Header height as % of viewport height. Auto-sizes to content if omitted."
-        },
-        "padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Internal padding (% of viewport)."
-        },
-        "background": {
-          "type": "string",
-          "description": "CSS background value (color, gradient, or image URL)."
-        },
-        "divider": {
-          "type": "object",
-          "description": "Optional bottom border below the header.",
-          "properties": {
-            "color": { "type": "string", "description": "Border color." },
-            "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
-          }
-        },
-        "columns": {
-          "type": "object",
-          "description": "Per-column sizing. 'fit' = wraps content tightly, 'fill' = takes available space. Defaults to 'fill'.",
-          "properties": {
-            "left":   { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } },
-            "center": { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } },
-            "right":  { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } }
-          }
-        },
         "elements": {
           "type": "array",
           "description": "Ordered list of header elements (text labels and logos).",
@@ -186,6 +157,41 @@
             "width": { "type": "number", "default": 1 },
             "style": { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" },
             "radius": { "type": "number", "default": 0 }
+          }
+        },
+        "header": {
+          "type": "object",
+          "description": "Visual properties of the header region. Content (elements) live at the top-level header field.",
+          "properties": {
+            "height": {
+              "type": "number",
+              "description": "Header min-height as % of viewport height."
+            },
+            "padding": {
+              "$ref": "#/$defs/padding",
+              "description": "Internal padding (% of viewport)."
+            },
+            "background": {
+              "type": "string",
+              "description": "CSS background (color, gradient, image, or $name palette ref)."
+            },
+            "divider": {
+              "type": "object",
+              "description": "Optional bottom border below the header.",
+              "properties": {
+                "color": { "type": "string", "description": "Border color." },
+                "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
+              }
+            },
+            "columns": {
+              "type": "object",
+              "description": "Per-column sizing. 'fit' = wraps content, 'fill' = takes available space. Default: empty columns collapse, others share content + remaining space.",
+              "properties": {
+                "left":   { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"] } } },
+                "center": { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"] } } },
+                "right":  { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"] } } }
+              }
+            }
           }
         }
       }

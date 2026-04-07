@@ -236,19 +236,23 @@ This loads the warm preset, then overrides one palette color.
 | `container.gutter` | number | `~1.25` | Gap between area columns (%) |
 ### `header` (top-level, sibling of `layout`)
 
-The header is a 3-column flex region (left/center/right) that holds text and logo elements. Each element specifies which column it lives in via `position`. Multiple elements in the same column stack vertically. `header` is a **top-level** field, not nested inside `layout`.
+The header is a 3-column flex region (left/center/right) that holds text and logo elements. Each element specifies which column it lives in via `position`. Multiple elements in the same column stack vertically.
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `height` | number | auto | Header height (% of viewport height). Auto-sizes to content if omitted. |
-| `padding` | number or `{top,right,bottom,left}` | `0` | Internal padding (%) |
-| `background` | string | inherits `layout.background_color` | CSS background (color, gradient, or image) |
-| `divider.color` | string | — | Optional bottom border color |
-| `divider.width` | number | `1` | Border width (px) |
-| `columns.left.mode` | `"fit"` \| `"fill"` | auto | Left column sizing |
-| `columns.center.mode` | `"fit"` \| `"fill"` | auto | Center column sizing |
-| `columns.right.mode` | `"fit"` \| `"fill"` | auto | Right column sizing |
-| `elements` | array | `[]` | Ordered list of header elements |
+The header has two parts:
+- **`header.elements`** (top-level) — the content (text labels, logos)
+- **`theme.header.*`** — visual properties (height, padding, background, divider, column sizing)
+
+| Field | Location | Type | Default | Description |
+|---|---|---|---|---|
+| `elements` | `header` | array | `[]` | Ordered list of header elements |
+| `height` | `theme.header` | number | auto | Header min-height (% of viewport height) |
+| `padding` | `theme.header` | number or `{top,right,bottom,left}` | `0` | Internal padding (%) |
+| `background` | `theme.header` | string | inherits | CSS background (color, gradient, or image) |
+| `divider.color` | `theme.header` | string | — | Optional bottom border color |
+| `divider.width` | `theme.header` | number | `1` | Border width (px) |
+| `columns.left.mode` | `theme.header` | `"fit"` \| `"fill"` | auto | Left column sizing |
+| `columns.center.mode` | `theme.header` | `"fit"` \| `"fill"` | auto | Center column sizing |
+| `columns.right.mode` | `theme.header` | `"fit"` \| `"fill"` | auto | Right column sizing |
 
 **Auto sizing** (when `mode` is not set): empty columns collapse to zero, columns with content take their natural width plus an equal share of remaining space. So a single centered title automatically gets the full header width.
 

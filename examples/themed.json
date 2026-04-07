@@ -2,7 +2,12 @@
   "layout": {
     "resolution": "4k",
     "orientation": "landscape",
-    "viewport_padding": { "top": "$tight", "right": "$loose", "bottom": "$tight", "left": "$loose" },
+    "viewport_padding": {
+      "top": "$tight",
+      "right": "$loose",
+      "bottom": "$tight",
+      "left": "$loose"
+    },
     "area_gap": 1.852,
     "spacing": {
       "tight": 0.5,
@@ -12,24 +17,6 @@
       "columns": 2,
       "gutter": 2.5
     }
-  },
-  "header": {
-    "height": 14,
-    "padding": { "top": 2, "right": 2, "bottom": 1, "left": 2 },
-    "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Twilight Wine Bar",
-        "font": {
-          "family": "Playfair Display",
-          "weight": "700",
-          "color": "$accent",
-          "size": "$hero"
-        },
-        "position": "center"
-      }
-    ]
   },
   "theme": {
     "preset": "warm",
@@ -62,17 +49,65 @@
       "size": 1
     }
   },
+  "header": {
+    "height": 14,
+    "padding": {
+      "top": 2,
+      "right": 2,
+      "bottom": 1,
+      "left": 2
+    },
+    "elements": [
+      {
+        "id": "header-1",
+        "type": "text",
+        "text": "Twilight Wine Bar",
+        "font": {
+          "family": "Playfair Display",
+          "weight": "700",
+          "color": "$accent",
+          "size": "$hero"
+        },
+        "position": "center"
+      }
+    ]
+  },
   "areas": [
     {
       "id": "wines",
       "title": "Wines by the Glass",
       "column_count": 1,
       "items": [
-        { "id": "pinot-noir", "name": "Pinot Noir, Willamette Valley", "description": "Cherry, earth, soft tannins", "price": "14.00" },
-        { "id": "cab", "name": "Cabernet Sauvignon, Napa", "description": "Blackcurrant, cedar, full body", "price": "16.00" },
-        { "id": "chardonnay", "name": "Chardonnay, Sonoma Coast", "description": "Lemon curd, oak, crisp finish", "price": "13.00" },
-        { "id": "rose", "name": "Provence Rosé", "description": "Strawberry, melon, dry", "price": "12.00" },
-        { "id": "prosecco", "name": "Prosecco, Veneto", "description": "Pear, honeysuckle, lively bubbles", "price": "11.00" }
+        {
+          "id": "pinot-noir",
+          "name": "Pinot Noir, Willamette Valley",
+          "description": "Cherry, earth, soft tannins",
+          "price": "14.00"
+        },
+        {
+          "id": "cab",
+          "name": "Cabernet Sauvignon, Napa",
+          "description": "Blackcurrant, cedar, full body",
+          "price": "16.00"
+        },
+        {
+          "id": "chardonnay",
+          "name": "Chardonnay, Sonoma Coast",
+          "description": "Lemon curd, oak, crisp finish",
+          "price": "13.00"
+        },
+        {
+          "id": "rose",
+          "name": "Provence Rosé",
+          "description": "Strawberry, melon, dry",
+          "price": "12.00"
+        },
+        {
+          "id": "prosecco",
+          "name": "Prosecco, Veneto",
+          "description": "Pear, honeysuckle, lively bubbles",
+          "price": "11.00"
+        }
       ]
     },
     {
@@ -80,11 +115,36 @@
       "title": "Small Plates",
       "column_count": 1,
       "items": [
-        { "id": "cheese", "name": "Artisan Cheese Board", "description": "Three cheeses, honey, marcona almonds", "price": "18.00" },
-        { "id": "charcuterie", "name": "Charcuterie Selection", "description": "Prosciutto, soppressata, pâté", "price": "21.00" },
-        { "id": "olives", "name": "Marinated Olives", "description": "Castelvetrano, citrus, herbs", "price": "8.00" },
-        { "id": "bruschetta", "name": "Tomato Bruschetta", "description": "Heirloom tomato, basil, grilled levain", "price": "12.00" },
-        { "id": "burrata", "name": "Burrata & Peach", "description": "Stone fruit, prosciutto, balsamic", "price": "16.00" }
+        {
+          "id": "cheese",
+          "name": "Artisan Cheese Board",
+          "description": "Three cheeses, honey, marcona almonds",
+          "price": "18.00"
+        },
+        {
+          "id": "charcuterie",
+          "name": "Charcuterie Selection",
+          "description": "Prosciutto, soppressata, pâté",
+          "price": "21.00"
+        },
+        {
+          "id": "olives",
+          "name": "Marinated Olives",
+          "description": "Castelvetrano, citrus, herbs",
+          "price": "8.00"
+        },
+        {
+          "id": "bruschetta",
+          "name": "Tomato Bruschetta",
+          "description": "Heirloom tomato, basil, grilled levain",
+          "price": "12.00"
+        },
+        {
+          "id": "burrata",
+          "name": "Burrata & Peach",
+          "description": "Stone fruit, prosciutto, balsamic",
+          "price": "16.00"
+        }
       ]
     }
   ]

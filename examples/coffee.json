@@ -2,30 +2,17 @@
   "layout": {
     "resolution": "4k",
     "orientation": "portrait",
-    "viewport_padding": { "top": 0.833, "right": 2.963, "bottom": 0.833, "left": 2.963 },
+    "viewport_padding": {
+      "top": 0.833,
+      "right": 2.963,
+      "bottom": 0.833,
+      "left": 2.963
+    },
     "area_gap": 1.25,
     "container": {
       "columns": 3,
       "gutter": 3.704
     }
-  },
-  "header": {
-    "height": 7,
-    "padding": { "top": 1.563, "right": 2, "bottom": 0.5, "left": 2 },
-    "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Coffee",
-        "font": {
-          "family": "Montserrat",
-          "weight": "700",
-          "color": "#ffffff",
-          "size": 3
-        },
-        "position": "center"
-      }
-    ]
   },
   "theme": {
     "background": "#1a1a1a",
@@ -56,6 +43,29 @@
     "divider_color": "#444444",
     "area_background": "transparent"
   },
+  "header": {
+    "height": 7,
+    "padding": {
+      "top": 1.563,
+      "right": 2,
+      "bottom": 0.5,
+      "left": 2
+    },
+    "elements": [
+      {
+        "id": "header-1",
+        "type": "text",
+        "text": "Coffee",
+        "font": {
+          "family": "Montserrat",
+          "weight": "700",
+          "color": "#ffffff",
+          "size": 3
+        },
+        "position": "center"
+      }
+    ]
+  },
   "areas": [
     {
       "id": "drinks-column",
@@ -67,15 +77,23 @@
           "title": "Hot Drinks",
           "column_count": 1,
           "gutter": 2.963,
-          "padding": { "bottom": 0.417 },
+          "padding": {
+            "bottom": 0.417
+          },
           "items": [
             {
               "id": "latte",
               "name": "Latte",
               "description": "Espresso with steamed milk",
               "variations": [
-                { "name": "Small", "price": "4.50" },
-                { "name": "Large", "price": "5.50" }
+                {
+                  "name": "Small",
+                  "price": "4.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "5.50"
+                }
               ]
             },
             {
@@ -83,8 +101,14 @@
               "name": "Cappuccino",
               "description": "Equal parts espresso, steamed milk, and foam",
               "variations": [
-                { "name": "Small", "price": "4.50" },
-                { "name": "Large", "price": "5.50" }
+                {
+                  "name": "Small",
+                  "price": "4.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "5.50"
+                }
               ]
             },
             {
@@ -92,8 +116,14 @@
               "name": "Americano",
               "description": "Espresso with hot water",
               "variations": [
-                { "name": "Small", "price": "3.50" },
-                { "name": "Large", "price": "4.50" }
+                {
+                  "name": "Small",
+                  "price": "3.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "4.50"
+                }
               ]
             },
             {
@@ -107,8 +137,14 @@
               "name": "Mocha",
               "description": "Espresso, chocolate, and steamed milk",
               "variations": [
-                { "name": "Small", "price": "5.00" },
-                { "name": "Large", "price": "6.00" }
+                {
+                  "name": "Small",
+                  "price": "5.00"
+                },
+                {
+                  "name": "Large",
+                  "price": "6.00"
+                }
               ]
             },
             {
@@ -116,8 +152,14 @@
               "name": "Drip Coffee",
               "description": "House blend, freshly brewed",
               "variations": [
-                { "name": "Small", "price": "2.50" },
-                { "name": "Large", "price": "3.50" }
+                {
+                  "name": "Small",
+                  "price": "2.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "3.50"
+                }
               ]
             },
             {
@@ -125,8 +167,14 @@
               "name": "Espresso",
               "description": "Single or double shot",
               "variations": [
-                { "name": "Single", "price": "2.50" },
-                { "name": "Double", "price": "3.50" }
+                {
+                  "name": "Single",
+                  "price": "2.50"
+                },
+                {
+                  "name": "Double",
+                  "price": "3.50"
+                }
               ]
             },
             {
@@ -148,8 +196,14 @@
               "name": "Iced Latte",
               "description": "Espresso over ice with cold milk",
               "variations": [
-                { "name": "Small", "price": "5.00" },
-                { "name": "Large", "price": "6.00" }
+                {
+                  "name": "Small",
+                  "price": "5.00"
+                },
+                {
+                  "name": "Large",
+                  "price": "6.00"
+                }
               ]
             },
             {
@@ -157,8 +211,14 @@
               "name": "Cold Brew",
               "description": "Slow-steeped for 18 hours",
               "variations": [
-                { "name": "Small", "price": "4.50" },
-                { "name": "Large", "price": "5.50" }
+                {
+                  "name": "Small",
+                  "price": "4.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "5.50"
+                }
               ]
             },
             {
@@ -166,8 +226,14 @@
               "name": "Iced Americano",
               "description": "Espresso and cold water over ice",
               "variations": [
-                { "name": "Small", "price": "3.50" },
-                { "name": "Large", "price": "4.50" }
+                {
+                  "name": "Small",
+                  "price": "3.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "4.50"
+                }
               ]
             },
             {
@@ -175,8 +241,14 @@
               "name": "Iced Mocha",
               "description": "Espresso, chocolate, milk, and ice",
               "variations": [
-                { "name": "Small", "price": "5.50" },
-                { "name": "Large", "price": "6.50" }
+                {
+                  "name": "Small",
+                  "price": "5.50"
+                },
+                {
+                  "name": "Large",
+                  "price": "6.50"
+                }
               ]
             },
             {
@@ -199,7 +271,9 @@
       "id": "food",
       "title": "Food",
       "column_count": 1,
-      "padding": { "top": 0 },
+      "padding": {
+        "top": 0
+      },
       "items": [
         {
           "id": "croissant",

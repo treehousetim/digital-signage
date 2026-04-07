@@ -2,29 +2,16 @@
   "layout": {
     "resolution": "4k",
     "orientation": "portrait",
-    "viewport_padding": { "top": 1.25, "right": 3.333, "bottom": 1.25, "left": 3.333 },
+    "viewport_padding": {
+      "top": 1.25,
+      "right": 3.333,
+      "bottom": 1.25,
+      "left": 3.333
+    },
     "area_gap": 1.458,
     "container": {
       "columns": 1
     }
-  },
-  "header": {
-    "height": 7.5,
-    "padding": { "top": 1.875, "right": 2, "bottom": 0.5, "left": 2 },
-    "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Sunrise Bakery",
-        "font": {
-          "family": "Playfair Display",
-          "weight": "700",
-          "color": "#3d2b1f",
-          "size": 3.5
-        },
-        "position": "center"
-      }
-    ]
   },
   "theme": {
     "background": "#faf3eb",
@@ -55,6 +42,29 @@
     "divider_color": "#d9cec3",
     "area_background": "transparent"
   },
+  "header": {
+    "height": 7.5,
+    "padding": {
+      "top": 1.875,
+      "right": 2,
+      "bottom": 0.5,
+      "left": 2
+    },
+    "elements": [
+      {
+        "id": "header-1",
+        "type": "text",
+        "text": "Sunrise Bakery",
+        "font": {
+          "family": "Playfair Display",
+          "weight": "700",
+          "color": "#3d2b1f",
+          "size": 3.5
+        },
+        "position": "center"
+      }
+    ]
+  },
   "areas": [
     {
       "id": "breads",
@@ -62,12 +72,42 @@
       "column_count": 2,
       "gutter": 2.963,
       "items": [
-        { "id": "sourdough", "name": "Sourdough Loaf", "description": "24-hour ferment, stone-baked", "price": "8.50" },
-        { "id": "baguette", "name": "French Baguette", "description": "Crispy crust, soft crumb", "price": "5.00" },
-        { "id": "ciabatta", "name": "Ciabatta", "description": "Italian olive oil bread", "price": "6.00" },
-        { "id": "rye", "name": "Dark Rye", "description": "Caraway seed, molasses", "price": "7.50" },
-        { "id": "brioche", "name": "Brioche Loaf", "description": "Buttery, golden pull-apart", "price": "9.00" },
-        { "id": "focaccia", "name": "Rosemary Focaccia", "description": "Sea salt, olive oil, herbs", "price": "7.00" }
+        {
+          "id": "sourdough",
+          "name": "Sourdough Loaf",
+          "description": "24-hour ferment, stone-baked",
+          "price": "8.50"
+        },
+        {
+          "id": "baguette",
+          "name": "French Baguette",
+          "description": "Crispy crust, soft crumb",
+          "price": "5.00"
+        },
+        {
+          "id": "ciabatta",
+          "name": "Ciabatta",
+          "description": "Italian olive oil bread",
+          "price": "6.00"
+        },
+        {
+          "id": "rye",
+          "name": "Dark Rye",
+          "description": "Caraway seed, molasses",
+          "price": "7.50"
+        },
+        {
+          "id": "brioche",
+          "name": "Brioche Loaf",
+          "description": "Buttery, golden pull-apart",
+          "price": "9.00"
+        },
+        {
+          "id": "focaccia",
+          "name": "Rosemary Focaccia",
+          "description": "Sea salt, olive oil, herbs",
+          "price": "7.00"
+        }
       ]
     },
     {
@@ -76,12 +116,39 @@
       "column_count": 2,
       "gutter": 2.963,
       "items": [
-        { "id": "croissant", "name": "Butter Croissant", "price": "4.00" },
-        { "id": "pain-choc", "name": "Pain au Chocolat", "price": "4.50" },
-        { "id": "almond-crois", "name": "Almond Croissant", "price": "5.00" },
-        { "id": "danish", "name": "Fruit Danish", "description": "Seasonal fruit, cream cheese", "price": "4.50" },
-        { "id": "cinnamon-roll", "name": "Cinnamon Roll", "description": "Cream cheese glaze", "price": "5.00" },
-        { "id": "scone", "name": "Scone", "description": "Blueberry or cranberry-orange", "price": "3.50" }
+        {
+          "id": "croissant",
+          "name": "Butter Croissant",
+          "price": "4.00"
+        },
+        {
+          "id": "pain-choc",
+          "name": "Pain au Chocolat",
+          "price": "4.50"
+        },
+        {
+          "id": "almond-crois",
+          "name": "Almond Croissant",
+          "price": "5.00"
+        },
+        {
+          "id": "danish",
+          "name": "Fruit Danish",
+          "description": "Seasonal fruit, cream cheese",
+          "price": "4.50"
+        },
+        {
+          "id": "cinnamon-roll",
+          "name": "Cinnamon Roll",
+          "description": "Cream cheese glaze",
+          "price": "5.00"
+        },
+        {
+          "id": "scone",
+          "name": "Scone",
+          "description": "Blueberry or cranberry-orange",
+          "price": "3.50"
+        }
       ]
     },
     {
@@ -90,10 +157,52 @@
       "column_count": 2,
       "gutter": 2.963,
       "items": [
-        { "id": "carrot-cake", "name": "Carrot Cake", "description": "Cream cheese frosting, walnuts", "variations": [{ "id": "var-1", "name": "Slice", "price": "6.00" }, { "id": "var-2", "name": "Whole", "price": "38.00" }] },
-        { "id": "choc-torte", "name": "Chocolate Torte", "description": "Flourless, raspberry coulis", "variations": [{ "id": "var-3", "name": "Slice", "price": "7.00" }, { "id": "var-4", "name": "Whole", "price": "42.00" }] },
-        { "id": "lemon-tart", "name": "Lemon Tart", "description": "Bruleed meringue top", "price": "6.50" },
-        { "id": "fruit-tart", "name": "Seasonal Fruit Tart", "description": "Pastry cream, fresh fruit", "price": "6.50" }
+        {
+          "id": "carrot-cake",
+          "name": "Carrot Cake",
+          "description": "Cream cheese frosting, walnuts",
+          "variations": [
+            {
+              "id": "var-1",
+              "name": "Slice",
+              "price": "6.00"
+            },
+            {
+              "id": "var-2",
+              "name": "Whole",
+              "price": "38.00"
+            }
+          ]
+        },
+        {
+          "id": "choc-torte",
+          "name": "Chocolate Torte",
+          "description": "Flourless, raspberry coulis",
+          "variations": [
+            {
+              "id": "var-3",
+              "name": "Slice",
+              "price": "7.00"
+            },
+            {
+              "id": "var-4",
+              "name": "Whole",
+              "price": "42.00"
+            }
+          ]
+        },
+        {
+          "id": "lemon-tart",
+          "name": "Lemon Tart",
+          "description": "Bruleed meringue top",
+          "price": "6.50"
+        },
+        {
+          "id": "fruit-tart",
+          "name": "Seasonal Fruit Tart",
+          "description": "Pastry cream, fresh fruit",
+          "price": "6.50"
+        }
       ]
     },
     {
@@ -102,12 +211,36 @@
       "column_count": 3,
       "gutter": 2.222,
       "items": [
-        { "id": "drip", "name": "Coffee", "price": "3.50" },
-        { "id": "latte", "name": "Latte", "price": "5.00" },
-        { "id": "tea", "name": "Tea", "price": "3.00" },
-        { "id": "hot-choc", "name": "Hot Chocolate", "price": "4.50" },
-        { "id": "juice", "name": "Fresh OJ", "price": "5.00" },
-        { "id": "water", "name": "Sparkling Water", "price": "2.50" }
+        {
+          "id": "drip",
+          "name": "Coffee",
+          "price": "3.50"
+        },
+        {
+          "id": "latte",
+          "name": "Latte",
+          "price": "5.00"
+        },
+        {
+          "id": "tea",
+          "name": "Tea",
+          "price": "3.00"
+        },
+        {
+          "id": "hot-choc",
+          "name": "Hot Chocolate",
+          "price": "4.50"
+        },
+        {
+          "id": "juice",
+          "name": "Fresh OJ",
+          "price": "5.00"
+        },
+        {
+          "id": "water",
+          "name": "Sparkling Water",
+          "price": "2.50"
+        }
       ]
     }
   ]

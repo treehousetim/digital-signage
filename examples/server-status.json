@@ -3,14 +3,19 @@
   "layout": {
     "container": { "columns": 3 }
   },
-  "theme": {
-    "colors": {
+  "tokens": {
+    "palette": {
       "background": "#0d1117",
-      "surface": "#161b22",
-      "accent": "#3fb950",
-      "text": "#c9d1d9",
-      "muted": "#8b949e",
-      "divider": "#21262d"
+      "surface":    "#161b22",
+      "accent":     "#3fb950",
+      "text":       "#c9d1d9",
+      "muted":      "#8b949e",
+      "divider":    "#21262d"
+    }
+  },
+  "theme": {
+    "fonts": {
+      "emphasis": { "color": "$accent" }
     },
     "areas": {
       "background": "$surface",

@@ -1,5 +1,14 @@
 {
   "preset": "light",
+  "tokens": {
+    "palette": {
+      "background": "#faf3eb",
+      "text":       "#3d2b1f",
+      "muted":      "#7a6455",
+      "accent":     "#8b5e3c",
+      "divider":    "#d9cec3"
+    }
+  },
   "layout": {
     "orientation": "portrait"
   },

@@ -437,6 +437,10 @@ var MenuEditor = (function () {
       { key: 'background', type: 'color', label: 'Background' },
       { key: 'text_color', type: 'color', label: 'Text Color' },
       { key: 'accent_color', type: 'color', label: 'Accent Color' },
+      { group: 'Pricing', defaultCollapsed: true, fields: [
+        { key: 'currency_symbol', type: 'text', label: 'Currency Symbol' },
+        { key: 'price_format', type: 'select', options: ['full', 'fewest'], label: 'Price Format' }
+      ]},
       { group: 'Fonts', defaultCollapsed: true, fields: [
         { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
         { key: 'item_name_font', type: 'font', label: 'Item Name Font' },

@@ -123,6 +123,17 @@
           "type": "string",
           "description": "Accent color used by titles/prices by default. Can use '$name' palette reference."
         },
+        "currency_symbol": {
+          "type": "string",
+          "default": "",
+          "description": "Currency symbol prepended to prices. Default is blank (no symbol)."
+        },
+        "price_format": {
+          "type": "string",
+          "enum": ["full", "fewest"],
+          "default": "full",
+          "description": "How to format price numbers. 'full' = always 2 decimals (50.00, 2.45). 'fewest' = drop trailing zeros (50, 2.45, 2.4)."
+        },
         "area_title_font": { "$ref": "#/$defs/font" },
         "item_name_font": { "$ref": "#/$defs/font" },
         "item_price_font": { "$ref": "#/$defs/font" },

@@ -316,6 +316,8 @@ Global visual definitions. All values can be overridden per-area or per-item via
 | `background` | string | — | Full-screen background. Color or `$name` |
 | `text_color` | string | — | Default text color. Color or `$name` |
 | `accent_color` | string | — | Accent color. Color or `$name` |
+| `currency_symbol` | string | `""` | Symbol prepended to prices (e.g. `"$"`, `"€"`). Default is blank. |
+| `price_format` | `"full"` \| `"fewest"` | `"full"` | `full` always shows 2 decimals (50.00). `fewest` drops trailing zeros (50, 2.4). |
 | `area_title_font` | Font | Montserrat 600 $accent $md | Section heading font |
 | `item_name_font` | Font | Lato 400 $text $base | Item name font |
 | `item_price_font` | Font | Lato 700 $text $base | Price font |

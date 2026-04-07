@@ -187,7 +187,9 @@ var MenuRenderer = (function () {
       divider_style: 'solid',
       area_background: 'transparent',
       area_border: null,
-      header: null
+      header: null,
+      currency_symbol: '',
+      price_format: 'full'
     }
   };
 
@@ -199,7 +201,9 @@ var MenuRenderer = (function () {
     return {
       palette:    Object.assign({}, DEFAULT_PALETTE, theme.palette || {}),
       typeScale:  Object.assign({}, DEFAULT_TYPE_SCALE, theme.type_scale || {}),
-      spacing:    Object.assign({}, DEFAULT_SPACING, layout.spacing || {})
+      spacing:    Object.assign({}, DEFAULT_SPACING, layout.spacing || {}),
+      currencySymbol: theme.currency_symbol != null ? theme.currency_symbol : '',
+      priceFormat: theme.price_format || 'full'
     };
   }
 
@@ -297,13 +301,23 @@ var MenuRenderer = (function () {
     return p.top + 'px ' + p.right + 'px ' + p.bottom + 'px ' + p.left + 'px';
   }
 
-  function formatPrice(value) {
+  function formatPrice(value, ctx) {
     if (value == null || value === '') return '';
     var str = String(value).trim();
-    if (str.charAt(0) === '$') return str;
+    var symbol = (ctx && ctx.currencySymbol != null) ? ctx.currencySymbol : '';
+    var format = (ctx && ctx.priceFormat) || 'full';
+    // If user provided a $-prefixed string, strip it (we'll add the configured symbol)
+    if (str.charAt(0) === '$') str = str.slice(1).trim();
     var num = parseFloat(str);
     if (isNaN(num)) return str;
-    return '$' + num.toFixed(2);
+    var formatted;
+    if (format === 'fewest') {
+      // 50.00 → "50", 2.45 → "2.45", 2.40 → "2.4"
+      formatted = parseFloat(num.toFixed(2)).toString();
+    } else {
+      formatted = num.toFixed(2);
+    }
+    return symbol + formatted;
   }
 
   function el(tag, className, attrs) {
@@ -576,7 +590,7 @@ var MenuRenderer = (function () {
     // Show base price if present (even when variations exist)
     if (hasPrice) {
       var priceEl = el('span', 'ds-item__price');
-      priceEl.textContent = formatPrice(item.price);
+      priceEl.textContent = formatPrice(item.price, ctx);
       applyFontOverride(priceEl, priceFont, baseFontSize, ctx);
       row.appendChild(priceEl);
     }
@@ -605,7 +619,7 @@ var MenuRenderer = (function () {
         vRow.appendChild(vName);
         if (showPrices) {
           var vPrice = el('span', 'ds-variation__price');
-          vPrice.textContent = formatPrice(v.price);
+          vPrice.textContent = formatPrice(v.price, ctx);
           vRow.appendChild(vPrice);
         }
         varList.appendChild(vRow);

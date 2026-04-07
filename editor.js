@@ -1256,6 +1256,7 @@ var MenuEditor = (function () {
       var previewTab = el('button', 'me-preview-tab me-preview-tab--active');
       previewTab.textContent = 'Preview';
       previewTab.addEventListener('click', function () {
+        commitJsonEdit();
         activeTab = 'preview';
         refreshTabs();
         refreshContent();
@@ -1632,20 +1633,33 @@ var MenuEditor = (function () {
 
     // Live edit: parse the textContent on input (debounced) and replace data
     var jsonEditTimer = null;
-    jsonCode.addEventListener('input', function () {
+    var jsonDirty = false;
+
+    function commitJsonEdit() {
+      if (!jsonDirty) return false;
       clearTimeout(jsonEditTimer);
-      jsonEditTimer = setTimeout(function () {
-        var text = jsonCode.textContent;
-        try {
-          var parsed = JSON.parse(text);
-          jsonCode.classList.remove('me-json-code--error');
-          // Replace data without resetting undo (so user can ctrl-z to revert)
-          store.replaceData(parsed, false);
-        } catch (e) {
-          jsonCode.classList.add('me-json-code--error');
-        }
-      }, 500);
+      jsonEditTimer = null;
+      var text = jsonCode.textContent;
+      try {
+        var parsed = JSON.parse(text);
+        jsonCode.classList.remove('me-json-code--error');
+        store.replaceData(parsed, false);
+        jsonDirty = false;
+        return true;
+      } catch (e) {
+        jsonCode.classList.add('me-json-code--error');
+        return false;
+      }
+    }
+
+    jsonCode.addEventListener('input', function () {
+      jsonDirty = true;
+      clearTimeout(jsonEditTimer);
+      jsonEditTimer = setTimeout(commitJsonEdit, 500);
     });
+
+    // Flush any pending edit on blur (so tab switches don't lose changes)
+    jsonCode.addEventListener('blur', commitJsonEdit);
 
     // Cmd+A / Ctrl+A inside the JSON view selects only the JSON content.
     // Arrow keys (up/down) when not editing move the highlighted line and select that path.

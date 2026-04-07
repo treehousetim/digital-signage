@@ -67,56 +67,34 @@
             }
           }
         },
-        "title": {
+        "header": {
           "type": "object",
-          "description": "The main title displayed at the top of the screen.",
+          "description": "Header region with multiple text and logo elements arranged in 3 columns (left/center/right).",
           "properties": {
-            "text": {
-              "type": "string",
-              "description": "The title text to display."
+            "height": {
+              "type": "number",
+              "description": "Header height as % of viewport height. Auto-sizes to content if omitted."
             },
-            "font": { "$ref": "#/$defs/font" },
-            "position": {
+            "padding": {
+              "$ref": "#/$defs/padding",
+              "description": "Internal padding (% of viewport)."
+            },
+            "background": {
+              "type": "string",
+              "description": "CSS background value (color, gradient, or image URL)."
+            },
+            "divider": {
               "type": "object",
+              "description": "Optional bottom border below the header.",
               "properties": {
-                "x_align": {
-                  "type": "string",
-                  "enum": ["left", "center", "right"],
-                  "default": "center",
-                  "description": "Horizontal alignment of the title."
-                },
-                "top_padding": {
-                  "type": "number",
-                  "default": 40,
-                  "description": "Pixel offset from the top edge of the screen."
-                }
+                "color": { "type": "string", "description": "Border color." },
+                "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
               }
-            }
-          }
-        },
-        "logo": {
-          "type": "object",
-          "description": "An optional logo image displayed in a top corner.",
-          "properties": {
-            "src": {
-              "type": "string",
-              "description": "Path or URL to the logo image."
             },
-            "x_align": {
-              "type": "string",
-              "enum": ["left", "right"],
-              "default": "left",
-              "description": "Which corner the logo appears in."
-            },
-            "top_padding": {
-              "type": "number",
-              "default": 20,
-              "description": "Pixel offset from the top edge."
-            },
-            "max_height": {
-              "type": "number",
-              "default": 80,
-              "description": "Maximum height of the logo in pixels."
+            "elements": {
+              "type": "array",
+              "description": "Ordered list of header elements (text labels and logos).",
+              "items": { "$ref": "#/$defs/header_element" }
             }
           }
         }
@@ -149,6 +127,48 @@
     }
   },
   "$defs": {
+    "header_element": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Text element (title, subtitle, tagline).",
+          "required": ["type"],
+          "properties": {
+            "id": { "type": "string", "description": "Unique element ID." },
+            "type": { "const": "text" },
+            "text": { "type": "string", "description": "Display text." },
+            "font": { "$ref": "#/$defs/font" },
+            "position": {
+              "type": "string",
+              "enum": ["left", "center", "right"],
+              "default": "center",
+              "description": "Horizontal column placement."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "description": "Logo image element.",
+          "required": ["type"],
+          "properties": {
+            "id": { "type": "string", "description": "Unique element ID." },
+            "type": { "const": "logo" },
+            "src": { "type": "string", "description": "Image URL or path." },
+            "max_height": {
+              "type": "number",
+              "default": 4,
+              "description": "Max height as % of viewport height."
+            },
+            "position": {
+              "type": "string",
+              "enum": ["left", "center", "right"],
+              "default": "left",
+              "description": "Horizontal column placement."
+            }
+          }
+        }
+      ]
+    },
     "padding": {
       "oneOf": [
         {

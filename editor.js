@@ -28,7 +28,20 @@ var MenuEditor = (function () {
       background_color: '#1a1a1a',
       viewport_padding: { top: 3, right: 1.25, bottom: 3, left: 1.25 },
       area_gap: 3,
-      container: { columns: 1, gutter: 1.25 }
+      container: { columns: 1, gutter: 1.25 },
+      header: {
+        height: 8,
+        padding: { top: 1, right: 2, bottom: 1, left: 2 },
+        elements: [
+          {
+            id: 'title-1',
+            type: 'text',
+            text: 'Menu',
+            font: { family: 'Montserrat', weight: '700', color: '#ffffff', size: 3 },
+            position: 'center'
+          }
+        ]
+      }
     },
     theme: {},
     areas: [
@@ -258,6 +271,29 @@ var MenuEditor = (function () {
           idCounters.var++;
           if (!parent.variations) parent.variations = [];
           parent.variations.push({ id: 'var-' + idCounters.var, name: 'New', price: '0.00' });
+        } else if (type === 'header_text' || type === 'header_logo') {
+          if (!idCounters.header) idCounters.header = 0;
+          idCounters.header++;
+          // Ensure layout.header.elements exists
+          if (!data.layout) data.layout = {};
+          if (!data.layout.header) data.layout.header = { elements: [] };
+          if (!data.layout.header.elements) data.layout.header.elements = [];
+          if (type === 'header_text') {
+            data.layout.header.elements.push({
+              id: 'header-' + idCounters.header,
+              type: 'text',
+              text: 'New Text',
+              position: 'center'
+            });
+          } else {
+            data.layout.header.elements.push({
+              id: 'header-' + idCounters.header,
+              type: 'logo',
+              src: '',
+              max_height: 4,
+              position: 'left'
+            });
+          }
         }
 
         emit('change');
@@ -375,18 +411,27 @@ var MenuEditor = (function () {
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
         { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
       ]},
-      { group: 'Title', fields: [
-        { key: 'title.text', type: 'text', label: 'Text' },
-        { key: 'title.font', type: 'font', label: 'Font' },
-        { key: 'title.position.x_align', type: 'select', options: ['left', 'center', 'right'], label: 'Alignment' },
-        { key: 'title.position.top_padding', type: 'number', label: 'Top Padding (%)', step: 0.25 }
-      ]},
-      { group: 'Logo', fields: [
-        { key: 'logo.src', type: 'text', label: 'Image URL' },
-        { key: 'logo.x_align', type: 'select', options: ['left', 'right'], label: 'Alignment' },
-        { key: 'logo.top_padding', type: 'number', label: 'Top Padding (%)', step: 0.25 },
-        { key: 'logo.max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
+      { group: 'Header', fields: [
+        { key: 'header.height', type: 'number', label: 'Height (%)', step: 0.25 },
+        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'header.background', type: 'color', label: 'Background' },
+        { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
+        { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' }
       ]}
+    ],
+    header_text: [
+      { key: 'id', type: 'text', label: 'ID' },
+      { key: 'type', type: 'select', options: ['text'], label: 'Type' },
+      { key: 'text', type: 'text', label: 'Text' },
+      { key: 'position', type: 'select', options: ['left', 'center', 'right'], label: 'Position' },
+      { key: 'font', type: 'font', label: 'Font' }
+    ],
+    header_logo: [
+      { key: 'id', type: 'text', label: 'ID' },
+      { key: 'type', type: 'select', options: ['logo'], label: 'Type' },
+      { key: 'src', type: 'text', label: 'Image URL' },
+      { key: 'position', type: 'select', options: ['left', 'center', 'right'], label: 'Position' },
+      { key: 'max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
     ],
     theme: [
       { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
@@ -955,6 +1000,66 @@ var MenuEditor = (function () {
       // Theme node
       container.appendChild(buildNode('theme', data.theme || {}, 'theme', 0));
 
+      // Header section
+      var headerSection = el('div', 'me-tree-node');
+      var headerSecH = el('div', 'me-tree-node__header me-tree-node__header--section');
+      var headerLabel = el('span', 'me-tree-label me-tree-label--section');
+      headerLabel.textContent = 'Header';
+      var addTextBtn = el('button', 'me-tree-btn', { title: 'Add Text Element' });
+      addTextBtn.textContent = 'T+';
+      addTextBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        store.addEntity('layout.header.elements', 'header_text');
+        refresh();
+      });
+      var addLogoBtn = el('button', 'me-tree-btn', { title: 'Add Logo Element' });
+      addLogoBtn.textContent = 'L+';
+      addLogoBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        store.addEntity('layout.header.elements', 'header_logo');
+        refresh();
+      });
+      headerSecH.appendChild(headerLabel);
+      headerSecH.appendChild(addTextBtn);
+      headerSecH.appendChild(addLogoBtn);
+      headerSection.appendChild(headerSecH);
+      container.appendChild(headerSection);
+
+      // Header element nodes
+      var headerElements = (data.layout && data.layout.header && data.layout.header.elements) || [];
+      headerElements.forEach(function (he, i) {
+        var nodePath = 'layout.header.elements[' + i + ']';
+        var hNode = el('div', 'me-tree-node');
+        hNode.style.paddingLeft = '16px';
+        var hHeader = el('div', 'me-tree-node__header');
+        if (nodePath === store.getSelectedPath()) {
+          hHeader.classList.add('me-tree-node__header--selected');
+        }
+        var hIcon = el('span', 'me-tree-icon');
+        hIcon.textContent = he.type === 'logo' ? '\u25A3' : '\u201C';
+        var hLabel = el('span', 'me-tree-label');
+        hLabel.textContent = he.text || he.id || (he.type === 'logo' ? 'Logo' : 'Text');
+        hHeader.appendChild(hIcon);
+        hHeader.appendChild(hLabel);
+
+        var hActions = el('span', 'me-tree-actions');
+        var hDelBtn = el('button', 'me-tree-btn me-tree-btn--danger', { title: 'Delete' });
+        hDelBtn.textContent = '\u2715';
+        hDelBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          store.deleteAtPath(nodePath);
+          refresh();
+        });
+        hActions.appendChild(hDelBtn);
+        hHeader.appendChild(hActions);
+
+        hHeader.addEventListener('click', function () {
+          store.select(nodePath);
+        });
+        hNode.appendChild(hHeader);
+        container.appendChild(hNode);
+      });
+
       // Areas header
       var areasHeader = el('div', 'me-tree-node');
       areasHeader.style.paddingLeft = '0px';
@@ -1006,6 +1111,9 @@ var MenuEditor = (function () {
       var type;
       if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
+      else if (path.indexOf('layout.header.elements[') === 0) {
+        type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
+      }
       else if (path.indexOf('.variations[') !== -1) type = 'variation';
       else if (path.indexOf('.items[') !== -1) type = 'item';
       else type = 'area';

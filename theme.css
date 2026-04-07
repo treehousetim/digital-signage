@@ -8,12 +8,6 @@
   /* Layout — CSS fallbacks; renderer overrides these with computed px values */
   --ds-background-color: #1a1a1a;
 
-  /* Title */
-  --ds-title-font-family: 'Montserrat', sans-serif;
-  --ds-title-font-weight: 700;
-  --ds-title-font-color: #ffffff;
-  --ds-title-font-size: 3em;
-
   /* Area titles */
   --ds-area-title-font-family: 'Montserrat', sans-serif;
   --ds-area-title-font-weight: 600;
@@ -65,33 +59,30 @@ html, body {
   background-color: var(--ds-background-color);
 }
 
-/* Header area: title + logo */
-.ds-header {
-  position: relative;
+/* Header region — 3-column flex layout */
+.ds-header-region {
+  display: flex;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.ds-title {
-  font-family: var(--ds-title-font-family);
-  font-weight: var(--ds-title-font-weight);
-  color: var(--ds-title-font-color);
-  font-size: var(--ds-title-font-size);
+.ds-header-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.25em;
+}
+
+.ds-header-col--left   { align-items: flex-start;  justify-content: center; }
+.ds-header-col--center { align-items: center;       justify-content: center; }
+.ds-header-col--right  { align-items: flex-end;     justify-content: center; }
+
+.ds-header-text {
   line-height: 1.2;
+  color: #ffffff;
 }
 
-.ds-title--left   { text-align: left; }
-.ds-title--center { text-align: center; }
-.ds-title--right  { text-align: right; }
-
-.ds-logo {
-  position: absolute;
-  top: 0;
-}
-
-.ds-logo--left  { left: 0; }
-.ds-logo--right { right: 0; }
-
-.ds-logo img {
+.ds-header-logo {
   display: block;
 }
 

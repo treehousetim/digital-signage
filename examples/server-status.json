@@ -9,18 +9,23 @@
       "columns": 3,
       "gutter": 1.25
     },
-    "title": {
-      "text": "Infrastructure Status",
-      "font": {
-        "family": "Roboto",
-        "weight": "700",
-        "color": "#58a6ff",
-        "size": 2.625
-      },
-      "position": {
-        "x_align": "center",
-        "top_padding": 1.852
-      }
+    "header": {
+      "height": 6.5,
+      "padding": { "top": 1.852, "right": 2, "bottom": 0.5, "left": 2 },
+      "elements": [
+        {
+          "id": "header-1",
+          "type": "text",
+          "text": "Infrastructure Status",
+          "font": {
+            "family": "Roboto",
+            "weight": "700",
+            "color": "#58a6ff",
+            "size": 2.625
+          },
+          "position": "center"
+        }
+      ]
     }
   },
   "theme": {

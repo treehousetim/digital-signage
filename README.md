@@ -201,14 +201,56 @@ The editor works standalone for JSON authoring — the preview tab is hidden and
 | `area_gap` | number | `~3` | Vertical gap between areas (%) |
 | `container.columns` | `1` \| `2` \| `3` | `1` | Top-level area column layout |
 | `container.gutter` | number | `~1.25` | Gap between area columns (%) |
-| `title.text` | string | — | Main title text |
-| `title.font` | Font | — | Title font |
-| `title.position.x_align` | `"left"` \| `"center"` \| `"right"` | `"center"` | Title alignment |
-| `title.position.top_padding` | number | `~1.85` | Distance from top edge (%) |
-| `logo.src` | string | — | Logo image path/URL |
-| `logo.x_align` | `"left"` \| `"right"` | `"left"` | Logo corner |
-| `logo.top_padding` | number | `~1` | Distance from top (%) |
-| `logo.max_height` | number | `~3.7` | Max logo height (%) |
+| `header` | object | — | Header region with text and logo elements (see below) |
+
+### `header`
+
+The header is a 3-column flex region (left/center/right) that holds text and logo elements. Each element specifies which column it lives in via `position`. Multiple elements in the same column stack vertically.
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `height` | number | auto | Header height (% of viewport height). Auto-sizes to content if omitted. |
+| `padding` | number or `{top,right,bottom,left}` | `0` | Internal padding (%) |
+| `background` | string | inherits `layout.background_color` | CSS background (color, gradient, or image) |
+| `divider.color` | string | — | Optional bottom border color |
+| `divider.width` | number | `1` | Border width (px) |
+| `elements` | array | `[]` | Ordered list of header elements |
+
+**Header text element:**
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `id` | string | auto | Unique element identifier |
+| `type` | `"text"` | — | Required |
+| `text` | string | — | Display text |
+| `font` | Font | theme default | Font override |
+| `position` | `"left"` \| `"center"` \| `"right"` | `"center"` | Column placement |
+
+**Header logo element:**
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `id` | string | auto | Unique element identifier |
+| `type` | `"logo"` | — | Required |
+| `src` | string | — | Image URL or path |
+| `max_height` | number | `4` | Max height (% of viewport height) |
+| `position` | `"left"` \| `"center"` \| `"right"` | `"left"` | Column placement |
+
+Example:
+```json
+"header": {
+  "height": 8,
+  "padding": { "top": 1, "right": 2, "bottom": 1, "left": 2 },
+  "background": "#1a1a1a",
+  "elements": [
+    { "id": "logo", "type": "logo", "src": "logo.png", "max_height": 4, "position": "left" },
+    { "id": "title", "type": "text", "text": "World Cup Coffee", "position": "center",
+      "font": { "family": "Montserrat", "weight": "700", "color": "#fff", "size": 3 } },
+    { "id": "subtitle", "type": "text", "text": "Est. 2019", "position": "center",
+      "font": { "size": 1, "color": "#888" } }
+  ]
+}
+```
 
 ### `theme`
 

@@ -9,18 +9,23 @@
       "columns": 2,
       "gutter": 2.5
     },
-    "title": {
-      "text": "The Corner Cafe",
-      "font": {
-        "family": "Playfair Display",
-        "weight": "700",
-        "color": "#f5e6d3",
-        "size": 3.25
-      },
-      "position": {
-        "x_align": "center",
-        "top_padding": 2.593
-      }
+    "header": {
+      "height": 8,
+      "padding": { "top": 2.593, "right": 2, "bottom": 0.5, "left": 2 },
+      "elements": [
+        {
+          "id": "header-1",
+          "type": "text",
+          "text": "The Corner Cafe",
+          "font": {
+            "family": "Playfair Display",
+            "weight": "700",
+            "color": "#f5e6d3",
+            "size": 3.25
+          },
+          "position": "center"
+        }
+      ]
     }
   },
   "theme": {

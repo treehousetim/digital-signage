@@ -8,18 +8,23 @@
     "container": {
       "columns": 1
     },
-    "title": {
-      "text": "Sunrise Bakery",
-      "font": {
-        "family": "Playfair Display",
-        "weight": "700",
-        "color": "#3d2b1f",
-        "size": 3.5
-      },
-      "position": {
-        "x_align": "center",
-        "top_padding": 1.875
-      }
+    "header": {
+      "height": 7.5,
+      "padding": { "top": 1.875, "right": 2, "bottom": 0.5, "left": 2 },
+      "elements": [
+        {
+          "id": "header-1",
+          "type": "text",
+          "text": "Sunrise Bakery",
+          "font": {
+            "family": "Playfair Display",
+            "weight": "700",
+            "color": "#3d2b1f",
+            "size": 3.5
+          },
+          "position": "center"
+        }
+      ]
     }
   },
   "theme": {

@@ -175,7 +175,11 @@ var MenuRenderer = (function () {
     }
 
     var layout = data.layout || {};
-    if (layout.title && layout.title.font) addFont(layout.title.font);
+    if (layout.header && layout.header.elements) {
+      layout.header.elements.forEach(function (e) {
+        if (e.type === 'text' && e.font) addFont(e.font);
+      });
+    }
 
     var theme = data.theme || {};
     addFont(theme.area_title_font);
@@ -208,14 +212,6 @@ var MenuRenderer = (function () {
     var vars = [];
 
     vars.push('--ds-background-color: ' + layout.background_color);
-
-    if (layout.title && layout.title.font) {
-      var tf = layout.title.font;
-      if (tf.family) vars.push("--ds-title-font-family: '" + tf.family + "', sans-serif");
-      if (tf.weight) vars.push('--ds-title-font-weight: ' + tf.weight);
-      if (tf.color) vars.push('--ds-title-font-color: ' + tf.color);
-      if (tf.size != null) vars.push('--ds-title-font-size: ' + resolveFont(tf.size, baseFontSize));
-    }
 
     var fontKeys = ['area_title', 'item_name', 'item_price', 'variation'];
     fontKeys.forEach(function (key) {
@@ -291,46 +287,67 @@ var MenuRenderer = (function () {
 
   // ── DOM Builders ───────────────────────────────────────────────────────
 
-  function buildHeader(layout, vpW, vpH, baseFontSize, spacing) {
-    var header = el('div', 'ds-header');
-    var vp = spacing.viewportPadding;
+  function buildHeaderText(element, baseFontSize) {
+    var div = el('div', 'ds-header-text');
+    if (element.id) div.setAttribute('data-ds-id', element.id);
+    div.textContent = element.text || '';
+    applyFontOverride(div, element.font, baseFontSize);
+    return div;
+  }
 
-    // Logo
-    if (layout.logo && layout.logo.src) {
-      var logo = layout.logo;
-      var logoWrap = el('div', 'ds-logo ds-logo--' + (logo.x_align || 'left'));
-      logoWrap.style.top = resolveV(logo.top_padding || 1, vpH) + 'px';
-      if (logo.x_align === 'right') {
-        logoWrap.style.right = vp.right + 'px';
-      } else {
-        logoWrap.style.left = vp.left + 'px';
-      }
-      var img = el('img', null, {
-        src: logo.src,
-        alt: 'Logo'
-      });
-      img.style.maxHeight = resolveV(logo.max_height || 3.7, vpH) + 'px';
-      logoWrap.appendChild(img);
-      header.appendChild(logoWrap);
+  function buildHeaderLogo(element, vpH) {
+    var img = el('img', 'ds-header-logo', { src: element.src, alt: 'Logo' });
+    if (element.id) img.setAttribute('data-ds-id', element.id);
+    var maxH = element.max_height != null ? element.max_height : 4;
+    img.style.maxHeight = resolveV(maxH, vpH) + 'px';
+    return img;
+  }
+
+  function buildHeaderRegion(header, vpW, vpH, baseFontSize) {
+    if (!header) return null;
+    var region = el('div', 'ds-header-region');
+
+    if (header.height != null) {
+      region.style.height = resolveV(header.height, vpH) + 'px';
+    }
+    if (header.padding != null) {
+      var rawPad = normalizePadding(header.padding);
+      var pad = resolvePaddingPx(rawPad, vpW, vpH);
+      region.style.padding = paddingCSS(pad);
+    }
+    if (header.background) {
+      region.style.background = header.background;
+    }
+    if (header.divider && header.divider.color) {
+      var w = (header.divider.width != null) ? header.divider.width : 1;
+      region.style.borderBottom = w + 'px solid ' + header.divider.color;
     }
 
-    // Title
-    if (layout.title && layout.title.text) {
-      var titleCfg = layout.title;
-      var pos = titleCfg.position || {};
-      var align = pos.x_align || 'center';
-      var titleEl = el('div', 'ds-title ds-title--' + align);
-      titleEl.textContent = titleCfg.text;
-      titleEl.style.paddingTop = resolveV(pos.top_padding || 1.85, vpH) + 'px';
-      titleEl.style.paddingLeft = vp.left + 'px';
-      titleEl.style.paddingRight = vp.right + 'px';
-      if (titleCfg.font && titleCfg.font.size != null) {
-        titleEl.style.fontSize = resolveFont(titleCfg.font.size, baseFontSize);
-      }
-      header.appendChild(titleEl);
-    }
+    var leftCol = el('div', 'ds-header-col ds-header-col--left');
+    var centerCol = el('div', 'ds-header-col ds-header-col--center');
+    var rightCol = el('div', 'ds-header-col ds-header-col--right');
 
-    return header;
+    var elements = header.elements || [];
+    elements.forEach(function (element) {
+      var node = null;
+      if (element.type === 'text') {
+        node = buildHeaderText(element, baseFontSize);
+      } else if (element.type === 'logo' && element.src) {
+        node = buildHeaderLogo(element, vpH);
+      }
+      if (!node) return;
+
+      var pos = element.position || (element.type === 'logo' ? 'left' : 'center');
+      if (pos === 'left') leftCol.appendChild(node);
+      else if (pos === 'right') rightCol.appendChild(node);
+      else centerCol.appendChild(node);
+    });
+
+    region.appendChild(leftCol);
+    region.appendChild(centerCol);
+    region.appendChild(rightCol);
+
+    return region;
   }
 
   function buildItem(item, areaDefaults, vpW, vpH, baseFontSize) {
@@ -618,9 +635,11 @@ var MenuRenderer = (function () {
     viewport.style.height = vpH + 'px';
     viewport.style.fontSize = baseFontSize + 'px';
 
-    // Header
-    var header = buildHeader(layout, vpW, vpH, baseFontSize, spacing);
-    viewport.appendChild(header);
+    // Header (only rendered if layout.header is defined)
+    if (layout.header) {
+      var headerRegion = buildHeaderRegion(layout.header, vpW, vpH, baseFontSize);
+      if (headerRegion) viewport.appendChild(headerRegion);
+    }
 
     // Areas container — CSS grid
     var containerCols = (layout.container && layout.container.columns) || 1;
@@ -696,7 +715,7 @@ var MenuRenderer = (function () {
   var KNOWN_LAYOUT_KEYS = [
     'resolution', 'orientation', 'mode', 'background_color',
     'x_spacer', 'y_spacer', 'viewport_padding', 'area_gap',
-    'container', 'title', 'logo'
+    'container', 'header'
   ];
   var KNOWN_AREA_KEYS = [
     'id', 'title', 'padding', 'gutter', 'align', 'valign',

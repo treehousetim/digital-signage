@@ -1,7 +1,16 @@
 {
   "preset": "cool",
+  "tokens": {
+    "palette": { "sun": "#f0e68c" }
+  },
   "layout": {
     "container": { "columns": 2 }
+  },
+  "theme": {
+    "fonts": {
+      "title":    { "color": "$sun" },
+      "emphasis": { "color": "$sun" }
+    }
   },
   "header": {
     "elements": [

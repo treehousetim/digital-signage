@@ -1,5 +1,9 @@
 {
-  "preset": "warm",
+  "preset": "dark",
+  "layout": {
+    "orientation": "portrait",
+    "container": { "columns": 1 }
+  },
   "header": {
     "elements": [
       { "type": "text", "text": "Coffee" }

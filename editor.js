@@ -1789,6 +1789,19 @@ var MenuEditor = (function () {
     });
 
     var previewDebounce;
+    var iframeReady = false;
+
+    function sendDataToIframe(data) {
+      if (!iframe || !iframe.contentWindow) return;
+      iframe.contentWindow.postMessage({ type: 'render', data: data }, '*');
+      setTimeout(function () {
+        if (iframe.contentWindow && getGridActive) {
+          iframe.contentWindow.postMessage({ type: 'grid', enabled: getGridActive() }, '*');
+        }
+        applyZoom();
+      }, 50);
+    }
+
     function updatePreview() {
       clearTimeout(previewDebounce);
       previewDebounce = setTimeout(function () {
@@ -1802,6 +1815,14 @@ var MenuEditor = (function () {
         var isPort = data.layout.orientation === 'portrait';
         currentVpW = isPort ? res.h : res.w;
         currentVpH = isPort ? res.w : res.h;
+
+        // If iframe is already loaded, just postMessage the new data
+        // (avoids reloading the iframe, which would steal focus from inspector inputs)
+        if (iframeReady) {
+          sendDataToIframe(data);
+          return;
+        }
+
         var html = '<!DOCTYPE html><html><head>' +
           '<link rel="stylesheet" href="theme.css">' +
           '<style>' +
@@ -1903,13 +1924,8 @@ var MenuEditor = (function () {
           '<\/script></body></html>';
         iframe.srcdoc = html;
         iframe.onload = function () {
-          iframe.contentWindow.postMessage({ type: 'render', data: data }, '*');
-          setTimeout(function () {
-            if (iframe.contentWindow && getGridActive) {
-              iframe.contentWindow.postMessage({ type: 'grid', enabled: getGridActive() }, '*');
-            }
-            applyZoom();
-          }, 100);
+          iframeReady = true;
+          sendDataToIframe(data);
         };
       }, 200);
     }

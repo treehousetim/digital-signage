@@ -21,36 +21,21 @@ var MenuEditor = (function () {
 
   var FONT_WEIGHTS = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
 
+  // Minimal blank template — relies on defaults for almost everything
   var BLANK_TEMPLATE = {
-    layout: {
-      resolution: '4k',
-      orientation: 'landscape',
-      viewport_padding: { top: 3, right: 1.25, bottom: 3, left: 1.25 },
-      area_gap: 3,
-      container: { columns: 1, gutter: 1.25 }
-    },
-    theme: {
-      background: '#1a1a1a',
-      header: {
-        height: 8,
-        padding: { top: 1, right: 2, bottom: 1, left: 2 }
-      }
-    },
+    preset: 'dark',
     header: {
       elements: [
-        {
-          id: 'title-1',
-          type: 'text',
-          text: 'Menu',
-          font: { family: 'Montserrat', weight: '700', color: '#ffffff', size: 3 },
-          position: 'center'
-        }
+        { type: 'text', text: 'Menu' }
       ]
     },
     areas: [
-      { id: 'area-1', title: 'Menu', column_count: 1, items: [
-        { id: 'item-1', name: 'Item 1', price: '0.00' }
-      ]}
+      {
+        title: 'Menu',
+        items: [
+          { name: 'Coffee', price: '3.00' }
+        ]
+      }
     ]
   };
 
@@ -402,61 +387,74 @@ var MenuEditor = (function () {
 
   // ── Field Definitions ──────────────────────────────────────────────────
 
+  var FONT_ROLES = ['', 'title', 'heading', 'body', 'emphasis', 'caption'];
+  var PRESET_OPTIONS = ['', 'dark', 'light', 'warm', 'cool', 'mono'];
+
   var FIELD_DEFS = {
+    root: [
+      { key: 'preset', type: 'select', options: PRESET_OPTIONS, label: 'Preset' }
+    ],
     layout: [
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
-      { key: 'area_gap', type: 'number', label: 'Area Gap (%)', step: 0.25 },
+      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (% or $token)' },
+      { key: 'area_gap', type: 'text', label: 'Area Gap (% or $token)' },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
-        { key: 'container.gutter', type: 'number', label: 'Gutter (%)', step: 0.25 }
-      ]},
-      { group: 'Defaults', defaultCollapsed: true, fields: [
-        { key: 'area_padding', type: 'padding', label: 'Area Padding (%)' },
-        { key: 'item_padding', type: 'padding', label: 'Item Padding (%)' },
-        { key: 'item_gutter', type: 'number', label: 'Item Gutter (%)', step: 0.25 }
+        { key: 'container.gutter', type: 'text', label: 'Gutter (% or $token)' }
       ]}
     ],
-    header_text: [
-      { key: 'id', type: 'text', label: 'ID' },
-      { key: 'type', type: 'select', options: ['text'], label: 'Type' },
-      { key: 'text', type: 'text', label: 'Text' },
-      { key: 'position', type: 'select', options: ['left', 'center', 'right'], label: 'Position' },
-      { key: 'font', type: 'font', label: 'Font' }
-    ],
-    header_logo: [
-      { key: 'id', type: 'text', label: 'ID' },
-      { key: 'type', type: 'select', options: ['logo'], label: 'Type' },
-      { key: 'src', type: 'text', label: 'Image URL' },
-      { key: 'position', type: 'select', options: ['left', 'center', 'right'], label: 'Position' },
-      { key: 'max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
+    tokens: [
+      // Tokens are key/value tables; show a hint pointing to the JSON tab
+      { key: 'palette', type: 'tokens_palette', label: 'Palette (color tokens)' },
+      { key: 'spacing', type: 'tokens_map', label: 'Spacing tokens' },
+      { key: 'type_scale', type: 'tokens_map', label: 'Type scale tokens' }
     ],
     theme: [
-      { key: 'preset', type: 'select', options: ['', 'dark', 'light', 'warm', 'cool', 'mono'], label: 'Preset' },
-      { key: 'background', type: 'color', label: 'Background' },
-      { key: 'text_color', type: 'color', label: 'Text Color' },
-      { key: 'accent_color', type: 'color', label: 'Accent Color' },
-      { group: 'Pricing', defaultCollapsed: true, fields: [
-        { key: 'currency_symbol', type: 'text', label: 'Currency Symbol' },
-        { key: 'price_format', type: 'select', options: ['full', 'fewest'], label: 'Price Format' }
+      { group: 'Colors', fields: [
+        { key: 'colors.background', type: 'color', label: 'Background' },
+        { key: 'colors.surface', type: 'color', label: 'Surface' },
+        { key: 'colors.text', type: 'color', label: 'Text' },
+        { key: 'colors.muted', type: 'color', label: 'Muted' },
+        { key: 'colors.accent', type: 'color', label: 'Accent' },
+        { key: 'colors.divider', type: 'color', label: 'Divider' }
       ]},
       { group: 'Fonts', defaultCollapsed: true, fields: [
-        { key: 'area_title_font', type: 'font', label: 'Area Title Font' },
-        { key: 'item_name_font', type: 'font', label: 'Item Name Font' },
-        { key: 'item_price_font', type: 'font', label: 'Item Price Font' },
-        { key: 'variation_font', type: 'font', label: 'Variation Font' },
-        { key: 'description_font', type: 'font', label: 'Description Font' }
+        { key: 'fonts.title', type: 'font', label: 'Title (header)' },
+        { key: 'fonts.heading', type: 'font', label: 'Heading (area titles)' },
+        { key: 'fonts.body', type: 'font', label: 'Body (item names)' },
+        { key: 'fonts.emphasis', type: 'font', label: 'Emphasis (prices)' },
+        { key: 'fonts.caption', type: 'font', label: 'Caption (descriptions)' }
       ]},
-      { group: 'Dividers & Borders', defaultCollapsed: true, fields: [
-        { key: 'divider_color', type: 'color', label: 'Divider Color' },
-        { key: 'divider_width', type: 'number', label: 'Divider Width (px)', step: 1 },
-        { key: 'divider_style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Divider Style' },
-        { key: 'area_background', type: 'color', label: 'Area Background' }
+      { group: 'Dividers', defaultCollapsed: true, fields: [
+        { key: 'dividers.color', type: 'color', label: 'Color' },
+        { key: 'dividers.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' }
+      ]},
+      { group: 'Areas (defaults)', defaultCollapsed: true, fields: [
+        { key: 'areas.padding', type: 'padding', label: 'Padding' },
+        { key: 'areas.background', type: 'color', label: 'Background' },
+        { key: 'areas.column_count', type: 'number', label: 'Item Columns' },
+        { key: 'areas.gutter', type: 'text', label: 'Item Gutter' },
+        { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
+        { key: 'areas.price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
+        { key: 'areas.title_font', type: 'select', options: FONT_ROLES, label: 'Title Font Role' }
+      ]},
+      { group: 'Items (defaults)', defaultCollapsed: true, fields: [
+        { key: 'items.padding', type: 'padding', label: 'Padding' },
+        { key: 'items.align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
+        { key: 'items.name_font', type: 'select', options: FONT_ROLES, label: 'Name Font Role' },
+        { key: 'items.price_font', type: 'select', options: FONT_ROLES, label: 'Price Font Role' },
+        { key: 'items.description_font', type: 'select', options: FONT_ROLES, label: 'Description Font Role' },
+        { key: 'items.variation_font', type: 'select', options: FONT_ROLES, label: 'Variation Font Role' }
+      ]},
+      { group: 'Pricing', defaultCollapsed: true, fields: [
+        { key: 'pricing.symbol', type: 'text', label: 'Currency Symbol' },
+        { key: 'pricing.format', type: 'select', options: ['full', 'fewest'], label: 'Price Format' }
       ]},
       { group: 'Header', defaultCollapsed: true, fields: [
-        { key: 'header.height', type: 'number', label: 'Height (%)', step: 0.25 },
-        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'header.height', type: 'text', label: 'Height (% or $token)' },
+        { key: 'header.padding', type: 'padding', label: 'Padding' },
         { key: 'header.background', type: 'color', label: 'Background' },
         { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
         { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' },
@@ -465,28 +463,36 @@ var MenuEditor = (function () {
         { key: 'header.columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right Col' }
       ]}
     ],
+    header_text: [
+      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'text', type: 'text', label: 'Text' },
+      { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
+      { key: 'font', type: 'select', options: FONT_ROLES, label: 'Font Role' }
+    ],
+    header_logo: [
+      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'src', type: 'text', label: 'Image URL' },
+      { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
+      { key: 'max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
+    ],
     area: [
-      { key: 'id', type: 'text', label: 'ID' },
+      { key: 'id', type: 'text', label: 'ID (auto)' },
       { key: 'title', type: 'text', label: 'Title' },
       { key: 'align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Title Align' },
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
       { key: 'columns', type: 'number', label: 'Sub-Area Columns' },
-      { key: 'gutter', type: 'number', label: 'Gutter (%)', step: 0.25 },
+      { key: 'gutter', type: 'text', label: 'Gutter' },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.title_font', type: 'font', label: 'Title Font' },
-        { key: 'style.item_name_font', type: 'font', label: 'Item Name Font' },
-        { key: 'style.item_price_font', type: 'font', label: 'Item Price Font' },
-        { key: 'style.variation_font', type: 'font', label: 'Variation Font' },
-        { key: 'style.divider_color', type: 'color', label: 'Divider Color' },
         { key: 'style.background', type: 'color', label: 'Background' }
       ]}
     ],
     item: [
-      { key: 'id', type: 'text', label: 'ID' },
+      { key: 'id', type: 'text', label: 'ID (auto)' },
       { key: 'name', type: 'text', label: 'Name' },
       { key: 'description', type: 'text', label: 'Description' },
       { key: 'price', type: 'text', label: 'Price' },
@@ -494,7 +500,7 @@ var MenuEditor = (function () {
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
       { key: 'variations_inline', type: 'checkbox', label: 'Variations Inline' },
       { key: 'show_variation_prices', type: 'checkbox', label: 'Show Variation Prices', defaultChecked: true },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.name_font', type: 'font', label: 'Name Font' },
         { key: 'style.price_font', type: 'font', label: 'Price Font' }
@@ -759,6 +765,84 @@ var MenuEditor = (function () {
 
       wrapper.appendChild(label);
       wrapper.appendChild(fontGroup);
+
+    } else if (fieldDef.type === 'tokens_palette' || fieldDef.type === 'tokens_map') {
+      // Inline key/value editor for tokens (palette: color, scale: number)
+      var isPalette = fieldDef.type === 'tokens_palette';
+      var tokens = (value && typeof value === 'object') ? value : {};
+      var tableWrap = el('div', 'me-tokens-editor');
+      var entries = Object.keys(tokens);
+
+      function rebuildTokenRows() {
+        tableWrap.innerHTML = '';
+        entries = Object.keys(tokens);
+        entries.forEach(function (k) {
+          var row = el('div', 'me-tokens-row');
+          var keyInput = el('input', 'me-field__input me-field__input--short', { type: 'text' });
+          keyInput.value = k;
+          var valInput = el('input', 'me-field__input', { type: isPalette ? 'text' : 'number' });
+          valInput.value = tokens[k];
+          if (isPalette) {
+            var swatch = el('input', 'me-field__color', { type: 'color' });
+            swatch.value = (typeof tokens[k] === 'string' && tokens[k].charAt(0) === '#') ? tokens[k] : '#000000';
+            swatch.addEventListener('input', function () {
+              tokens[k] = swatch.value;
+              valInput.value = swatch.value;
+              store.update(fullPath, tokens);
+            });
+            row.appendChild(swatch);
+          }
+          var keyTimer;
+          keyInput.addEventListener('input', function () {
+            clearTimeout(keyTimer);
+            keyTimer = setTimeout(function () {
+              var newKey = keyInput.value.trim();
+              if (newKey && newKey !== k) {
+                tokens[newKey] = tokens[k];
+                delete tokens[k];
+                store.update(fullPath, tokens);
+                rebuildTokenRows();
+              }
+            }, 400);
+          });
+          var valTimer;
+          valInput.addEventListener('input', function () {
+            clearTimeout(valTimer);
+            valTimer = setTimeout(function () {
+              var v = isPalette ? valInput.value : parseFloat(valInput.value);
+              if (isPalette || !isNaN(v)) {
+                tokens[k] = v;
+                store.update(fullPath, tokens);
+              }
+            }, 400);
+          });
+          var delBtn = el('button', 'me-tree-btn me-tree-btn--danger');
+          delBtn.textContent = '\u2715';
+          delBtn.addEventListener('click', function () {
+            delete tokens[k];
+            store.update(fullPath, tokens);
+            rebuildTokenRows();
+          });
+          row.appendChild(keyInput);
+          row.appendChild(valInput);
+          row.appendChild(delBtn);
+          tableWrap.appendChild(row);
+        });
+        // Add new
+        var addBtn = el('button', 'me-tree-btn');
+        addBtn.textContent = '+ add';
+        addBtn.addEventListener('click', function () {
+          var newKey = 'token-' + (entries.length + 1);
+          tokens[newKey] = isPalette ? '#000000' : 1;
+          store.update(fullPath, tokens);
+          rebuildTokenRows();
+        });
+        tableWrap.appendChild(addBtn);
+      }
+      rebuildTokenRows();
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(tableWrap);
     }
 
     container.appendChild(wrapper);
@@ -791,8 +875,10 @@ var MenuEditor = (function () {
     }
 
     function getNodeLabel(path, obj) {
+      if (path === '') return 'Menu';
       if (path === 'layout') return 'Layout';
       if (path === 'theme') return 'Theme';
+      if (path === 'tokens') return 'Tokens';
       if (obj.title) return obj.title;
       if (obj.name) return obj.name;
       if (obj.id) return obj.id;
@@ -801,10 +887,12 @@ var MenuEditor = (function () {
 
     function getNodeIcon(type) {
       var icons = {
-        layout: '\u2630', // trigram
-        theme: '\u2726',  // star
-        area: '\u25A1',   // square
-        item: '\u2022',   // bullet
+        root: '\u25C6',     // diamond
+        tokens: '\u269C',   // fleur
+        layout: '\u2630',   // trigram
+        theme: '\u2726',    // star
+        area: '\u25A1',     // square
+        item: '\u2022',     // bullet
         variation: '\u2013' // dash
       };
       return icons[type] || '\u2022';
@@ -1018,6 +1106,12 @@ var MenuEditor = (function () {
 
       var data = store.getData();
 
+      // Root (Menu) — shows preset selector
+      container.appendChild(buildNode('', data, 'root', 0));
+
+      // Tokens
+      container.appendChild(buildNode('tokens', data.tokens || {}, 'tokens', 0));
+
       // Layout node
       container.appendChild(buildNode('layout', data.layout || {}, 'layout', 0));
 
@@ -1125,17 +1219,18 @@ var MenuEditor = (function () {
       var data = store.getData();
       var value = getAtPath(data, path);
 
-      if (value == null && path !== 'layout' && path !== 'theme') {
-        var msg = el('div', 'me-inspector__empty');
-        msg.textContent = 'Select a node in the tree';
-        container.appendChild(msg);
+      // Tree sections (Header, Areas) and unselectable nodes get empty inspector
+      if (value == null && path !== 'layout' && path !== 'theme' && path !== '' && path !== 'tokens') {
+        // Empty inspector — no message
         return;
       }
 
       // Determine type
       var type;
-      if (path === 'layout') type = 'layout';
+      if (path === '') type = 'root';
+      else if (path === 'layout') type = 'layout';
       else if (path === 'theme') type = 'theme';
+      else if (path === 'tokens') type = 'tokens';
       else if (path.indexOf('header.elements[') === 0) {
         type = (value && value.type === 'logo') ? 'header_logo' : 'header_text';
       }

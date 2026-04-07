@@ -1,152 +1,44 @@
 {
+  "preset": "warm",
+  "tokens": {
+    "palette": { "accent": "#ff8c42" },
+    "type_scale": { "menu": 2 },
+    "spacing": { "tight": 0.5, "loose": 4 }
+  },
   "layout": {
-    "resolution": "4k",
-    "orientation": "landscape",
-    "viewport_padding": {
-      "top": "$tight",
-      "right": "$loose",
-      "bottom": "$tight",
-      "left": "$loose"
-    },
-    "area_gap": 1.852,
-    "spacing": {
-      "tight": 0.5,
-      "loose": 4
-    },
-    "container": {
-      "columns": 2,
-      "gutter": 2.5
-    }
+    "container": { "columns": 2 },
+    "viewport_padding": { "top": "$tight", "right": "$loose", "bottom": "$tight", "left": "$loose" }
   },
   "theme": {
-    "preset": "warm",
-    "palette": {
-      "accent": "#ff8c42"
-    },
-    "type_scale": {
-      "menu": 2
-    },
-    "area_title_font": {
-      "family": "Playfair Display",
-      "weight": "600",
-      "color": "$accent",
-      "size": "$menu"
-    },
-    "item_name_font": {
-      "family": "Lato",
-      "weight": "400",
-      "size": 1.375
-    },
-    "item_price_font": {
-      "family": "Lato",
-      "weight": "700",
-      "color": "$accent",
-      "size": 1.375
-    },
-    "variation_font": {
-      "family": "Lato",
-      "weight": "400",
-      "size": 1
-    },
-    "header": {
-      "height": 14,
-      "padding": {
-        "top": 2,
-        "right": 2,
-        "bottom": 1,
-        "left": 2
-      }
+    "fonts": {
+      "title": { "family": "Playfair Display", "size": "$hero" },
+      "heading": { "family": "Playfair Display", "size": "$menu" }
     }
   },
   "header": {
     "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Twilight Wine Bar",
-        "font": {
-          "family": "Playfair Display",
-          "weight": "700",
-          "color": "$accent",
-          "size": "$hero"
-        },
-        "position": "center"
-      }
+      { "type": "text", "text": "Twilight Wine Bar" }
     ]
   },
   "areas": [
     {
-      "id": "wines",
       "title": "Wines by the Glass",
-      "column_count": 1,
       "items": [
-        {
-          "id": "pinot-noir",
-          "name": "Pinot Noir, Willamette Valley",
-          "description": "Cherry, earth, soft tannins",
-          "price": "14.00"
-        },
-        {
-          "id": "cab",
-          "name": "Cabernet Sauvignon, Napa",
-          "description": "Blackcurrant, cedar, full body",
-          "price": "16.00"
-        },
-        {
-          "id": "chardonnay",
-          "name": "Chardonnay, Sonoma Coast",
-          "description": "Lemon curd, oak, crisp finish",
-          "price": "13.00"
-        },
-        {
-          "id": "rose",
-          "name": "Provence Rosé",
-          "description": "Strawberry, melon, dry",
-          "price": "12.00"
-        },
-        {
-          "id": "prosecco",
-          "name": "Prosecco, Veneto",
-          "description": "Pear, honeysuckle, lively bubbles",
-          "price": "11.00"
-        }
+        { "name": "Pinot Noir, Willamette Valley", "description": "Cherry, earth, soft tannins", "price": "14" },
+        { "name": "Cabernet Sauvignon, Napa", "description": "Blackcurrant, cedar, full body", "price": "16" },
+        { "name": "Chardonnay, Sonoma Coast", "description": "Lemon curd, oak, crisp finish", "price": "13" },
+        { "name": "Provence Rosé", "description": "Strawberry, melon, dry", "price": "12" },
+        { "name": "Prosecco, Veneto", "description": "Pear, honeysuckle, lively bubbles", "price": "11" }
       ]
     },
     {
-      "id": "small-plates",
       "title": "Small Plates",
-      "column_count": 1,
       "items": [
-        {
-          "id": "cheese",
-          "name": "Artisan Cheese Board",
-          "description": "Three cheeses, honey, marcona almonds",
-          "price": "18.00"
-        },
-        {
-          "id": "charcuterie",
-          "name": "Charcuterie Selection",
-          "description": "Prosciutto, soppressata, pâté",
-          "price": "21.00"
-        },
-        {
-          "id": "olives",
-          "name": "Marinated Olives",
-          "description": "Castelvetrano, citrus, herbs",
-          "price": "8.00"
-        },
-        {
-          "id": "bruschetta",
-          "name": "Tomato Bruschetta",
-          "description": "Heirloom tomato, basil, grilled levain",
-          "price": "12.00"
-        },
-        {
-          "id": "burrata",
-          "name": "Burrata & Peach",
-          "description": "Stone fruit, prosciutto, balsamic",
-          "price": "16.00"
-        }
+        { "name": "Artisan Cheese Board", "description": "Three cheeses, honey, marcona almonds", "price": "18" },
+        { "name": "Charcuterie Selection", "description": "Prosciutto, soppressata, pâté", "price": "21" },
+        { "name": "Marinated Olives", "description": "Castelvetrano, citrus, herbs", "price": "8" },
+        { "name": "Tomato Bruschetta", "description": "Heirloom tomato, basil, grilled levain", "price": "12" },
+        { "name": "Burrata & Peach", "description": "Stone fruit, prosciutto, balsamic", "price": "16" }
       ]
     }
   ]

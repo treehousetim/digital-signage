@@ -583,6 +583,32 @@
   background: rgba(244, 67, 54, 0.06);
 }
 
+/* ── Tokens editor ──────────────────────────────────────────────────── */
+
+.me-tokens-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.me-tokens-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.me-tokens-row .me-field__input {
+  flex: 1;
+}
+
+.me-tokens-row .me-field__color {
+  flex-shrink: 0;
+}
+
 /* ── Import Modal ───────────────────────────────────────────────────── */
 
 .me-modal-overlay {

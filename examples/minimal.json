@@ -1,48 +1,11 @@
 {
-  "layout": {
-    "resolution": "4k"
-  },
-  "theme": {
-    "header": {
-      "height": 7,
-      "padding": {
-        "top": 1.5,
-        "right": 2,
-        "bottom": 0.5,
-        "left": 2
-      }
-    }
-  },
-  "header": {
-    "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Menu",
-        "position": "center"
-      }
-    ]
-  },
   "areas": [
     {
-      "id": "menu",
       "title": "Menu",
       "items": [
-        {
-          "id": "item-1",
-          "name": "Coffee",
-          "price": "3.00"
-        },
-        {
-          "id": "item-2",
-          "name": "Tea",
-          "price": "2.50"
-        },
-        {
-          "id": "item-3",
-          "name": "Water",
-          "price": "1.00"
-        }
+        { "name": "Coffee", "price": "3" },
+        { "name": "Tea", "price": "2.50" },
+        { "name": "Water", "price": "1" }
       ]
     }
   ]

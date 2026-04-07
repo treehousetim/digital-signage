@@ -1,216 +1,61 @@
 {
+  "preset": "mono",
   "layout": {
-    "resolution": "4k",
-    "orientation": "landscape",
-    "viewport_padding": {
-      "top": 1.111,
-      "right": 1.458,
-      "bottom": 1.111,
-      "left": 1.458
-    },
-    "area_gap": 1.481,
-    "container": {
-      "columns": 3,
-      "gutter": 1.25
-    }
+    "container": { "columns": 3 }
   },
   "theme": {
-    "background": "#0d1117",
-    "area_title_font": {
-      "family": "Roboto",
-      "weight": "600",
-      "color": "#3fb950",
-      "size": 1.375
+    "colors": {
+      "background": "#0d1117",
+      "surface": "#161b22",
+      "accent": "#3fb950",
+      "text": "#c9d1d9",
+      "muted": "#8b949e",
+      "divider": "#21262d"
     },
-    "item_name_font": {
-      "family": "Roboto",
-      "weight": "400",
-      "color": "#c9d1d9",
-      "size": 1.125
-    },
-    "item_price_font": {
-      "family": "Roboto",
-      "weight": "700",
-      "color": "#3fb950",
-      "size": 1.125
-    },
-    "variation_font": {
-      "family": "Roboto",
-      "weight": "400",
-      "color": "#8b949e",
-      "size": 0.875
-    },
-    "divider_color": "#21262d",
-    "area_background": "#161b22",
-    "header": {
-      "height": 6.5,
-      "padding": {
-        "top": 1.852,
-        "right": 2,
-        "bottom": 0.5,
-        "left": 2
-      }
+    "areas": {
+      "background": "$surface",
+      "padding": "$sm"
     }
   },
   "header": {
     "elements": [
-      {
-        "id": "header-1",
-        "type": "text",
-        "text": "Infrastructure Status",
-        "font": {
-          "family": "Roboto",
-          "weight": "700",
-          "color": "#58a6ff",
-          "size": 2.625
-        },
-        "position": "center"
-      }
+      { "type": "text", "text": "Infrastructure Status", "font": { "extends": "title", "color": "#58a6ff" } }
     ]
   },
   "areas": [
     {
-      "id": "prod-services",
       "title": "Production Services",
-      "column_count": 1,
-      "padding": 0.625,
       "items": [
-        {
-          "id": "api-gateway",
-          "name": "API Gateway",
-          "description": "us-east-1, us-west-2",
-          "price": "UP"
-        },
-        {
-          "id": "auth-service",
-          "name": "Auth Service",
-          "description": "OAuth2 / SSO provider",
-          "price": "UP"
-        },
-        {
-          "id": "web-frontend",
-          "name": "Web Frontend",
-          "description": "CDN-backed, 3 regions",
-          "price": "UP"
-        },
-        {
-          "id": "search-api",
-          "name": "Search API",
-          "description": "Elasticsearch cluster",
-          "price": "UP"
-        },
-        {
-          "id": "payment",
-          "name": "Payment Processing",
-          "description": "Stripe integration",
-          "price": "UP"
-        },
-        {
-          "id": "notification",
-          "name": "Notification Service",
-          "description": "Email, SMS, push",
-          "price": "UP"
-        },
-        {
-          "id": "file-storage",
-          "name": "File Storage",
-          "description": "S3-compatible, 3 buckets",
-          "price": "UP"
-        }
+        { "name": "API Gateway", "description": "us-east-1, us-west-2", "price": "UP" },
+        { "name": "Auth Service", "description": "OAuth2 / SSO provider", "price": "UP" },
+        { "name": "Web Frontend", "description": "CDN-backed, 3 regions", "price": "UP" },
+        { "name": "Search API", "description": "Elasticsearch cluster", "price": "UP" },
+        { "name": "Payment Processing", "description": "Stripe integration", "price": "UP" },
+        { "name": "Notification Service", "description": "Email, SMS, push", "price": "UP" },
+        { "name": "File Storage", "description": "S3-compatible, 3 buckets", "price": "UP" }
       ]
     },
     {
-      "id": "databases",
       "title": "Databases",
-      "column_count": 1,
-      "padding": 0.625,
       "items": [
-        {
-          "id": "pg-primary",
-          "name": "PostgreSQL Primary",
-          "description": "db-prod-01, 64GB",
-          "price": "UP"
-        },
-        {
-          "id": "pg-replica",
-          "name": "PostgreSQL Replica",
-          "description": "db-prod-02, read-only",
-          "price": "UP"
-        },
-        {
-          "id": "redis-cache",
-          "name": "Redis Cache",
-          "description": "cache-prod-01, 16GB",
-          "price": "UP"
-        },
-        {
-          "id": "redis-queue",
-          "name": "Redis Queue",
-          "description": "queue-prod-01, 8GB",
-          "price": "UP"
-        },
-        {
-          "id": "mongo-docs",
-          "name": "MongoDB (Documents)",
-          "description": "3-node replica set",
-          "price": "UP"
-        },
-        {
-          "id": "es-cluster",
-          "name": "Elasticsearch",
-          "description": "3-node, 500GB index",
-          "price": "UP"
-        }
+        { "name": "PostgreSQL Primary", "description": "db-prod-01, 64GB", "price": "UP" },
+        { "name": "PostgreSQL Replica", "description": "db-prod-02, read-only", "price": "UP" },
+        { "name": "Redis Cache", "description": "cache-prod-01, 16GB", "price": "UP" },
+        { "name": "Redis Queue", "description": "queue-prod-01, 8GB", "price": "UP" },
+        { "name": "MongoDB (Documents)", "description": "3-node replica set", "price": "UP" },
+        { "name": "Elasticsearch", "description": "3-node, 500GB index", "price": "UP" }
       ]
     },
     {
-      "id": "infra",
       "title": "Infrastructure",
-      "column_count": 1,
-      "padding": 0.625,
       "items": [
-        {
-          "id": "k8s-prod",
-          "name": "K8s Cluster (prod)",
-          "description": "12 nodes, auto-scaling",
-          "price": "UP"
-        },
-        {
-          "id": "k8s-staging",
-          "name": "K8s Cluster (staging)",
-          "description": "4 nodes",
-          "price": "UP"
-        },
-        {
-          "id": "ci-cd",
-          "name": "CI/CD Pipeline",
-          "description": "GitHub Actions, 8 runners",
-          "price": "UP"
-        },
-        {
-          "id": "monitoring",
-          "name": "Monitoring Stack",
-          "description": "Grafana + Prometheus",
-          "price": "UP"
-        },
-        {
-          "id": "logging",
-          "name": "Log Aggregation",
-          "description": "Loki, 30-day retention",
-          "price": "UP"
-        },
-        {
-          "id": "dns",
-          "name": "DNS",
-          "description": "Cloudflare, 4 zones",
-          "price": "UP"
-        },
-        {
-          "id": "vpn",
-          "name": "VPN Gateway",
-          "description": "WireGuard, internal access",
-          "price": "UP"
-        }
+        { "name": "K8s Cluster (prod)", "description": "12 nodes, auto-scaling", "price": "UP" },
+        { "name": "K8s Cluster (staging)", "description": "4 nodes", "price": "UP" },
+        { "name": "CI/CD Pipeline", "description": "GitHub Actions, 8 runners", "price": "UP" },
+        { "name": "Monitoring Stack", "description": "Grafana + Prometheus", "price": "UP" },
+        { "name": "Log Aggregation", "description": "Loki, 30-day retention", "price": "UP" },
+        { "name": "DNS", "description": "Cloudflare, 4 zones", "price": "UP" },
+        { "name": "VPN Gateway", "description": "WireGuard, internal access", "price": "UP" }
       ]
     }
   ]

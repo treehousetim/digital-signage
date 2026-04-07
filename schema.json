@@ -2,201 +2,205 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/treehousetim/digital-signage/schema.json",
   "title": "Digital Signage Menu Definition",
-  "description": "JSON schema for the digital signage menu templating engine. Defines layout, theming, and menu content for full-screen display rendering.",
+  "description": "Design system for full-screen menu displays. Most fields are optional — defaults handle the rest.",
   "type": "object",
   "required": ["areas"],
   "properties": {
-    "layout": {
+    "preset": {
+      "type": "string",
+      "enum": ["dark", "light", "warm", "cool", "mono"],
+      "description": "Built-in theme preset. Sets palette and font families. User overrides take precedence."
+    },
+    "tokens": {
       "type": "object",
-      "description": "Controls the overall screen layout, resolution scaling, title, and logo placement.",
+      "description": "Design tokens. Reference any value with $name in spatial, color, or font size fields.",
       "properties": {
-        "resolution": {
-          "type": "string",
-          "enum": ["1080", "2k", "4k"],
-          "default": "4k",
-          "description": "Display resolution. Sets the viewport container size: 1080=1920x1080, 2k=2560x1440, 4k=3840x2160."
-        },
-        "orientation": {
-          "type": "string",
-          "enum": ["landscape", "portrait"],
-          "default": "landscape",
-          "description": "Screen orientation. Landscape is 1920x1080 base, portrait is 1080x1920 base."
-        },
-        "mode": {
-          "type": "string",
-          "enum": ["display", "preview"],
-          "default": "display",
-          "description": "Rendering mode. 'display' renders at native resolution with CSS scale. 'preview' scales to fit the browser viewport for previewing on any screen."
-        },
-        "x_spacer": {
-          "type": "number",
-          "default": 1.25,
-          "description": "Legacy horizontal spacing fallback (% of viewport width). Use viewport_padding and container.gutter instead."
-        },
-        "y_spacer": {
-          "type": "number",
-          "default": 3,
-          "description": "Legacy vertical spacing fallback (% of viewport height)."
-        },
-        "viewport_padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Padding from the screen edges to the content area (% of viewport)."
-        },
-        "area_gap": {
-          "type": "number",
-          "description": "Vertical gap between area sections (% of viewport height)."
-        },
-        "area_padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Default internal padding for all areas (overridable per-area)."
-        },
-        "item_padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Default padding for all items (overridable per-item)."
-        },
-        "item_gutter": {
-          "type": "number",
-          "description": "Default gap between item columns (% of viewport width)."
+        "palette": {
+          "type": "object",
+          "description": "Named colors. Built-in keys: background, surface, text, muted, accent, divider. Add your own freely.",
+          "additionalProperties": { "type": "string" }
         },
         "spacing": {
           "type": "object",
-          "description": "Custom spacing scale. Override token names like xs/sm/md/lg/xl. Reference with '$name' in any spatial value.",
+          "description": "Named spacing values (percentage of viewport). Built-in keys: none, xs, sm, md, lg, xl, xxl.",
           "additionalProperties": { "type": "number" }
         },
+        "type_scale": {
+          "type": "object",
+          "description": "Named font sizes (em multipliers). Built-in keys: xs, sm, base, md, lg, xl, hero.",
+          "additionalProperties": { "type": "number" }
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "Canvas dimensions and content arrangement.",
+      "properties": {
+        "resolution": { "type": "string", "enum": ["1080", "2k", "4k"], "default": "4k" },
+        "orientation": { "type": "string", "enum": ["landscape", "portrait"], "default": "landscape" },
+        "mode": { "type": "string", "enum": ["display", "preview"], "default": "display" },
+        "viewport_padding": { "$ref": "#/$defs/padding" },
+        "area_gap": { "$ref": "#/$defs/spacing_value" },
         "container": {
           "type": "object",
-          "description": "Controls how top-level areas are arranged on screen.",
           "properties": {
-            "columns": {
-              "type": "integer",
-              "enum": [1, 2, 3],
-              "default": 1,
-              "description": "Number of columns for area layout."
-            },
-            "gutter": {
-              "type": "number",
-              "description": "Gap between area columns (% of viewport width)."
-            }
+            "columns": { "type": "integer", "enum": [1, 2, 3], "default": 1 },
+            "gutter": { "$ref": "#/$defs/spacing_value" }
           }
         }
       }
     },
+    "theme": { "$ref": "#/$defs/theme" },
     "header": {
       "type": "object",
-      "description": "Top-level header content. Holds the elements (text labels, logos). Visual properties live in theme.header.",
+      "description": "Header content. Visual properties live in theme.header.",
       "properties": {
         "elements": {
           "type": "array",
-          "description": "Ordered list of header elements (text labels and logos).",
           "items": { "$ref": "#/$defs/header_element" }
         }
       }
     },
+    "areas": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/area" }
+    }
+  },
+  "$defs": {
+    "spacing_value": {
+      "description": "A number (% of viewport), a string with $name token reference, or a string with px (e.g. '12px').",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string" }
+      ]
+    },
+    "padding": {
+      "description": "Padding shorthand. A number/token applies uniformly. An object sets each side independently.",
+      "oneOf": [
+        { "$ref": "#/$defs/spacing_value" },
+        {
+          "type": "object",
+          "properties": {
+            "top":    { "$ref": "#/$defs/spacing_value" },
+            "right":  { "$ref": "#/$defs/spacing_value" },
+            "bottom": { "$ref": "#/$defs/spacing_value" },
+            "left":   { "$ref": "#/$defs/spacing_value" }
+          }
+        }
+      ]
+    },
+    "font": {
+      "description": "Font definition. Can be an object or a string reference to a theme.fonts role.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Reference to a theme font role: title, heading, body, emphasis, caption."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "extends": { "type": "string", "description": "Inherit from a theme font role and override specific fields." },
+            "family": { "type": "string", "description": "Font family. Google Fonts auto-loaded." },
+            "weight": { "type": "string" },
+            "color":  { "type": "string", "description": "CSS color or '$name' palette reference." },
+            "size":   { "description": "em number or '$name' type_scale reference." }
+          }
+        }
+      ]
+    },
     "theme": {
       "type": "object",
-      "description": "Visual definitions: colors, fonts, dividers, palette, type scale, and presets.",
+      "description": "Visual definitions. Every group has sensible defaults and can be partially overridden.",
       "properties": {
-        "preset": {
-          "type": "string",
-          "enum": ["dark", "light", "warm", "cool", "mono"],
-          "description": "Built-in theme preset. Loaded as defaults that the user can override."
-        },
-        "palette": {
+        "colors": {
           "type": "object",
-          "description": "Named colors. Reference with '$name' in any color field. Common keys: background, surface, text, muted, accent, divider.",
-          "additionalProperties": { "type": "string" }
+          "description": "Semantic color slots. Each defaults to a $palette reference.",
+          "properties": {
+            "background": { "type": "string" },
+            "surface":    { "type": "string" },
+            "text":       { "type": "string" },
+            "muted":      { "type": "string" },
+            "accent":     { "type": "string" },
+            "divider":    { "type": "string" }
+          }
         },
-        "type_scale": {
+        "fonts": {
           "type": "object",
-          "description": "Custom type scale (em values). Override token names like xs/sm/base/md/lg/xl/hero. Reference with '$name' in font sizes.",
-          "additionalProperties": { "type": "number" }
+          "description": "Semantic font roles referenced from elements.",
+          "properties": {
+            "title":    { "$ref": "#/$defs/font" },
+            "heading":  { "$ref": "#/$defs/font" },
+            "body":     { "$ref": "#/$defs/font" },
+            "emphasis": { "$ref": "#/$defs/font" },
+            "caption":  { "$ref": "#/$defs/font" }
+          }
         },
-        "background": {
-          "type": "string",
-          "description": "Full-screen background. Color, gradient, image, or '$name' palette reference."
-        },
-        "text_color": {
-          "type": "string",
-          "description": "Default text color. Can use '$name' palette reference."
-        },
-        "accent_color": {
-          "type": "string",
-          "description": "Accent color used by titles/prices by default. Can use '$name' palette reference."
-        },
-        "currency_symbol": {
-          "type": "string",
-          "default": "",
-          "description": "Currency symbol prepended to prices. Default is blank (no symbol)."
-        },
-        "price_format": {
-          "type": "string",
-          "enum": ["full", "fewest"],
-          "default": "full",
-          "description": "How to format price numbers. 'full' = always 2 decimals (50.00, 2.45). 'fewest' = drop trailing zeros (50, 2.45, 2.4)."
-        },
-        "area_title_font": { "$ref": "#/$defs/font" },
-        "item_name_font": { "$ref": "#/$defs/font" },
-        "item_price_font": { "$ref": "#/$defs/font" },
-        "variation_font": { "$ref": "#/$defs/font" },
-        "description_font": { "$ref": "#/$defs/font" },
-        "divider_color": {
-          "type": "string",
-          "default": "#444444",
-          "description": "CSS color (or '$name' ref) for item dividers."
-        },
-        "divider_width": {
-          "type": "number",
-          "default": 1,
-          "description": "Divider line width in pixels."
-        },
-        "divider_style": {
-          "type": "string",
-          "enum": ["solid", "dashed", "dotted"],
-          "default": "solid",
-          "description": "Divider line style."
-        },
-        "area_background": {
-          "type": "string",
-          "default": "transparent",
-          "description": "Background for area blocks."
-        },
-        "area_border": {
+        "dividers": {
           "type": "object",
-          "description": "Optional border around area blocks.",
           "properties": {
             "color": { "type": "string" },
             "width": { "type": "number", "default": 1 },
-            "style": { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" },
-            "radius": { "type": "number", "default": 0 }
+            "style": { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" }
+          }
+        },
+        "areas": {
+          "type": "object",
+          "description": "Default settings inherited by all areas.",
+          "properties": {
+            "padding":      { "$ref": "#/$defs/padding" },
+            "background":   { "type": "string" },
+            "border": {
+              "type": "object",
+              "properties": {
+                "color":  { "type": "string" },
+                "width":  { "type": "number", "default": 1 },
+                "style":  { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" },
+                "radius": { "type": "number" }
+              }
+            },
+            "title_font":   { "$ref": "#/$defs/font" },
+            "column_count": { "type": "integer", "default": 1 },
+            "gutter":       { "$ref": "#/$defs/spacing_value" },
+            "item_align":   { "type": "string", "enum": ["left", "center", "right"], "default": "left" },
+            "price_align":  { "type": "string", "enum": ["left", "right"], "default": "right" }
+          }
+        },
+        "items": {
+          "type": "object",
+          "description": "Default settings inherited by all items.",
+          "properties": {
+            "padding":          { "$ref": "#/$defs/padding" },
+            "name_font":        { "$ref": "#/$defs/font" },
+            "price_font":       { "$ref": "#/$defs/font" },
+            "description_font": { "$ref": "#/$defs/font" },
+            "variation_font":   { "$ref": "#/$defs/font" },
+            "align":            { "type": "string", "enum": ["left", "center", "right"], "default": "left" }
+          }
+        },
+        "pricing": {
+          "type": "object",
+          "properties": {
+            "symbol": { "type": "string", "default": "", "description": "Currency symbol prepended to prices." },
+            "format": { "type": "string", "enum": ["full", "fewest"], "default": "full" }
           }
         },
         "header": {
           "type": "object",
-          "description": "Visual properties of the header region. Content (elements) live at the top-level header field.",
+          "description": "Visual properties of the header region (content lives in top-level header.elements).",
           "properties": {
-            "height": {
-              "type": "number",
-              "description": "Header min-height as % of viewport height."
-            },
-            "padding": {
-              "$ref": "#/$defs/padding",
-              "description": "Internal padding (% of viewport)."
-            },
-            "background": {
-              "type": "string",
-              "description": "CSS background (color, gradient, image, or $name palette ref)."
-            },
+            "height":     { "$ref": "#/$defs/spacing_value" },
+            "padding":    { "$ref": "#/$defs/padding" },
+            "background": { "type": "string" },
             "divider": {
               "type": "object",
-              "description": "Optional bottom border below the header.",
               "properties": {
-                "color": { "type": "string", "description": "Border color." },
-                "width": { "type": "number", "default": 1, "description": "Border width in pixels." }
+                "color": { "type": "string" },
+                "width": { "type": "number", "default": 1 }
               }
             },
             "columns": {
               "type": "object",
-              "description": "Per-column sizing. 'fit' = wraps content, 'fill' = takes available space. Default: empty columns collapse, others share content + remaining space.",
+              "description": "Per-column sizing. Empty columns auto-collapse.",
               "properties": {
                 "left":   { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"] } } },
                 "center": { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"] } } },
@@ -207,231 +211,100 @@
         }
       }
     },
-    "areas": {
-      "type": "array",
-      "description": "The menu areas (sections) containing items to display.",
-      "items": { "$ref": "#/$defs/area" }
-    }
-  },
-  "$defs": {
     "header_element": {
       "oneOf": [
         {
           "type": "object",
-          "description": "Text element (title, subtitle, tagline).",
           "required": ["type"],
           "properties": {
-            "id": { "type": "string", "description": "Unique element ID." },
-            "type": { "const": "text" },
-            "text": { "type": "string", "description": "Display text." },
-            "font": { "$ref": "#/$defs/font" },
-            "position": {
-              "type": "string",
-              "enum": ["left", "center", "right"],
-              "default": "center",
-              "description": "Horizontal column placement."
-            }
+            "id":       { "type": "string", "description": "Auto-generated if omitted." },
+            "type":     { "const": "text" },
+            "text":     { "type": "string" },
+            "font":     { "$ref": "#/$defs/font" },
+            "position": { "type": "string", "enum": ["left", "center", "right"], "default": "center" }
           }
         },
         {
           "type": "object",
-          "description": "Logo image element.",
           "required": ["type"],
           "properties": {
-            "id": { "type": "string", "description": "Unique element ID." },
-            "type": { "const": "logo" },
-            "src": { "type": "string", "description": "Image URL or path." },
-            "max_height": {
-              "type": "number",
-              "default": 4,
-              "description": "Max height as % of viewport height."
-            },
-            "position": {
-              "type": "string",
-              "enum": ["left", "center", "right"],
-              "default": "left",
-              "description": "Horizontal column placement."
-            }
+            "id":         { "type": "string" },
+            "type":       { "const": "logo" },
+            "src":        { "type": "string" },
+            "max_height": { "$ref": "#/$defs/spacing_value", "default": 4 },
+            "position":   { "type": "string", "enum": ["left", "center", "right"], "default": "left" }
           }
         }
       ]
-    },
-    "padding": {
-      "oneOf": [
-        {
-          "type": "number",
-          "description": "Uniform padding on all sides in pixels."
-        },
-        {
-          "type": "object",
-          "description": "Per-side padding in pixels.",
-          "properties": {
-            "top":    { "type": "number", "default": 0 },
-            "right":  { "type": "number", "default": 0 },
-            "bottom": { "type": "number", "default": 0 },
-            "left":   { "type": "number", "default": 0 }
-          }
-        }
-      ]
-    },
-    "font": {
-      "type": "object",
-      "description": "Font definition with family, weight, color, and size.",
-      "properties": {
-        "family": {
-          "type": "string",
-          "default": "Lato",
-          "description": "CSS font-family name. Google Fonts (Montserrat, Lato, Roboto, Open Sans, Oswald) are auto-loaded."
-        },
-        "weight": {
-          "type": "string",
-          "default": "400",
-          "description": "CSS font-weight value."
-        },
-        "color": {
-          "type": "string",
-          "default": "#ffffff",
-          "description": "CSS color value."
-        },
-        "size": {
-          "type": "string",
-          "default": "22px",
-          "description": "CSS font-size value."
-        }
-      }
     },
     "area": {
       "type": "object",
-      "description": "A menu area. Either a leaf (has items) or a group (has sub-areas). Items and areas are mutually exclusive.",
-      "required": ["id"],
+      "description": "A leaf area (with items) or a group area (with nested areas). Most fields inherit from theme.areas.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for this area."
-        },
-        "title": {
-          "type": "string",
-          "description": "Display title for this section. Optional — omit for untitled groups."
-        },
-        "padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Internal padding within this area. Number or {top,right,bottom,left} object."
-        },
-        "gutter": {
-          "type": "number",
-          "description": "Gap between columns — item columns (leaf areas) or sub-area columns (group areas)."
-        },
-        "align": {
-          "type": "string",
-          "enum": ["left", "center", "right"],
-          "default": "left",
-          "description": "Horizontal alignment of the area title."
-        },
-        "valign": {
-          "type": "string",
-          "enum": ["top", "center", "bottom"],
-          "default": "top",
-          "description": "Vertical alignment of this area within its parent grid cell."
-        },
-        "item_align": {
-          "type": "string",
-          "enum": ["left", "center", "right"],
-          "default": "left",
-          "description": "Default text alignment for item names in this area."
-        },
-        "price_align": {
-          "type": "string",
-          "enum": ["left", "right"],
-          "default": "right",
-          "description": "Alignment of item prices."
-        },
-        "column_count": {
-          "type": "integer",
-          "default": 1,
-          "description": "Number of columns for the item grid within this leaf area (1-3)."
-        },
-        "columns": {
-          "type": "integer",
-          "default": 1,
-          "description": "Number of columns for sub-area layout in a group area."
+        "id":           { "type": "string", "description": "Auto-generated from title if omitted." },
+        "title":        { "type": "string" },
+        "padding":      { "$ref": "#/$defs/padding" },
+        "background":   { "type": "string" },
+        "title_font":   { "$ref": "#/$defs/font" },
+        "column_count": { "type": "integer" },
+        "columns":      { "type": "integer", "description": "For group areas: number of sub-area columns." },
+        "gutter":       { "$ref": "#/$defs/spacing_value" },
+        "align":        { "type": "string", "enum": ["left", "center", "right"] },
+        "valign":       { "type": "string", "enum": ["top", "center", "bottom"] },
+        "item_align":   { "type": "string", "enum": ["left", "center", "right"] },
+        "price_align":  { "type": "string", "enum": ["left", "right"] },
+        "style": {
+          "type": "object",
+          "description": "Per-area visual overrides.",
+          "properties": {
+            "title_font": { "$ref": "#/$defs/font" },
+            "background": { "type": "string" }
+          }
         },
         "items": {
           "type": "array",
-          "description": "Menu items in this leaf area.",
           "items": { "$ref": "#/$defs/item" }
         },
         "areas": {
           "type": "array",
-          "description": "Nested sub-areas. When present, this area is a group container. Mutually exclusive with items.",
+          "description": "Nested sub-areas. Mutually exclusive with items.",
           "items": { "$ref": "#/$defs/area" }
         }
       }
     },
     "item": {
       "type": "object",
-      "required": ["id", "name"],
+      "description": "Menu item. Only `name` is required.",
+      "required": ["name"],
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for this item."
-        },
-        "name": {
-          "type": "string",
-          "description": "Display name of the menu item."
-        },
-        "description": {
-          "type": "string",
-          "description": "Optional short description shown below the item name."
-        },
-        "price": {
-          "type": "string",
-          "description": "Base price for this item. Always displayed when present, even alongside variations. Use with variations for patterns like 'Sandwich $10' with add-on variations."
-        },
-        "show_variation_prices": {
-          "type": "boolean",
-          "default": true,
-          "description": "When false, hide individual variation prices (useful when variations are descriptive labels only)."
-        },
-        "variations_inline": {
-          "type": "boolean",
-          "default": true,
-          "description": "Display variations in a compact inline row. Set to false for stacked rows."
-        },
+        "id":          { "type": "string", "description": "Auto-generated from name if omitted." },
+        "name":        { "type": "string" },
+        "description": { "type": "string" },
+        "price":       { "type": "string", "description": "Display string. Numeric values are formatted per theme.pricing." },
         "variations": {
           "type": "array",
-          "description": "Variations with individual prices, displayed as rows below the item. Can coexist with a base price for add-on pricing patterns.",
           "items": {
             "type": "object",
-            "required": ["name", "price"],
+            "required": ["name"],
             "properties": {
-              "id": {
-                "type": "string",
-                "description": "Unique identifier for this variation. Used by external systems to address specific variations."
-              },
-              "name": {
-                "type": "string",
-                "description": "Variation label (e.g. Small, Large, 12oz)."
-              },
-              "price": {
-                "type": "string",
-                "description": "Price for this variation."
-              }
+              "id":    { "type": "string" },
+              "name":  { "type": "string" },
+              "price": { "type": "string" }
             }
           }
         },
-        "padding": {
-          "$ref": "#/$defs/padding",
-          "description": "Padding around this item. Defaults to {top:8, bottom:8}."
-        },
-        "align": {
-          "type": "string",
-          "enum": ["left", "center", "right"],
-          "description": "Text alignment for this item. Inherits from area.item_align if omitted."
-        },
-        "hide_if_empty": {
-          "type": "boolean",
-          "default": false,
-          "description": "If true, hide this item when it has no price and no variations."
+        "padding": { "$ref": "#/$defs/padding" },
+        "align":   { "type": "string", "enum": ["left", "center", "right"] },
+        "hide_if_empty":         { "type": "boolean", "default": false },
+        "variations_inline":     { "type": "boolean", "default": true },
+        "show_variation_prices": { "type": "boolean", "default": true },
+        "style": {
+          "type": "object",
+          "description": "Per-item visual overrides.",
+          "properties": {
+            "name_font":  { "$ref": "#/$defs/font" },
+            "price_font": { "$ref": "#/$defs/font" }
+          }
         }
       }
     }

@@ -212,20 +212,22 @@ The header is a 3-column flex region (left/center/right) that holds text and log
 | `background` | string | inherits `layout.background_color` | CSS background (color, gradient, or image) |
 | `divider.color` | string | — | Optional bottom border color |
 | `divider.width` | number | `1` | Border width (px) |
-| `columns.left.flex` | number | `1` | Left column flex (0 = shrink to content, 1+ = expand) |
-| `columns.center.flex` | number | `1` | Center column flex |
-| `columns.right.flex` | number | `1` | Right column flex |
+| `columns.left.mode` | `"fit"` \| `"fill"` | `"fill"` | Left column sizing |
+| `columns.center.mode` | `"fit"` \| `"fill"` | `"fill"` | Center column sizing |
+| `columns.right.mode` | `"fit"` \| `"fill"` | `"fill"` | Right column sizing |
 | `elements` | array | `[]` | Ordered list of header elements |
 
-**Column flex example** — full-width centered title:
+`fit` = column wraps to its content width (or disappears if empty). `fill` = column expands to take available space, sharing equally with other `fill` columns.
+
+**Example** — full-width centered title with `fit` columns on the sides:
 ```json
 "columns": {
-  "left":   { "flex": 0 },
-  "center": { "flex": 1 },
-  "right":  { "flex": 0 }
+  "left":   { "mode": "fit" },
+  "center": { "mode": "fill" },
+  "right":  { "mode": "fit" }
 }
 ```
-With `flex: 0` on left and right, those columns shrink to fit their content (or disappear if empty), letting the center column take the entire width.
+The left and right columns shrink to fit their content (or disappear if empty), letting the center take the entire header width.
 
 **Header text element:**
 

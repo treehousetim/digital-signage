@@ -95,11 +95,11 @@
         },
         "columns": {
           "type": "object",
-          "description": "Per-column flex values. 0 = shrink to content, 1+ = take that share of remaining space.",
+          "description": "Per-column sizing. 'fit' = wraps content tightly, 'fill' = takes available space. Defaults to 'fill'.",
           "properties": {
-            "left":   { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } },
-            "center": { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } },
-            "right":  { "type": "object", "properties": { "flex": { "type": "number", "default": 1 } } }
+            "left":   { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } },
+            "center": { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } },
+            "right":  { "type": "object", "properties": { "mode": { "type": "string", "enum": ["fit", "fill"], "default": "fill" } } }
           }
         },
         "elements": {

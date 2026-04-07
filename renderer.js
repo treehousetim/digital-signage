@@ -326,15 +326,15 @@ var MenuRenderer = (function () {
     var centerCol = el('div', 'ds-header-col ds-header-col--center');
     var rightCol = el('div', 'ds-header-col ds-header-col--right');
 
-    // Apply column flex values (0 = shrink to content, N = take that share of remaining space)
+    // Column sizing: "fit" = wraps content, "fill" = takes available space
     var cols = header.columns || {};
-    function flexFor(c) {
-      var f = c && c.flex != null ? c.flex : 1;
-      return f === 0 ? '0 0 auto' : (f + ' 1 0');
+    function colMode(c) {
+      var m = c && c.mode ? c.mode : 'fill';
+      return m === 'fit' ? '0 0 auto' : '1 1 0';
     }
-    leftCol.style.flex = flexFor(cols.left);
-    centerCol.style.flex = flexFor(cols.center);
-    rightCol.style.flex = flexFor(cols.right);
+    leftCol.style.flex = colMode(cols.left);
+    centerCol.style.flex = colMode(cols.center);
+    rightCol.style.flex = colMode(cols.right);
 
     var elements = header.elements || [];
     elements.forEach(function (element) {

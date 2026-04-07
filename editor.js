@@ -417,10 +417,10 @@ var MenuEditor = (function () {
       { key: 'background', type: 'color', label: 'Background' },
       { key: 'divider.color', type: 'color', label: 'Divider Color' },
       { key: 'divider.width', type: 'number', label: 'Divider Width (px)' },
-      { group: 'Column Flex (0 = shrink, 1+ = expand)', fields: [
-        { key: 'columns.left.flex', type: 'number', label: 'Left', step: 1 },
-        { key: 'columns.center.flex', type: 'number', label: 'Center', step: 1 },
-        { key: 'columns.right.flex', type: 'number', label: 'Right', step: 1 }
+      { group: 'Column Sizing', fields: [
+        { key: 'columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left' },
+        { key: 'columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center' },
+        { key: 'columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right' }
       ]}
     ],
     header_text: [

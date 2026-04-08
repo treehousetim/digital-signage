@@ -74,7 +74,7 @@ The design system has six top-level concepts. All are optional except `areas`.
 
 ### 1. Design vars
 
-Vars are named design tokens you can reference anywhere with `$name`.
+Vars are named design values you can reference anywhere with `$name`.
 
 | Type | Built-in names | Use |
 |---|---|---|
@@ -332,6 +332,8 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `coffee.json` | Coffee shop with hot/cold drinks | Theme import, item variations |
 | `cafe.json` | Breakfast cafe with multi-column layout | Container columns, palette override |
 | `bakery.json` | Portrait bakery menu | Light theme + custom palette overrides |
+| `indian.json` | Indian restaurant | Rupee currency, custom palette, fonts |
+| `pub.json` | English pub | Pound currency, dark wood palette, blackletter header |
 | `surf-shop.json` | Lessons + retail | Cool theme, custom $sun var |
 | `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |
 | `themed.json` | Wine bar | Custom vars, font extension, full reference system |

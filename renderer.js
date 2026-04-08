@@ -143,6 +143,7 @@ var MenuRenderer = (function () {
     },
     pricing: {
       symbol: '',
+      symbol_position: 'before',
       format: 'full'
     },
     header: {
@@ -202,6 +203,8 @@ var MenuRenderer = (function () {
       spacing:   deepMerge(DEFAULT_VARS.spacing,    vars.spacing || {}),
       theme: theme,
       currencySymbol: (theme.pricing && theme.pricing.symbol != null) ? theme.pricing.symbol : '',
+      currencyPosition: (theme.pricing && theme.pricing.symbol_position) || 'before',
+      currencySpace: !!(theme.pricing && theme.pricing.symbol_space),
       priceFormat: (theme.pricing && theme.pricing.format) || 'full'
     };
   }
@@ -327,6 +330,8 @@ var MenuRenderer = (function () {
     if (value == null || value === '') return '';
     var str = String(value).trim();
     var symbol = (ctx && ctx.currencySymbol != null) ? ctx.currencySymbol : '';
+    var position = (ctx && ctx.currencyPosition) || 'before';
+    var space = (ctx && ctx.currencySpace && symbol) ? ' ' : '';
     var format = (ctx && ctx.priceFormat) || 'full';
     if (str.charAt(0) === '$') str = str.slice(1).trim();
     var num = parseFloat(str);
@@ -337,7 +342,7 @@ var MenuRenderer = (function () {
     } else {
       formatted = num.toFixed(2);
     }
-    return symbol + formatted;
+    return position === 'after' ? formatted + space + symbol : symbol + space + formatted;
   }
 
   // ── Auto-ID Generation ─────────────────────────────────────────────────
@@ -598,6 +603,41 @@ var MenuRenderer = (function () {
     row.appendChild(nameEl);
 
     if (hasPrice) {
+      // Optional leader between name and price
+      var pl = themeItems.price_line;
+      if (pl && pl.style && pl.style !== 'none') {
+        var leader = el('span', 'ds-item__leader');
+        leader.style.flex = '1 1 auto';
+        leader.style.alignSelf = 'center';
+        var color = resolveColor(pl.color || '$muted', ctx);
+        var thickness = (pl.thickness != null ? pl.thickness : 1);
+        var segDefault = pl.style === 'dots' ? 2 : 6;
+        var segVal = pl.segment_size != null ? pl.segment_size : segDefault;
+        var leaderH = pl.style === 'dots' ? Math.max(thickness, segVal) : thickness;
+        leader.style.height = leaderH + 'px';
+        leader.style.marginLeft = toHorizontalPx(pl.padding_left != null ? pl.padding_left : '$xs', vpW, ctx) + 'px';
+        leader.style.marginRight = toHorizontalPx(pl.padding_right != null ? pl.padding_right : '$xs', vpW, ctx) + 'px';
+        if (pl.style === 'solid') {
+          leader.style.background = color;
+        } else {
+          var seg = segVal;
+          var gap = pl.gap_size != null ? pl.gap_size : 4;
+          var period = seg + gap;
+          if (pl.style === 'dots') {
+            // Radial gradient circle — bg tile is seg×seg so circle is round
+            leader.style.backgroundImage = 'radial-gradient(circle at center, ' + color + ' ' + (seg/2) + 'px, transparent ' + ((seg/2) + 0.5) + 'px)';
+            leader.style.backgroundSize = period + 'px ' + seg + 'px';
+            leader.style.backgroundRepeat = 'space no-repeat';
+            leader.style.backgroundPosition = 'left center';
+          } else { // dashes
+            leader.style.backgroundImage = 'linear-gradient(to right, ' + color + ' 0 ' + seg + 'px, transparent ' + seg + 'px ' + period + 'px)';
+            leader.style.backgroundSize = period + 'px ' + thickness + 'px';
+            leader.style.backgroundRepeat = 'space no-repeat';
+            leader.style.backgroundPosition = 'left center';
+          }
+        }
+        row.appendChild(leader);
+      }
       var priceEl = el('span', 'ds-item__price');
       priceEl.textContent = formatPrice(item.price, ctx);
       applyFont(priceEl, priceFont, baseFontSize, ctx);
@@ -1103,6 +1143,7 @@ var MenuRenderer = (function () {
     watch: watch,
     validate: validate,
     formatPrice: formatPrice,
+    autoAssignIds: autoAssignIds,
     /** Fetch a single JSON file. Returns Promise<data>. */
     import: importUrl,
     /** Recursively resolve all `uses` references in data. Returns Promise<flatData>. */

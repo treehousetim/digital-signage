@@ -100,6 +100,23 @@
 .me-panel--preview {
   flex: 1;
   border-right: none;
+  min-width: 200px;
+}
+
+.me-resizer {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  flex-shrink: 0;
+}
+.me-resizer:hover, .me-resizer:active { background: #0066cc; }
+
+.me-drag-overlay {
+  position: fixed;
+  inset: 0;
+  cursor: col-resize;
+  z-index: 99999;
+  background: transparent;
 }
 
 .me-panel__header {
@@ -187,14 +204,25 @@
   letter-spacing: 0.5px;
 }
 
+.me-tree-node__header { position: relative; }
+
 .me-tree-actions {
   display: none;
   gap: 2px;
-  margin-left: auto;
-  flex-shrink: 0;
+  position: absolute;
+  right: 4px;
+  bottom: 100%;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 3px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-.me-tree-node__header:hover .me-tree-actions {
+.me-tree-node__header:hover .me-tree-actions,
+.me-tree-actions:hover,
+.me-tree-actions--show {
   display: flex;
 }
 

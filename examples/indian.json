@@ -1,0 +1,79 @@
+{
+  "uses": "themes/warm.json",
+  "vars": {
+    "palette": {
+      "background": "#1a0f08",
+      "surface": "#2a1810",
+      "text": "#f5e6d3",
+      "muted": "#c9a574",
+      "accent": "#e8a33d",
+      "divider": "#5a3a20"
+    }
+  },
+  "theme": {
+    "layout": {
+      "columns": 2
+    },
+    "pricing": {
+      "symbol": "₹",
+      "symbol_position": "before",
+      "format": "fewest"
+    },
+    "fonts": {
+      "header": { "family": "Cinzel", "size": "$hero" },
+      "area_title": { "family": "Cinzel", "size": "$lg" }
+    }
+  },
+  "header": {
+    "elements": [
+      { "type": "text", "text": "Saffron Kitchen" },
+      { "type": "text", "text": "Authentic Indian Cuisine", "font": "description" }
+    ]
+  },
+  "areas": [
+    {
+      "title": "Starters",
+      "items": [
+        { "name": "Samosa", "description": "Crispy pastry, spiced potato & peas", "price": "180" },
+        { "name": "Paneer Tikka", "description": "Marinated cottage cheese, charred", "price": "320" },
+        { "name": "Chicken 65", "description": "Spicy fried chicken, curry leaves", "price": "380" },
+        { "name": "Onion Bhaji", "description": "Crispy onion fritters", "price": "160" }
+      ]
+    },
+    {
+      "title": "Curries",
+      "items": [
+        { "name": "Butter Chicken", "description": "Tomato cream, fenugreek", "price": "480" },
+        { "name": "Lamb Rogan Josh", "description": "Kashmiri chilies, yogurt", "price": "560" },
+        { "name": "Palak Paneer", "description": "Spinach, cottage cheese", "price": "380" },
+        { "name": "Chana Masala", "description": "Chickpeas, ginger, tomato", "price": "320" },
+        { "name": "Dal Makhani", "description": "Slow-cooked black lentils, butter", "price": "340" }
+      ]
+    },
+    {
+      "title": "Tandoor",
+      "items": [
+        { "name": "Tandoori Chicken", "description": "Half / Full", "variations": [
+          { "name": "Half", "price": "420" },
+          { "name": "Full", "price": "780" }
+        ]},
+        { "name": "Seekh Kebab", "description": "Minced lamb skewers", "price": "440" },
+        { "name": "Tandoori Prawns", "description": "Yogurt, garam masala", "price": "620" }
+      ]
+    },
+    {
+      "title": "Breads & Rice",
+      "items": [
+        { "name": "Garlic Naan", "price": "80" },
+        { "name": "Butter Naan", "price": "70" },
+        { "name": "Roti", "price": "50" },
+        { "name": "Jeera Rice", "price": "180" },
+        { "name": "Hyderabadi Biryani", "description": "Saffron, fried onions", "variations": [
+          { "name": "Veg", "price": "320" },
+          { "name": "Chicken", "price": "420" },
+          { "name": "Lamb", "price": "520" }
+        ]}
+      ]
+    }
+  ]
+}

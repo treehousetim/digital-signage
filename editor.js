@@ -174,7 +174,7 @@ var MenuEditor = (function () {
     var data = deepClone(initialData || BLANK_TEMPLATE);
     var idCounters = scanMaxIds(data);
     ensureVariationIds(data, idCounters);
-    var selectedPath = 'layout';
+    var selectedPath = 'theme';
     var undoStack = [];
     var redoStack = [];
     var listeners = {};
@@ -231,6 +231,9 @@ var MenuEditor = (function () {
           snapshot();
         }
         data = deepClone(newData);
+        if (typeof MenuRenderer !== 'undefined' && MenuRenderer.autoAssignIds) {
+          MenuRenderer.autoAssignIds(data);
+        }
         idCounters = scanMaxIds(data);
         ensureVariationIds(data, idCounters);
         emit('change');
@@ -298,7 +301,7 @@ var MenuEditor = (function () {
           delete parentObj[idx];
         }
         if (selectedPath === path || selectedPath.indexOf(path + '.') === 0 || selectedPath.indexOf(path + '[') === 0) {
-          selectedPath = parentPath(path) || 'layout';
+          selectedPath = parentPath(path) || 'theme';
           emit('select');
         }
         emit('change');
@@ -404,15 +407,15 @@ var MenuEditor = (function () {
     layout: [
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (% or $token)' },
-      { key: 'row_gutter', type: 'text', label: 'Area Gap (% or $token)' },
+      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (% or $var)' },
+      { key: 'row_gutter', type: 'text', label: 'Area Gap (% or $var)' },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
-        { key: 'container.gutter', type: 'text', label: 'Gutter (% or $token)' }
+        { key: 'container.gutter', type: 'text', label: 'Gutter (% or $var)' }
       ]}
     ],
     vars: [
-      // Vars are key/value tables of design tokens
+      // Vars are key/value tables of design vars
       { key: 'palette', type: 'vars_palette', label: 'Palette (colors)' },
       { key: 'spacing', type: 'vars_map', label: 'Spacing' },
       { key: 'type_scale', type: 'vars_map', label: 'Type scale' }
@@ -422,9 +425,9 @@ var MenuEditor = (function () {
         { key: 'layout.resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
         { key: 'layout.orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
         { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
-        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter (% or $token)' },
+        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter (% or $var)' },
         { key: 'layout.columns', type: 'select', options: ['1', '2', '3', '4', '5', '6'], label: 'Columns' },
-        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter (% or $token)' }
+        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter (% or $var)' }
       ]},
       { group: 'Colors', fields: [
         { key: 'colors.background', type: 'color', label: 'Background' },
@@ -444,7 +447,7 @@ var MenuEditor = (function () {
         { key: 'areas.padding', type: 'padding', label: 'Padding (%)' },
         { key: 'areas.background', type: 'color', label: 'Background' },
         { key: 'areas.column_count', type: 'number', label: 'Item Columns' },
-        { key: 'areas.gutter', type: 'text', label: 'Item Gutter (% or $token)' },
+        { key: 'areas.gutter', type: 'text', label: 'Item Gutter (% or $var)' },
         { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
         { key: 'areas.price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
         { key: 'areas.title_font', type: 'font_role', label: 'Title Font Role' }
@@ -457,12 +460,23 @@ var MenuEditor = (function () {
         { key: 'items.description_font', type: 'font_role', label: 'Description Font Role' },
         { key: 'items.variation_font', type: 'font_role', label: 'Variation Font Role' }
       ]},
+      { group: 'Price Line', defaultCollapsed: true, fields: [
+        { key: 'items.price_line.style', type: 'select', options: ['', 'none', 'dots', 'dashes', 'solid'], label: 'Style' },
+        { key: 'items.price_line.color', type: 'color', label: 'Color' },
+        { key: 'items.price_line.thickness', type: 'number', label: 'Thickness (px)', step: 1 },
+        { key: 'items.price_line.segment_size', type: 'number', label: 'Dot/Dash Size (px)', step: 1 },
+        { key: 'items.price_line.gap_size', type: 'number', label: 'Gap Between (px)', step: 1 },
+        { key: 'items.price_line.padding_left', type: 'text', label: 'Left Padding (% or $var)' },
+        { key: 'items.price_line.padding_right', type: 'text', label: 'Right Padding (% or $var)' }
+      ]},
       { group: 'Pricing', defaultCollapsed: true, fields: [
         { key: 'pricing.symbol', type: 'text', label: 'Currency Symbol' },
+        { key: 'pricing.symbol_position', type: 'select', options: ['before', 'after'], label: 'Symbol Position' },
+        { key: 'pricing.symbol_space', type: 'checkbox', label: 'Add Symbol Space' },
         { key: 'pricing.format', type: 'select', options: ['full', 'fewest'], label: 'Price Format' }
       ]},
       { group: 'Header', defaultCollapsed: true, fields: [
-        { key: 'header.height', type: 'text', label: 'Height (% or $token)' },
+        { key: 'header.height', type: 'text', label: 'Height (% or $var)' },
         { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
         { key: 'header.background', type: 'color', label: 'Background' },
         { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
@@ -491,7 +505,7 @@ var MenuEditor = (function () {
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
       { key: 'columns', type: 'number', label: 'Sub-Area Columns' },
-      { key: 'gutter', type: 'text', label: 'Gutter (% or $token)' },
+      { key: 'gutter', type: 'text', label: 'Gutter (% or $var)' },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
       { key: 'padding', type: 'padding', label: 'Padding (%)' },
@@ -598,7 +612,11 @@ var MenuEditor = (function () {
       var cb = el('input', 'me-field__checkbox', { type: 'checkbox' });
       cb.checked = (value != null) ? !!value : !!fieldDef.defaultChecked;
       cb.addEventListener('change', function () {
-        store.update(fullPath, cb.checked || undefined);
+        // Store explicit false for unchecked when default is true; otherwise undefined
+        var v;
+        if (cb.checked) v = true;
+        else v = fieldDef.defaultChecked ? false : undefined;
+        store.update(fullPath, v);
       });
       var cbLabel = el('span', 'me-field__cb-label');
       cbLabel.textContent = fieldDef.label;
@@ -992,8 +1010,27 @@ var MenuEditor = (function () {
       header.appendChild(icon);
       header.appendChild(label);
 
-      // Action buttons on hover
+      // Action buttons on hover (with delayed hide)
       var actions = el('span', 'me-tree-actions');
+      var hideTimer;
+      function showActions() {
+        clearTimeout(hideTimer);
+        // Hide any other open popover immediately
+        document.querySelectorAll('.me-tree-actions--show').forEach(function (a) {
+          if (a !== actions) a.classList.remove('me-tree-actions--show');
+        });
+        actions.classList.add('me-tree-actions--show');
+      }
+      function scheduleHide() {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function () {
+          actions.classList.remove('me-tree-actions--show');
+        }, 600);
+      }
+      header.addEventListener('mouseenter', showActions);
+      header.addEventListener('mouseleave', scheduleHide);
+      actions.addEventListener('mouseenter', showActions);
+      actions.addEventListener('mouseleave', scheduleHide);
 
       if (type === 'area') {
         var addItem = el('button', 'me-tree-btn', { title: 'Add Item' });
@@ -1495,6 +1532,7 @@ var MenuEditor = (function () {
 
     // Zoom state
     var zoomLevel = 0; // 0 = fit, 1-5 = zoom levels
+    window.addEventListener('resize', function () { if (iframe) applyZoom(); });
     var ZOOM_SCALES = [0, 0.25, 0.5, 0.75, 1.0, 1.5]; // 0 = auto-fit
 
     // Zoom controls in tabs bar
@@ -2126,7 +2164,29 @@ var MenuEditor = (function () {
       if (userOnChange) userOnChange(data);
     };
 
+    // Auto-assign IDs to all entities so click-to-select works
+    if (initialData && typeof MenuRenderer !== 'undefined' && MenuRenderer.autoAssignIds) {
+      MenuRenderer.autoAssignIds(initialData);
+    }
+
     var store = createDataStore(initialData, wrappedOnChange);
+
+    // Re-run autoAssignIds on every change so newly added entities get IDs
+    if (typeof MenuRenderer !== 'undefined' && MenuRenderer.autoAssignIds) {
+      store.on('change', function () {
+        MenuRenderer.autoAssignIds(store.getData());
+      });
+    }
+
+    // Persist & restore selected path
+    var SEL_KEY = 'me-editor:selected';
+    try {
+      var savedSel = localStorage.getItem(SEL_KEY);
+      if (savedSel) store.select(savedSel);
+    } catch (e) {}
+    store.on('select', function () {
+      try { localStorage.setItem(SEL_KEY, store.getSelectedPath()); } catch (e) {}
+    });
 
     // Root
     var root = el('div', 'me-editor-root');
@@ -2297,6 +2357,8 @@ var MenuEditor = (function () {
       { value: 'examples/coffee.json', label: 'Coffee Shop' },
       { value: 'examples/cafe.json', label: 'Cafe' },
       { value: 'examples/bakery.json', label: 'Bakery' },
+      { value: 'examples/indian.json', label: 'Indian (Rupees)' },
+      { value: 'examples/pub.json', label: 'English Pub (Pounds)' },
       { value: 'examples/surf-shop.json', label: 'Surf Shop' },
       { value: 'examples/server-status.json', label: 'Server Status' },
       { value: 'examples/themed.json', label: 'Themed (uses + refs)' },
@@ -2341,8 +2403,44 @@ var MenuEditor = (function () {
     var prevContent = el('div', 'me-panel__content me-preview-panel-content');
     previewPanel.appendChild(prevContent);
 
+    // Restore saved panel widths
+    var PANEL_KEY = 'me-editor:panels';
+    var savedSizes = {};
+    try { savedSizes = JSON.parse(localStorage.getItem(PANEL_KEY) || '{}'); } catch (e) {}
+    if (savedSizes.tree) treePanel.style.width = savedSizes.tree + 'px';
+    if (savedSizes.inspector) inspectorPanel.style.width = savedSizes.inspector + 'px';
+
+    function makeResizer(targetPanel, key) {
+      var r = el('div', 'me-resizer');
+      r.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        var startX = e.clientX;
+        var startW = targetPanel.getBoundingClientRect().width;
+        // Overlay blocks iframe from capturing mouse events during drag
+        var overlay = el('div', 'me-drag-overlay');
+        document.body.appendChild(overlay);
+        function move(ev) {
+          var w = Math.max(140, startW + (ev.clientX - startX));
+          targetPanel.style.width = w + 'px';
+          window.dispatchEvent(new Event('resize'));
+        }
+        function up() {
+          document.removeEventListener('mousemove', move);
+          document.removeEventListener('mouseup', up);
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          savedSizes[key] = parseInt(targetPanel.style.width, 10);
+          try { localStorage.setItem(PANEL_KEY, JSON.stringify(savedSizes)); } catch (e) {}
+        }
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up);
+      });
+      return r;
+    }
+
     panels.appendChild(treePanel);
+    panels.appendChild(makeResizer(treePanel, 'tree'));
     panels.appendChild(inspectorPanel);
+    panels.appendChild(makeResizer(inspectorPanel, 'inspector'));
     panels.appendChild(previewPanel);
     root.appendChild(panels);
 
@@ -2382,9 +2480,22 @@ var MenuEditor = (function () {
 
       if (e.data.type === 'preview-select') {
         // Click-to-select: find the path for this ID and select it
-        var path = findPathById(e.data.id, store.getData().areas, 'areas');
+        var d = store.getData();
+        var path = findPathById(e.data.id, d.areas, 'areas');
+        if (!path && d.header && d.header.elements) {
+          path = findPathById(e.data.id, d.header.elements, 'header.elements');
+        }
         if (path) {
+          // Ensure inspector panel is wide enough to be visible
+          var insp = root.querySelector('.me-panel--inspector');
+          if (insp && insp.getBoundingClientRect().width < 200) {
+            insp.style.width = '300px';
+            window.dispatchEvent(new Event('resize'));
+          }
           store.select(path);
+          // Scroll inspector to top so user sees the new selection
+          var inspContent = root.querySelector('.me-inspector-content');
+          if (inspContent) inspContent.scrollTop = 0;
         }
       }
 

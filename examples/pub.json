@@ -1,0 +1,87 @@
+{
+  "uses": "themes/dark.json",
+  "vars": {
+    "palette": {
+      "background": "#1c1410",
+      "surface": "#2a1d15",
+      "text": "#f0e6d2",
+      "muted": "#a8927a",
+      "accent": "#c9a14a",
+      "divider": "#4a3525"
+    }
+  },
+  "theme": {
+    "layout": {
+      "columns": 2
+    },
+    "pricing": {
+      "symbol": "£",
+      "symbol_position": "before"
+    },
+    "fonts": {
+      "header": { "family": "UnifrakturCook", "weight": "700", "size": "$hero" },
+      "area_title": { "family": "Cinzel", "size": "$lg" }
+    }
+  },
+  "header": {
+    "elements": [
+      { "type": "text", "text": "The Crown & Anchor" },
+      { "type": "text", "text": "Est. 1847 — Free House", "font": "description" }
+    ]
+  },
+  "areas": [
+    {
+      "title": "Draught Ales",
+      "items": [
+        { "name": "London Pride", "description": "Fuller's, 4.1%", "variations": [
+          { "name": "Half", "price": "3.20" },
+          { "name": "Pint", "price": "5.80" }
+        ]},
+        { "name": "Doom Bar", "description": "Sharp's, 4.0%", "variations": [
+          { "name": "Half", "price": "3.10" },
+          { "name": "Pint", "price": "5.60" }
+        ]},
+        { "name": "Old Speckled Hen", "description": "Morland, 5.2%", "variations": [
+          { "name": "Half", "price": "3.40" },
+          { "name": "Pint", "price": "6.20" }
+        ]},
+        { "name": "Guinness", "description": "Stout, 4.2%", "variations": [
+          { "name": "Half", "price": "3.30" },
+          { "name": "Pint", "price": "6.00" }
+        ]}
+      ]
+    },
+    {
+      "title": "Wines & Spirits",
+      "items": [
+        { "name": "House Red / White", "variations": [
+          { "name": "175ml", "price": "5.50" },
+          { "name": "250ml", "price": "7.50" },
+          { "name": "Bottle", "price": "22.00" }
+        ]},
+        { "name": "Single Malt Whisky", "description": "Ask at the bar", "price": "6.50" },
+        { "name": "Gin & Tonic", "description": "Hendrick's, Fever-Tree", "price": "8.50" },
+        { "name": "Pimm's No.1", "description": "Summer cup", "price": "7.50" }
+      ]
+    },
+    {
+      "title": "Sunday Roast",
+      "items": [
+        { "name": "Roast Beef", "description": "Yorkshire pudding, roast potatoes, gravy", "price": "18.50" },
+        { "name": "Roast Lamb", "description": "Mint sauce, seasonal veg", "price": "19.50" },
+        { "name": "Roast Chicken", "description": "Bread sauce, stuffing", "price": "16.50" },
+        { "name": "Nut Roast", "description": "Vegetarian, all the trimmings", "price": "15.50" }
+      ]
+    },
+    {
+      "title": "Pub Classics",
+      "items": [
+        { "name": "Fish & Chips", "description": "Beer-battered haddock, mushy peas", "price": "16.00" },
+        { "name": "Steak & Ale Pie", "description": "Suet pastry, mash, gravy", "price": "15.50" },
+        { "name": "Bangers & Mash", "description": "Cumberland sausages, onion gravy", "price": "13.50" },
+        { "name": "Ploughman's", "description": "Cheddar, pickle, crusty bread", "price": "12.00" },
+        { "name": "Scotch Egg", "description": "House-made, piccalilli", "price": "7.50" }
+      ]
+    }
+  ]
+}

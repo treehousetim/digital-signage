@@ -4,6 +4,9 @@
     "layout": {
       "orientation": "portrait",
       "columns": 1
+    },
+    "pricing": {
+      "symbol": "$"
     }
   },
   "header": {

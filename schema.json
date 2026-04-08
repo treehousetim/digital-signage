@@ -15,7 +15,7 @@
     },
     "vars": {
       "type": "object",
-      "description": "Design vars (named tokens). Reference any value with $name in spatial, color, or font size fields.",
+      "description": "Design vars (named values). Reference any value with $name in spatial, color, or font size fields.",
       "properties": {
         "palette": {
           "type": "object",
@@ -52,14 +52,14 @@
   },
   "$defs": {
     "spacing_value": {
-      "description": "A length value. Strings: '12' or '12px' (pixels), '5%' (percent of viewport), '$name' (token reference). Bare numbers are pixels.",
+      "description": "A length value. Strings: '12' or '12px' (pixels), '5%' (percent of viewport), '$name' (var reference). Bare numbers are pixels.",
       "oneOf": [
         { "type": "number" },
         { "type": "string" }
       ]
     },
     "padding": {
-      "description": "Padding shorthand. A number/token applies uniformly. An object sets each side independently.",
+      "description": "Padding shorthand. A number/var applies uniformly. An object sets each side independently.",
       "oneOf": [
         { "$ref": "#/$defs/spacing_value" },
         {
@@ -165,13 +165,28 @@
             "price_font":       { "$ref": "#/$defs/font" },
             "description_font": { "$ref": "#/$defs/font" },
             "variation_font":   { "$ref": "#/$defs/font" },
-            "align":            { "type": "string", "enum": ["left", "center", "right"], "default": "left" }
+            "align":            { "type": "string", "enum": ["left", "center", "right"], "default": "left" },
+            "price_line": {
+              "type": "object",
+              "description": "Optional leader between item name and price.",
+              "properties": {
+                "style":         { "type": "string", "enum": ["none", "dots", "dashes", "solid"], "default": "none" },
+                "color":         { "type": "string" },
+                "thickness":     { "type": "number", "default": 1 },
+                "segment_size":  { "type": "number", "description": "Dot diameter or dash length (px)." },
+                "gap_size":      { "type": "number", "description": "Space between dots/dashes (px)." },
+                "padding_left":  { "$ref": "#/$defs/spacing_value" },
+                "padding_right": { "$ref": "#/$defs/spacing_value" }
+              }
+            }
           }
         },
         "pricing": {
           "type": "object",
           "properties": {
-            "symbol": { "type": "string", "default": "", "description": "Currency symbol prepended to prices." },
+            "symbol": { "type": "string", "default": "", "description": "Currency symbol." },
+            "symbol_position": { "type": "string", "enum": ["before", "after"], "default": "before" },
+            "symbol_space": { "type": "boolean", "default": false, "description": "Insert a space between the symbol and the number." },
             "format": { "type": "string", "enum": ["full", "fewest"], "default": "full" }
           }
         },

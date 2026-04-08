@@ -31,6 +31,10 @@
         "family": "Playfair Display",
         "size": "$menu"
       }
+    },
+    "pricing": {
+      "symbol": "€",
+      "symbol_position": "after"
     }
   },
   "header": {

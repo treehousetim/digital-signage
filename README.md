@@ -359,6 +359,79 @@ Portrait orientation swaps width and height. Display mode renders at native size
 </script>
 ```
 
+## Headless PNG generation pipeline
+
+The renderer is plain HTML/CSS/JS, so any headless browser can produce a pixel-perfect PNG. Recommended pipeline:
+
+### 1. Minimal render page
+
+Create a tiny page that the headless browser will load. It should accept the menu JSON via query string, file, or stdin and render at native resolution (no preview scaling — `theme.layout.mode: "display"` is the default).
+
+```html
+<!-- render.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="theme.css">
+  <style>html,body{margin:0;padding:0;background:#000;overflow:hidden}</style>
+</head>
+<body>
+  <div id="display"></div>
+  <script src="renderer.js"></script>
+  <script>
+    var url = new URLSearchParams(location.search).get('menu');
+    MenuRenderer.loadFromUrl(url, document.getElementById('display'))
+      .then(function () { window.__rendered = true; });
+  </script>
+</body>
+</html>
+```
+
+### 2. Screenshot with Puppeteer (Node)
+
+```js
+const puppeteer = require('puppeteer');
+
+async function renderToPng(menuUrl, outPath) {
+  // Read the menu's resolution to size the viewport. The renderer uses
+  // the canvas dimensions defined by theme.layout.resolution + orientation.
+  const RES = { '1080': [1920,1080], '2k': [2560,1440], '4k': [3840,2160] };
+  const menu = await (await fetch(menuUrl)).json();
+  const layout = (menu.theme && menu.theme.layout) || {};
+  const [w, h] = RES[layout.resolution || '4k'];
+  const portrait = layout.orientation === 'portrait';
+  const vw = portrait ? h : w;
+  const vh = portrait ? w : h;
+
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+  const page = await browser.newPage();
+  await page.setViewport({ width: vw, height: vh, deviceScaleFactor: 1 });
+  await page.goto(`http://localhost:8080/render.html?menu=${encodeURIComponent(menuUrl)}`);
+
+  // Wait for the renderer to finish (Google fonts, uses imports, etc.)
+  await page.waitForFunction('window.__rendered === true', { timeout: 15000 });
+  await page.evaluate(() => document.fonts.ready);
+
+  // Capture only the canvas viewport
+  const el = await page.$('.ds-viewport');
+  await el.screenshot({ path: outPath, omitBackground: false });
+  await browser.close();
+}
+```
+
+### 3. Or use the in-browser PNG export
+
+If you're already running in a browser context, you can render directly to a `<canvas>` via `html2canvas` or similar — the editor uses this approach for its "Export PNG" button. See `editor.js` (search for `pngBtn`) for the pattern.
+
+### Key points
+
+- **Set `theme.layout.mode` to `"display"`** (the default) so the renderer uses native pixel dimensions. `"preview"` mode auto-scales to fit the window.
+- **Wait for fonts** — Google Fonts are injected at render time. `document.fonts.ready` resolves once they've loaded.
+- **Wait for `uses` resolution** — `loadFromUrl()` and `resolve()` are async. The `__rendered` flag pattern above handles this.
+- **Match viewport to canvas** — set the headless browser's viewport to the menu's resolution × orientation so nothing gets cropped or scaled.
+- **No network for fully-offline pipelines** — pre-bundle Google Fonts as local CSS, or strip `family` from theme fonts to use system fonts.
+
 ### Auto-refresh display
 
 For live signage, use watch mode to poll for updates:

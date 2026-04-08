@@ -79,8 +79,13 @@ Vars are named design values you can reference anywhere with `$name`.
 | Type | Built-in names | Use |
 |---|---|---|
 | **Palette** (colors) | `background`, `surface`, `text`, `muted`, `accent`, `divider` | `"color": "$accent"` |
-| **Spacing** (% of viewport) | `none`, `xs` (.25), `sm` (.5), `md` (1), `lg` (2), `xl` (3), `xxl` (5) | `"padding": "$md"` |
+| **Spacing** | `none` (0%), `xs` (.25%), `sm` (.5%), `md` (1%), `lg` (2%), `xl` (3%), `xxl` (5%) | `"padding": "$md"` |
 | **Type scale** (em) | `xs` (.75), `sm` (1), `base` (1.375), `md` (1.75), `lg` (2.5), `xl` (3.5), `hero` (5) | `"size": "$lg"` |
+
+Spacing values use these units:
+- `"5%"` — percent of viewport (width for horizontal, height for vertical)
+- `"12"` / `"12px"` / `12` — pixels
+- `"$name"` — var reference
 
 Override or add vars at the top level:
 
@@ -88,7 +93,7 @@ Override or add vars at the top level:
 {
   "vars": {
     "palette": { "accent": "#ff8c42" },
-    "spacing": { "tight": 0.5, "loose": 4 },
+    "spacing": { "tight": "0.5%", "loose": "4%" },
     "type_scale": { "menu": 2 }
   }
 }
@@ -123,7 +128,15 @@ The theme is a *semantic visual contract* — semantic groups of properties that
 
 ```js
 theme: {
-  colors:  { background, surface, text, muted, accent, divider },
+  layout: {
+    resolution,        // "1080" | "2k" | "4k"
+    orientation,       // "landscape" | "portrait"
+    viewport_padding,  // padding around content
+    columns,           // 1–6 top-level columns
+    column_gutter,     // horizontal gap between columns
+    row_gutter         // vertical gap between stacked areas
+  },
+  colors: { background, surface, text, muted, accent, divider },
   fonts: {
     header:      { ... },   // header text elements
     area_title:  { ... },   // area titles
@@ -138,10 +151,40 @@ theme: {
     title_font, column_count, gutter, item_align, price_align
   },
   items: {
-    padding, name_font, price_font, description_font, variation_font, align
+    padding, name_font, price_font, description_font, variation_font, align,
+    price_line: { style, color, thickness, segment_size, gap_size, padding_left, padding_right }
   },
-  pricing: { symbol, format },
+  pricing: { symbol, symbol_position, symbol_space, format },
   header:  { height, padding, background, divider, columns }
+}
+```
+
+### Currency
+
+```json
+"pricing": {
+  "symbol": "€",
+  "symbol_position": "after",   // "before" or "after"
+  "symbol_space": true,          // adds a space between number and symbol
+  "format": "full"               // "full" (12.50) or "fewest" (12.5)
+}
+```
+
+### Item price line (leader)
+
+Draw a leader between item name and price (vertically centered):
+
+```json
+"items": {
+  "price_line": {
+    "style": "dots",          // "none" | "dots" | "dashes" | "solid"
+    "color": "$muted",
+    "thickness": 2,            // px
+    "segment_size": 3,         // dot diameter or dash length (px)
+    "gap_size": 6,             // space between dots/dashes (px)
+    "padding_left": "$xs",
+    "padding_right": "$xs"
+  }
 }
 ```
 
@@ -157,7 +200,7 @@ Elements reference fonts by role name, not by full font definition:
 }
 ```
 
-This pulls from `theme.fonts.title`. Override one field with `extends`:
+This pulls from `theme.fonts.header`. Custom roles can be added by defining any new key in `theme.fonts` — the editor's font dropdowns build dynamically from whatever roles exist. Override one field with `extends`:
 
 ```json
 { "font": { "extends": "header", "color": "$accent" } }
@@ -260,23 +303,23 @@ editor.destroy();
 
 ### Editor features
 
-- **Three-panel layout**: structure tree, property inspector, live preview
-- **Tree**: expand/collapse, click to select, hover buttons for add/delete/duplicate, drag-and-drop reordering
-- **Inspector**: schema-driven form fields with grouped collapsible sections
-- **Style overrides** with "Inherited — click to override" cover that auto-hides when no override is set
-- **Live preview** in iframe, zoomable (25%–150%), with minimap viewport indicator
+- **Three-panel layout** with **resizable panes** (drag the dividers; widths persisted)
+- **Tree**: expand/collapse, click to select, action buttons float above the row with delayed hide, drag-and-drop reordering
+- **Inspector**: schema-driven form fields with grouped collapsible sections; group state and selected node persist in localStorage
+- **Dynamic font roles**: add custom roles in `theme.fonts` and they appear in every font dropdown automatically
+- **Style overrides** with "Inherited — click to override" cover; ✕ button on the group header reverts to inherited
+- **Live preview** in iframe, zoomable (25%–150%), with minimap viewport indicator; auto re-fits as panels resize
 - **JSON tab**: editable, syntax-highlighted, tree-synced (clicking a tree node scrolls to & highlights its line)
-- **Hover-to-highlight**: hovering a tree node highlights the corresponding element in the preview
-- **Click-to-select in preview**: click any element in the preview to select it in the tree
+- **Click-to-select in preview**: click any area, item, or header element to select and inspect it
 - **Drag handles** for resizing padding (Element mode) or layout (Layout mode)
 - **Toolbar**: New, Import, Export, Export PNG, Undo/Redo (Ctrl+Z), Grid overlay, Examples dropdown, Resize mode toggle
-- **localStorage auto-save**: editor state survives page reloads
+- **localStorage auto-save**: editor state, panel widths, group collapse state, and selected node all persist
 - **Cmd+A** in JSON view selects only the JSON content
 - **Arrow keys** navigate the tree
 
 ## Resolution & units
 
-Content is resolution-independent. Spatial values are percentages of the viewport (horizontal = % of width, vertical = % of height). Font sizes are em multipliers of a resolution-scaled base font size.
+Content is resolution-independent. Spatial values can be percentages of the viewport (`"5%"`), pixels (`12`, `"12"`, `"12px"`), or var references (`"$md"`). Font sizes are em multipliers of a resolution-scaled base font size.
 
 | Resolution | Canvas | Base font |
 |---|---|---|

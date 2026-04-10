@@ -51,8 +51,22 @@
     }
   },
   "$defs": {
+    "divider_config": {
+      "type": "object",
+      "properties": {
+        "color":  { "type": "string", "description": "CSS color or '$name' palette reference." },
+        "width":  { "type": "number", "default": 1 },
+        "style":  { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" },
+        "sides":   {
+          "type": "array",
+          "description": "Divider orientation: 'tb' draws top+bottom borders, 'lr' draws left+right borders. For standalone divider elements (items, variations) 'tb' is a horizontal line and 'lr' is a vertical line.",
+          "items": { "type": "string", "enum": ["tb", "lr"] }
+        },
+        "padding": { "$ref": "#/$defs/spacing_value", "description": "Padding applied on each active side (between content and divider line)." },
+      }
+    },
     "spacing_value": {
-      "description": "A length value. Strings: '12' or '12px' (pixels), '5%' (percent of viewport), '$name' (var reference). Bare numbers are pixels.",
+      "description": "A length value. Strings: '12' or '12px' (pixels), '1.5em', '0.5rem', '10pt', etc. (any CSS unit passed through), '5%' (percent of viewport), '$name' (var reference). Bare numbers are pixels.",
       "oneOf": [
         { "type": "number" },
         { "type": "string" }
@@ -128,10 +142,13 @@
         },
         "dividers": {
           "type": "object",
+          "description": "Divider lines for header, areas, items, and variations. Each type inherits from 'default'.",
           "properties": {
-            "color": { "type": "string" },
-            "width": { "type": "number", "default": 1 },
-            "style": { "type": "string", "enum": ["solid", "dashed", "dotted"], "default": "solid" }
+            "default":   { "$ref": "#/$defs/divider_config" },
+            "header":    { "$ref": "#/$defs/divider_config" },
+            "area":      { "$ref": "#/$defs/divider_config" },
+            "item":      { "$ref": "#/$defs/divider_config" },
+            "variation": { "$ref": "#/$defs/divider_config" }
           }
         },
         "areas": {
@@ -197,13 +214,6 @@
             "height":     { "$ref": "#/$defs/spacing_value" },
             "padding":    { "$ref": "#/$defs/padding" },
             "background": { "type": "string" },
-            "divider": {
-              "type": "object",
-              "properties": {
-                "color": { "type": "string" },
-                "width": { "type": "number", "default": 1 }
-              }
-            },
             "columns": {
               "type": "object",
               "description": "Per-column sizing. Empty columns auto-collapse.",

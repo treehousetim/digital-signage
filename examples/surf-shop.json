@@ -16,6 +16,10 @@
       "price": {
         "color": "$sun"
       }
+    },
+    "dividers": {
+      "item": { "sides": ["tb"] },
+      "variation": { "sides": ["tb"] }
     }
   },
   "header": {

@@ -47,6 +47,32 @@ var MenuEditor = (function () {
     return JSON.parse(JSON.stringify(obj));
   }
 
+  // Store pure numeric strings as numbers, unit strings as strings.
+  function coerceSpacing(v) {
+    var n = Number(v);
+    return isNaN(n) ? v : n;
+  }
+
+  // ArrowUp/Down on spacing text inputs: nudge the numeric component, preserve the unit suffix.
+  // Shift → ×10 step, Alt/Option → ×0.1 step, default → 1.
+  // No-op for var references ($name) or non-numeric values.
+  function spacingArrowKey(e, input, onUpdate) {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    var raw = input.value.trim();
+    if (!raw || raw.charAt(0) === '$') return;
+    var n = parseFloat(raw);
+    if (isNaN(n)) return;
+    e.preventDefault();
+    var suffix = raw.replace(/^-?\d+\.?\d*/, '');
+    var step = e.shiftKey ? 10 : (e.altKey ? 0.1 : 1);
+    var delta = e.key === 'ArrowUp' ? step : -step;
+    var newN = Math.round((n + delta) * 1000) / 1000;
+    if (newN < 0) newN = 0;
+    var formatted = String(newN) + suffix;
+    input.value = formatted;
+    onUpdate(coerceSpacing(formatted));
+  }
+
   function el(tag, className, attrs) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -407,11 +433,11 @@ var MenuEditor = (function () {
     layout: [
       { key: 'resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
       { key: 'orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding (% or $var)' },
-      { key: 'row_gutter', type: 'text', label: 'Area Gap (% or $var)' },
+      { key: 'viewport_padding', type: 'padding', label: 'Viewport Padding' },
+      { key: 'row_gutter', type: 'text', label: 'Area Gap', placeholder: '24px  1em  2%  $lg' },
       { group: 'Container', fields: [
         { key: 'container.columns', type: 'select', options: ['1', '2', '3'], label: 'Columns' },
-        { key: 'container.gutter', type: 'text', label: 'Gutter (% or $var)' }
+        { key: 'container.gutter', type: 'text', label: 'Gutter', placeholder: '24px  1em  2%  $lg' }
       ]}
     ],
     vars: [
@@ -424,10 +450,10 @@ var MenuEditor = (function () {
       { group: 'Layout', fields: [
         { key: 'layout.resolution', type: 'select', options: ['1080', '2k', '4k'], label: 'Resolution' },
         { key: 'layout.orientation', type: 'select', options: ['landscape', 'portrait'], label: 'Orientation' },
-        { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding (%)' },
-        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter (% or $var)' },
+        { key: 'layout.viewport_padding', type: 'padding', label: 'Viewport Padding' },
+        { key: 'layout.row_gutter', type: 'text', label: 'Row Gutter', placeholder: '24px  1em  2%  $lg' },
         { key: 'layout.columns', type: 'select', options: ['1', '2', '3', '4', '5', '6'], label: 'Columns' },
-        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter (% or $var)' }
+        { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter', placeholder: '24px  1em  2%  $lg' }
       ]},
       { group: 'Colors', fields: [
         { key: 'colors.background', type: 'color', label: 'Background' },
@@ -438,22 +464,52 @@ var MenuEditor = (function () {
         { key: 'colors.divider', type: 'color', label: 'Divider' }
       ]},
       { group: 'Fonts', defaultCollapsed: true, type: 'fonts_editor', key: 'fonts' },
-      { group: 'Dividers', defaultCollapsed: true, fields: [
-        { key: 'dividers.color', type: 'color', label: 'Color' },
-        { key: 'dividers.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' }
+      { group: 'Dividers: Default', defaultCollapsed: true, fields: [
+        { key: 'dividers.default.color', type: 'color', label: 'Color' },
+        { key: 'dividers.default.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.default.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+        { key: 'dividers.default.sides', type: 'sides', label: 'Sides' },
+        { key: 'dividers.default.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
+      ]},
+      { group: 'Dividers: Header', defaultCollapsed: true, fields: [
+        { key: 'dividers.header.color', type: 'color', label: 'Color' },
+        { key: 'dividers.header.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.header.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+        { key: 'dividers.header.sides', type: 'sides', label: 'Sides' },
+        { key: 'dividers.header.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
+      ]},
+      { group: 'Dividers: Area', defaultCollapsed: true, fields: [
+        { key: 'dividers.area.color', type: 'color', label: 'Color' },
+        { key: 'dividers.area.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.area.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+        { key: 'dividers.area.sides', type: 'sides', label: 'Sides' },
+        { key: 'dividers.area.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
+      ]},
+      { group: 'Dividers: Item', defaultCollapsed: true, fields: [
+        { key: 'dividers.item.color', type: 'color', label: 'Color' },
+        { key: 'dividers.item.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.item.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+        { key: 'dividers.item.sides', type: 'sides', label: 'Sides' },
+        { key: 'dividers.item.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
+      ]},
+      { group: 'Dividers: Variation', defaultCollapsed: true, fields: [
+        { key: 'dividers.variation.color', type: 'color', label: 'Color' },
+        { key: 'dividers.variation.width', type: 'number', label: 'Width (px)', step: 1 },
+        { key: 'dividers.variation.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+        { key: 'dividers.variation.sides', type: 'sides', label: 'Sides' },
+        { key: 'dividers.variation.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
       ]},
       { group: 'Areas (defaults)', defaultCollapsed: true, fields: [
-        { key: 'areas.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'areas.padding', type: 'padding', label: 'Padding' },
         { key: 'areas.background', type: 'color', label: 'Background' },
         { key: 'areas.column_count', type: 'number', label: 'Item Columns' },
-        { key: 'areas.gutter', type: 'text', label: 'Item Gutter (% or $var)' },
+        { key: 'areas.gutter', type: 'text', label: 'Item Gutter', placeholder: '24px  1em  2%  $lg' },
         { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
         { key: 'areas.price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
         { key: 'areas.title_font', type: 'font_role', label: 'Title Font Role' }
       ]},
       { group: 'Items (defaults)', defaultCollapsed: true, fields: [
-        { key: 'items.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'items.padding', type: 'padding', label: 'Padding' },
         { key: 'items.align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Align' },
         { key: 'items.name_font', type: 'font_role', label: 'Name Font Role' },
         { key: 'items.price_font', type: 'font_role', label: 'Price Font Role' },
@@ -466,8 +522,8 @@ var MenuEditor = (function () {
         { key: 'items.price_line.thickness', type: 'number', label: 'Thickness (px)', step: 1 },
         { key: 'items.price_line.segment_size', type: 'number', label: 'Dot/Dash Size (px)', step: 1 },
         { key: 'items.price_line.gap_size', type: 'number', label: 'Gap Between (px)', step: 1 },
-        { key: 'items.price_line.padding_left', type: 'text', label: 'Left Padding (% or $var)' },
-        { key: 'items.price_line.padding_right', type: 'text', label: 'Right Padding (% or $var)' }
+        { key: 'items.price_line.padding_left', type: 'text', label: 'Left Padding', placeholder: '8px  1em  2%  $xs' },
+        { key: 'items.price_line.padding_right', type: 'text', label: 'Right Padding', placeholder: '8px  1em  2%  $xs' }
       ]},
       { group: 'Pricing', defaultCollapsed: true, fields: [
         { key: 'pricing.symbol', type: 'text', label: 'Currency Symbol' },
@@ -476,11 +532,9 @@ var MenuEditor = (function () {
         { key: 'pricing.format', type: 'select', options: ['full', 'fewest'], label: 'Price Format' }
       ]},
       { group: 'Header', defaultCollapsed: true, fields: [
-        { key: 'header.height', type: 'text', label: 'Height (% or $var)' },
-        { key: 'header.padding', type: 'padding', label: 'Padding (%)' },
+        { key: 'header.height', type: 'text', label: 'Height', placeholder: '24px  1em  2%  $lg' },
+        { key: 'header.padding', type: 'padding', label: 'Padding' },
         { key: 'header.background', type: 'color', label: 'Background' },
-        { key: 'header.divider.color', type: 'color', label: 'Divider Color' },
-        { key: 'header.divider.width', type: 'number', label: 'Divider Width (px)' },
         { key: 'header.columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left Col' },
         { key: 'header.columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center Col' },
         { key: 'header.columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right Col' }
@@ -496,7 +550,7 @@ var MenuEditor = (function () {
       { key: 'id', type: 'text', label: 'ID (auto)' },
       { key: 'src', type: 'text', label: 'Image URL' },
       { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
-      { key: 'max_height', type: 'number', label: 'Max Height (%)', step: 0.25 }
+      { key: 'max_height', type: 'number', label: 'Max Height', step: 0.25 }
     ],
     area: [
       { key: 'id', type: 'text', label: 'ID (auto)' },
@@ -505,10 +559,10 @@ var MenuEditor = (function () {
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
       { key: 'columns', type: 'number', label: 'Sub-Area Columns' },
-      { key: 'gutter', type: 'text', label: 'Gutter (% or $var)' },
+      { key: 'gutter', type: 'text', label: 'Gutter', placeholder: '24px  1em  2%  $lg' },
       { key: 'item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.title_font', type: 'font', label: 'Title Font' },
         { key: 'style.background', type: 'color', label: 'Background' }
@@ -523,7 +577,7 @@ var MenuEditor = (function () {
       { key: 'hide_if_empty', type: 'checkbox', label: 'Hide If Empty' },
       { key: 'variations_inline', type: 'checkbox', label: 'Variations Inline' },
       { key: 'show_variation_prices', type: 'checkbox', label: 'Show Variation Prices', defaultChecked: true },
-      { key: 'padding', type: 'padding', label: 'Padding (%)' },
+      { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.name_font', type: 'font', label: 'Name Font' },
         { key: 'style.price_font', type: 'font', label: 'Price Font' }
@@ -549,12 +603,19 @@ var MenuEditor = (function () {
     if (fieldDef.type === 'text') {
       var input = el('input', 'me-field__input', { type: 'text' });
       input.value = value || '';
+      if (fieldDef.placeholder) input.placeholder = fieldDef.placeholder;
       var timer;
       input.addEventListener('input', function () {
         clearTimeout(timer);
         timer = setTimeout(function () {
           store.update(fullPath, input.value || undefined);
         }, 300);
+      });
+      input.addEventListener('keydown', function (e) {
+        spacingArrowKey(e, input, function (v) {
+          clearTimeout(timer);
+          store.update(fullPath, v != null ? v : undefined);
+        });
       });
       wrapper.appendChild(label);
       wrapper.appendChild(input);
@@ -677,14 +738,14 @@ var MenuEditor = (function () {
 
     } else if (fieldDef.type === 'padding') {
       var padVal = value;
-      var isUniform = padVal == null || typeof padVal === 'number';
+      var isUniform = padVal == null || typeof padVal !== 'object';
       var padWrap = el('div', 'me-padding-editor');
 
       var modeBtn = el('button', 'me-padding-editor__toggle');
       modeBtn.textContent = isUniform ? 'Per-side' : 'Uniform';
 
-      var uniformInput = el('input', 'me-field__input', { type: 'number', placeholder: '0' });
-      uniformInput.value = isUniform ? (padVal || '') : '';
+      var uniformInput = el('input', 'me-field__input', { type: 'text', placeholder: '8px  1em  2%  $xs' });
+      uniformInput.value = isUniform ? (padVal != null ? padVal : '') : '';
 
       var perSideWrap = el('div', 'me-padding-editor__sides');
       var sides = ['top', 'right', 'bottom', 'left'];
@@ -693,15 +754,25 @@ var MenuEditor = (function () {
         var sideGroup = el('div', 'me-padding-editor__side');
         var sLabel = el('span', 'me-padding-editor__side-label');
         sLabel.textContent = s.charAt(0).toUpperCase();
-        var sInput = el('input', 'me-field__input me-field__input--tiny', { type: 'number', placeholder: '0' });
-        sInput.value = (!isUniform && padVal && padVal[s]) ? padVal[s] : '';
+        var sInput = el('input', 'me-field__input me-field__input--tiny', { type: 'text', placeholder: '0' });
+        sInput.value = (!isUniform && padVal && padVal[s] != null) ? padVal[s] : '';
         sInput.addEventListener('input', function () {
           var obj = {};
           sides.forEach(function (side) {
-            var v = sideInputs[side].value;
-            if (v !== '') obj[side] = parseFloat(v);
+            var v = sideInputs[side].value.trim();
+            if (v !== '') obj[side] = coerceSpacing(v);
           });
           store.update(fullPath, Object.keys(obj).length ? obj : undefined);
+        });
+        sInput.addEventListener('keydown', function (e) {
+          spacingArrowKey(e, sInput, function () {
+            var obj = {};
+            sides.forEach(function (side) {
+              var v = sideInputs[side].value.trim();
+              if (v !== '') obj[side] = coerceSpacing(v);
+            });
+            store.update(fullPath, Object.keys(obj).length ? obj : undefined);
+          });
         });
         sideInputs[s] = sInput;
         sideGroup.appendChild(sLabel);
@@ -710,8 +781,13 @@ var MenuEditor = (function () {
       });
 
       uniformInput.addEventListener('input', function () {
-        var v = uniformInput.value === '' ? undefined : parseFloat(uniformInput.value);
-        store.update(fullPath, v);
+        var v = uniformInput.value.trim();
+        store.update(fullPath, v === '' ? undefined : coerceSpacing(v));
+      });
+      uniformInput.addEventListener('keydown', function (e) {
+        spacingArrowKey(e, uniformInput, function (v) {
+          store.update(fullPath, v != null ? v : undefined);
+        });
       });
 
       modeBtn.addEventListener('click', function () {
@@ -720,7 +796,8 @@ var MenuEditor = (function () {
         uniformInput.style.display = isUniform ? '' : 'none';
         perSideWrap.style.display = isUniform ? 'none' : '';
         if (isUniform) {
-          store.update(fullPath, uniformInput.value ? parseFloat(uniformInput.value) : undefined);
+          var v = uniformInput.value.trim();
+          store.update(fullPath, v ? coerceSpacing(v) : undefined);
         }
       });
 
@@ -911,6 +988,29 @@ var MenuEditor = (function () {
 
       wrapper.appendChild(label);
       wrapper.appendChild(tableWrap);
+
+    } else if (fieldDef.type === 'sides') {
+      var sidesVal = Array.isArray(value) ? value : [];
+      var sidesRow = el('div', 'me-field__sides');
+      [['tb', 'T/B'], ['lr', 'L/R']].forEach(function (pair) {
+        var sKey = pair[0], sLabel = pair[1];
+        var sCb = el('input', '', { type: 'checkbox' });
+        sCb.checked = sidesVal.indexOf(sKey) !== -1;
+        var sLbl = el('label', 'me-field__side-label');
+        sLbl.appendChild(sCb);
+        var sTxt = el('span');
+        sTxt.textContent = sLabel;
+        sLbl.appendChild(sTxt);
+        sCb.addEventListener('change', function () {
+          var cur = Array.isArray(getAtPath(store.getData(), fullPath)) ? getAtPath(store.getData(), fullPath).slice() : [];
+          if (sCb.checked) { if (cur.indexOf(sKey) === -1) cur.push(sKey); }
+          else { cur = cur.filter(function (s) { return s !== sKey; }); }
+          store.update(fullPath, cur.length ? cur : undefined);
+        });
+        sidesRow.appendChild(sLbl);
+      });
+      wrapper.appendChild(label);
+      wrapper.appendChild(sidesRow);
     }
 
     container.appendChild(wrapper);

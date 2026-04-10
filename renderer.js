@@ -119,9 +119,11 @@ var MenuRenderer = (function () {
       description: { family: 'Lato',       weight: '400', color: '$muted',  size: '$sm' }
     },
     dividers: {
-      color: '$divider',
-      width: 1,
-      style: 'solid'
+      default:   { color: '$divider', width: 1, style: 'solid' },
+      header:    { sides: ['tb'] },
+      area:      { sides: [] },
+      item:      { sides: ['tb'] },
+      variation: { sides: [] }
     },
     areas: {
       padding: '0%',
@@ -227,9 +229,90 @@ var MenuRenderer = (function () {
     return ctx.typeScale[key] != null ? ctx.typeScale[key] : val;
   }
 
+  // ── Divider Utilities ─────────────────────────────────────────────────
+
+  function resolveDividerCfg(type, ctx) {
+    var d = ctx.theme.dividers || {};
+    var def = d.default || {};
+    var specific = d[type] || {};
+    return {
+      color:   specific.color   != null ? specific.color   : (def.color   != null ? def.color   : '$divider'),
+      width:   specific.width   != null ? specific.width   : (def.width   != null ? def.width   : 1),
+      style:   specific.style   || def.style   || 'solid',
+      sides:   specific.sides   !== undefined  ? specific.sides  : (def.sides  !== undefined ? def.sides  : null),
+      padding: specific.padding != null ? specific.padding : (def.padding != null ? def.padding : null)
+    };
+  }
+
+  // Used for area and header borders — applied directly to the element.
+  // sides values: "tb" = top+bottom borders, "lr" = left+right borders
+  function applyDivider(elem, type, defaultSides, vpW, vpH, ctx) {
+    var cfg = resolveDividerCfg(type, ctx);
+    var sides = cfg.sides != null ? cfg.sides : defaultSides;
+    if (!sides || !sides.length || cfg.width === 0) return;
+    var color = resolveColor(cfg.color, ctx) || 'transparent';
+    var border = cfg.width + 'px ' + cfg.style + ' ' + color;
+    sides.forEach(function (side) {
+      var props = side === 'tb' ? ['borderTop', 'borderBottom']
+                : side === 'lr' ? ['borderLeft', 'borderRight']
+                : [];
+      var padProps = side === 'tb' ? ['paddingTop', 'paddingBottom']
+                  : side === 'lr' ? ['paddingLeft', 'paddingRight']
+                  : [];
+      props.forEach(function (p) { elem.style[p] = border; });
+      if (cfg.padding != null) {
+        var px = (side === 'tb')
+          ? toVerticalPx(cfg.padding, vpH, ctx)
+          : toHorizontalPx(cfg.padding, vpW, ctx);
+        padProps.forEach(function (p) { elem.style[p] = toCSSPx(px); });
+      }
+    });
+  }
+
+  // Used for item and variation dividers — returns a standalone element placed
+  // between siblings. Padding on active sides becomes margin on the element.
+  // Standalone divider element placed between siblings.
+  // sides values: "tb" = horizontal line (border-top, zero height, full width)
+  //               "lr" = vertical line   (border-left, zero width, stretched height)
+  function buildDividerEl(type, className, vpW, vpH, ctx) {
+    var cfg = resolveDividerCfg(type, ctx);
+    var sides = cfg.sides != null ? cfg.sides : [];
+    if (!sides.length || cfg.width === 0) return null;
+    var divEl = el('div', className);
+    var color = resolveColor(cfg.color, ctx) || 'transparent';
+    var border = cfg.width + 'px ' + cfg.style + ' ' + color;
+    sides.forEach(function (side) {
+      if (side === 'tb') {
+        divEl.style.borderTop = border;
+        divEl.style.height = '0';
+        if (cfg.padding != null) {
+          var px = toVerticalPx(cfg.padding, vpH, ctx);
+          divEl.style.marginTop = toCSSPx(px);
+          divEl.style.marginBottom = toCSSPx(px);
+        }
+      } else if (side === 'lr') {
+        divEl.style.borderLeft = border;
+        divEl.style.width = '0';
+        if (cfg.padding != null) {
+          var px = toHorizontalPx(cfg.padding, vpW, ctx);
+          divEl.style.marginLeft = toCSSPx(px);
+          divEl.style.marginRight = toCSSPx(px);
+        }
+      }
+    });
+    return divEl;
+  }
+
   // ── Unit Resolution Utilities ──────────────────────────────────────────
 
-  // No unit = px. Use "%" suffix for viewport percent. Numbers are px.
+  // Converts a resolved spacing value to a CSS string.
+  // Numbers become 'Npx'. CSS unit strings (em, rem, pt, etc.) pass through.
+  function toCSSPx(v) {
+    return typeof v === 'string' ? v : v + 'px';
+  }
+
+  // Resolves a spacing value to a number (px) or a CSS unit string.
+  // "%" → viewport-relative pixels. CSS unit strings pass through as-is.
   function toHorizontalPx(val, vpW, ctx) {
     if (ctx) val = resolveSpace(val, ctx);
     if (val == null) return 0;
@@ -237,6 +320,7 @@ var MenuRenderer = (function () {
       var n = parseFloat(val);
       if (isNaN(n)) return 0;
       if (val.indexOf('%') !== -1) return n / 100 * vpW;
+      if (/[a-z]/i.test(val.trim())) return val.trim(); // CSS unit — pass through
       return n;
     }
     return val;
@@ -249,6 +333,7 @@ var MenuRenderer = (function () {
       var n = parseFloat(val);
       if (isNaN(n)) return 0;
       if (val.indexOf('%') !== -1) return n / 100 * vpH;
+      if (/[a-z]/i.test(val.trim())) return val.trim(); // CSS unit — pass through
       return n;
     }
     return val;
@@ -285,7 +370,7 @@ var MenuRenderer = (function () {
   }
 
   function paddingCSS(p) {
-    return p.top + 'px ' + p.right + 'px ' + p.bottom + 'px ' + p.left + 'px';
+    return toCSSPx(p.top) + ' ' + toCSSPx(p.right) + ' ' + toCSSPx(p.bottom) + ' ' + toCSSPx(p.left);
   }
 
   // ── Font Resolution ────────────────────────────────────────────────────
@@ -334,6 +419,7 @@ var MenuRenderer = (function () {
     var space = (ctx && ctx.currencySpace && symbol) ? ' ' : '';
     var format = (ctx && ctx.priceFormat) || 'full';
     if (str.charAt(0) === '$') str = str.slice(1).trim();
+    if (/[a-zA-Z]/.test(str)) return str;
     var num = parseFloat(str);
     if (isNaN(num)) return str;
     var formatted;
@@ -503,7 +589,7 @@ var MenuRenderer = (function () {
     var img = el('img', 'ds-header-logo', { src: element.src, alt: element.alt || 'Logo' });
     if (element.id) img.setAttribute('data-ds-id', element.id);
     var maxH = element.max_height != null ? element.max_height : 4;
-    img.style.maxHeight = toVerticalPx(maxH, vpH, ctx) + 'px';
+    img.style.maxHeight = toCSSPx(toVerticalPx(maxH, vpH, ctx));
     return img;
   }
 
@@ -515,21 +601,17 @@ var MenuRenderer = (function () {
     var height  = themeHeader.height;
     var padding = themeHeader.padding;
     var bg      = themeHeader.background;
-    var divider = themeHeader.divider;
-    var cols    = themeHeader.columns || {};
+    var cols = themeHeader.columns || {};
 
     if (height != null) {
-      region.style.minHeight = toVerticalPx(height, vpH, ctx) + 'px';
+      region.style.minHeight = toCSSPx(toVerticalPx(height, vpH, ctx));
     }
     if (padding != null) {
       var pad = resolvePaddingPx(normalizePadding(padding), vpW, vpH, ctx);
       region.style.padding = paddingCSS(pad);
     }
     if (bg) region.style.background = resolveColor(bg, ctx);
-    if (divider && divider.color) {
-      var w = (divider.width != null) ? divider.width : 1;
-      region.style.borderBottom = w + 'px solid ' + resolveColor(divider.color, ctx);
-    }
+    applyDivider(region, 'header', ['bottom'], vpW, vpH, ctx);
 
     var leftCol   = el('div', 'ds-header-col ds-header-col--left');
     var centerCol = el('div', 'ds-header-col ds-header-col--center');
@@ -593,7 +675,7 @@ var MenuRenderer = (function () {
     var row = el('div', 'ds-item__row');
     if (priceAlign === 'left') {
       row.style.justifyContent = 'flex-start';
-      row.style.gap = toHorizontalPx('$xs', vpW, ctx) + 'px';
+      row.style.gap = toCSSPx(toHorizontalPx('$xs', vpW, ctx));
     }
 
     var nameEl = el('span', 'ds-item__name');
@@ -615,8 +697,8 @@ var MenuRenderer = (function () {
         var segVal = pl.segment_size != null ? pl.segment_size : segDefault;
         var leaderH = pl.style === 'dots' ? Math.max(thickness, segVal) : thickness;
         leader.style.height = leaderH + 'px';
-        leader.style.marginLeft = toHorizontalPx(pl.padding_left != null ? pl.padding_left : '$xs', vpW, ctx) + 'px';
-        leader.style.marginRight = toHorizontalPx(pl.padding_right != null ? pl.padding_right : '$xs', vpW, ctx) + 'px';
+        leader.style.marginLeft = toCSSPx(toHorizontalPx(pl.padding_left != null ? pl.padding_left : '$xs', vpW, ctx));
+        leader.style.marginRight = toCSSPx(toHorizontalPx(pl.padding_right != null ? pl.padding_right : '$xs', vpW, ctx));
         if (pl.style === 'solid') {
           leader.style.background = color;
         } else {
@@ -660,7 +742,11 @@ var MenuRenderer = (function () {
       var varList = el('div', 'ds-variations' + (inline ? ' ds-variations--inline' : ''));
       var varFont = itemStyle.variation_font || themeItems.variation_font || 'description';
 
-      item.variations.forEach(function (v) {
+      item.variations.forEach(function (v, vi) {
+        if (vi > 0) {
+          var vDiv = buildDividerEl('variation', 'ds-variation__divider', vpW, vpH, ctx);
+          if (vDiv) varList.appendChild(vDiv);
+        }
         var vRow = el('div', 'ds-variation');
         if (v.id) vRow.setAttribute('data-ds-id', v.id);
         var vName = el('span', 'ds-variation__name');
@@ -704,6 +790,7 @@ var MenuRenderer = (function () {
     }
     var pad = resolvePaddingPx(normalizePadding(padding), vpW, vpH, ctx);
     section.style.padding = paddingCSS(pad);
+    applyDivider(section, 'area', [], vpW, vpH, ctx);
     if (background) section.style.background = resolveColor(background, ctx);
     if (border) {
       var bw = border.width != null ? border.width : 1;
@@ -727,7 +814,7 @@ var MenuRenderer = (function () {
     }
 
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(columnCount, 3));
-    grid.style.columnGap = toHorizontalPx(gutter, vpW, ctx) + 'px';
+    grid.style.columnGap = toCSSPx(toHorizontalPx(gutter, vpW, ctx));
     grid.style.rowGap = '0px';
 
     var areaConfig = {
@@ -735,7 +822,15 @@ var MenuRenderer = (function () {
       price_align: priceAlign
     };
 
-    (area.items || []).forEach(function (item) {
+    var areaItems = area.items || [];
+    areaItems.forEach(function (item, i) {
+      if (i > 0) {
+        var iDiv = buildDividerEl('item', 'ds-item-divider', vpW, vpH, ctx);
+        if (iDiv) {
+          iDiv.style.gridColumn = '1 / -1';
+          grid.appendChild(iDiv);
+        }
+      }
       var node = buildItem(item, areaConfig, vpW, vpH, baseFontSize, ctx);
       if (node) grid.appendChild(node);
     });
@@ -759,6 +854,7 @@ var MenuRenderer = (function () {
     }
     var pad = resolvePaddingPx(normalizePadding(padding), vpW, vpH, ctx);
     section.style.padding = paddingCSS(pad);
+    applyDivider(section, 'area', [], vpW, vpH, ctx);
     if (background) section.style.background = resolveColor(background, ctx);
 
     if (area.valign) {
@@ -782,10 +878,11 @@ var MenuRenderer = (function () {
     var grid = el('div', 'ds-area-group__grid');
     grid.style.display = 'grid';
     grid.style.gridTemplateColumns = 'repeat(' + subCols + ', 1fr)';
-    grid.style.columnGap = subGutter + 'px';
-    grid.style.rowGap = subGap + 'px';
+    grid.style.columnGap = toCSSPx(subGutter);
+    grid.style.rowGap = toCSSPx(subGap);
 
-    (area.areas || []).forEach(function (subArea) {
+    var subAreas = area.areas || [];
+    subAreas.forEach(function (subArea) {
       grid.appendChild(buildArea(subArea, spacing, depth + 1, vpW, vpH, baseFontSize, ctx));
     });
 
@@ -923,8 +1020,8 @@ var MenuRenderer = (function () {
     var areasWrap = el('div', 'ds-areas');
     areasWrap.style.display = 'grid';
     areasWrap.style.gridTemplateColumns = 'repeat(' + containerCols + ', 1fr)';
-    areasWrap.style.columnGap = spacing.containerGutter + 'px';
-    areasWrap.style.rowGap = spacing.areaGap + 'px';
+    areasWrap.style.columnGap = toCSSPx(spacing.containerGutter);
+    areasWrap.style.rowGap = toCSSPx(spacing.areaGap);
     areasWrap.style.padding = paddingCSS(spacing.viewportPadding);
 
     areas.forEach(function (area) {

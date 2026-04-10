@@ -21,6 +21,11 @@
     "fonts": {
       "header": { "family": "UnifrakturCook", "weight": "700", "size": "$hero" },
       "area_title": { "family": "Cinzel", "size": "$lg" }
+    },
+    "dividers": {
+      "item": { "sides": ["tb"] },
+      "variation": { "sides": ["tb"] },
+      "area": { "sides": ["tb"] }
     }
   },
   "header": {

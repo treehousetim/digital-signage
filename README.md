@@ -145,7 +145,13 @@ theme: {
     description: { ... },   // descriptions, variations
     // ...add any custom role name and reference it from any `font` field
   },
-  dividers: { color, width, style },
+  dividers: {
+    default:   { color, width, style, sides, padding },  // base — all types inherit
+    header:    { ... },   // overrides for the header bottom line
+    area:      { ... },   // overrides for area borders
+    item:      { ... },   // overrides for item separators
+    variation: { ... }    // overrides for variation separators
+  },
   areas: {
     padding, background, border,
     title_font, column_count, gutter, item_align, price_align
@@ -155,7 +161,7 @@ theme: {
     price_line: { style, color, thickness, segment_size, gap_size, padding_left, padding_right }
   },
   pricing: { symbol, symbol_position, symbol_space, format },
-  header:  { height, padding, background, divider, columns }
+  header:  { height, padding, background, columns }
 }
 ```
 
@@ -187,6 +193,42 @@ Draw a leader between item name and price (vertically centered):
   }
 }
 ```
+
+### Dividers
+
+`theme.dividers` controls separator lines on header, areas, items, and variations. Each type inherits from `default` and can override any field.
+
+```json
+"dividers": {
+  "default":   { "color": "$divider", "width": 1, "style": "solid" },
+  "header":    { "sides": ["bottom"] },
+  "area":      { "sides": [] },
+  "item":      { "sides": ["bottom"] },
+  "variation": { "sides": [] }
+}
+```
+
+Each config object accepts:
+
+| Field | Description |
+|---|---|
+| `color` | CSS color or `$palette` reference |
+| `width` | Line thickness in px |
+| `style` | `"solid"` \| `"dashed"` \| `"dotted"` |
+| `sides` | Array of sides to draw: `["top"]`, `["left","right"]`, `["bottom"]`, etc. |
+| `padding` | Spacing pushed between the content and each active side — accepts the same units as spacing fields (`8px`, `2%`, `$xs`) |
+
+`padding` only applies on active sides. A left-border area divider with `padding: "$sm"` adds left padding only; the other three sides are untouched.
+
+```json
+"dividers": {
+  "default": { "color": "$accent", "width": 3 },
+  "area":    { "sides": ["left"], "padding": "$sm" },
+  "item":    { "color": "$divider", "width": 1, "sides": ["bottom"] }
+}
+```
+
+Set `width: 0` to hide a specific type's divider entirely.
 
 ### 4. Font roles
 
@@ -448,7 +490,7 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `coffee.json` | Coffee shop with hot/cold drinks | Theme import, item variations |
 | `cafe.json` | Breakfast cafe with multi-column layout | Container columns, palette override |
 | `bakery.json` | Portrait bakery menu | Light theme + custom palette overrides |
-| `indian.json` | Indian restaurant | Rupee currency, custom palette, fonts |
+| `indian.json` | Indian restaurant | Rupee currency, accent left-border area dividers with padding, variation dividers |
 | `pub.json` | English pub | Pound currency, dark wood palette, blackletter header |
 | `surf-shop.json` | Lessons + retail | Cool theme, custom $sun var |
 | `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |

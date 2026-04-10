@@ -429,6 +429,23 @@
   font-size: 13px;
 }
 
+/* ── Sides Selector ────────────────────────────────────────────────── */
+
+.me-field__sides {
+  display: flex;
+  gap: 12px;
+}
+
+.me-field__side-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #ccc;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
 /* ── Padding Editor ─────────────────────────────────────────────────── */
 
 .me-padding-editor__toggle {

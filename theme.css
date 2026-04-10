@@ -122,13 +122,7 @@ html, body {
 .ds-items--cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 
 /* Single item */
-.ds-item {
-  border-bottom: 1px solid var(--ds-divider-color);
-}
 
-.ds-item:last-child {
-  border-bottom: none;
-}
 
 .ds-item__row {
   display: flex;
@@ -191,15 +185,34 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Standalone divider elements — placed between items/variations in the DOM */
+.ds-item-divider {
+  grid-column: 1 / -1;
+}
+
+.ds-variation__divider {
+  align-self: stretch;
+}
+
+.ds-variations--inline .ds-variation__divider {
+  align-self: stretch;
+}
+
 /* Inline variation mode — compact horizontal layout */
 .ds-variations--inline {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.1em 1em;
+  row-gap: 0.1em;
+  /* No column-gap — handled per-element so divider padding can reach zero */
 }
 
 .ds-variations--inline .ds-variation {
   flex: 0 0 auto;
+}
+
+/* Default spacing between adjacent variations when no divider is present */
+.ds-variations--inline .ds-variation + .ds-variation {
+  margin-left: 0.8em;
 }
 
 .ds-variations--inline .ds-variation__name {

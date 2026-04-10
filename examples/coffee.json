@@ -7,6 +7,10 @@
     },
     "pricing": {
       "symbol": "$"
+    },
+    "dividers": {
+      "item": { "sides": ["tb"] },
+      "variation": { "sides": ["tb"] }
     }
   },
   "header": {

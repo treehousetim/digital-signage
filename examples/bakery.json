@@ -12,6 +12,10 @@
   "theme": {
     "layout": {
       "orientation": "portrait"
+    },
+    "dividers": {
+      "default": { "style": "dashed" },
+      "item": { "sides": ["tb"] }
     }
   },
   "header": {

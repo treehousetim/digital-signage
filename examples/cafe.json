@@ -7,6 +7,10 @@
     "colors": {
       "accent": "#d4a574"
     },
+    "dividers": {
+      "item": { "sides": ["tb"] },
+      "variation": { "sides": ["tb"] }
+    },
     "header": {
       "padding": {
         "top": "$lg",

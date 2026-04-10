@@ -22,6 +22,10 @@
     "areas": {
       "background": "$surface",
       "padding": "$sm"
+    },
+    "dividers": {
+      "item": { "sides": ["tb"] },
+      "area": { "sides": ["tb"] }
     }
   },
   "header": {

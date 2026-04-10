@@ -22,6 +22,12 @@
     "fonts": {
       "header": { "family": "Cinzel", "size": "$hero" },
       "area_title": { "family": "Cinzel", "size": "$lg" }
+    },
+    "dividers": {
+      "default": { "color": "$accent", "width": 2 },
+      "area":    { "sides": ["lr"], "padding": "$sm" },
+      "item":    { "color": "$divider", "width": 1, "sides": ["tb"] },
+      "variation": { "sides": ["tb"], "padding": "$xs" }
     }
   },
   "header": {

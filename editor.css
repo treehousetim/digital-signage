@@ -446,6 +446,154 @@
   text-transform: capitalize;
 }
 
+/* ── Background / Gradient Editor ──────────────────────────────────── */
+
+.me-bg-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.me-bg-editor__mode-row {
+  display: flex;
+  gap: 4px;
+}
+
+.me-bg-editor__mode-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #888;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+}
+
+.me-bg-editor__mode-btn:hover {
+  background: #333;
+  color: #ccc;
+}
+
+.me-bg-editor__mode-btn.active {
+  background: #0066cc;
+  color: #fff;
+  border-color: #0088ff;
+}
+
+.me-gradient-preview {
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: linear-gradient(135deg, #000 0%, #fff 100%);
+}
+
+.me-gradient-angle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.me-gradient-presets {
+  display: flex;
+  gap: 3px;
+}
+
+.me-gradient-preset {
+  width: 26px;
+  height: 26px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: #ccc;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.me-gradient-preset:hover {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+.me-gradient-angle-input {
+  width: 52px !important;
+}
+
+.me-gradient-angle-deg {
+  font-size: 12px;
+  color: #888;
+}
+
+.me-gradient-stops {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.me-gradient-stop {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.me-gradient-stop__pos {
+  width: 44px !important;
+}
+
+.me-gradient-stop__pct {
+  font-size: 11px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.me-gradient-stop__delete {
+  background: transparent;
+  border: 1px solid #555;
+  color: #888;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.me-gradient-stop__delete:hover:not(:disabled) {
+  background: #5a2a2a;
+  border-color: #f44336;
+  color: #ff8a80;
+}
+
+.me-gradient-stop__delete:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.me-gradient-add {
+  background: transparent;
+  border: 1px solid #555;
+  color: #888;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  align-self: flex-start;
+}
+
+.me-gradient-add:hover {
+  background: #333;
+  color: #ccc;
+}
+
 /* ── Padding Editor ─────────────────────────────────────────────────── */
 
 .me-padding-editor__toggle {

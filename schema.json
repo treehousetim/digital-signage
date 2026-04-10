@@ -259,8 +259,11 @@
       "properties": {
         "id":           { "type": "string", "description": "Auto-generated from title if omitted." },
         "title":        { "type": "string" },
+        "icon":         { "type": "string", "description": "URL to an image or SVG rendered above the title." },
+        "icon_height":  { "$ref": "#/$defs/spacing_value", "description": "Max height of the icon. Defaults to 25% of viewport height." },
+        "subtitle":     { "type": "string", "description": "Secondary text below the title, styled with the description font role." },
+        "background":   { "type": "string", "description": "CSS color or linear-gradient(...) string. Overrides theme.areas.background." },
         "padding":      { "$ref": "#/$defs/padding" },
-        "background":   { "type": "string" },
         "title_font":   { "$ref": "#/$defs/font" },
         "column_count": { "type": "integer" },
         "columns":      { "type": "integer", "description": "For group areas: number of sub-area columns." },

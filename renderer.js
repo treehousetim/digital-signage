@@ -800,8 +800,24 @@ var MenuRenderer = (function () {
       if (border.radius != null) section.style.borderRadius = border.radius + 'px';
     }
     if (area.valign) {
-      var valignMap = { top: 'start', center: 'center', bottom: 'end' };
-      section.style.alignSelf = valignMap[area.valign] || 'start';
+      var jcMap = { top: 'flex-start', center: 'center', bottom: 'flex-end' };
+      var asMap = { top: 'start',      center: 'center', bottom: 'end'      };
+      section.style.display        = 'flex';
+      section.style.flexDirection  = 'column';
+      section.style.justifyContent = jcMap[area.valign] || 'flex-start';
+      section.style.alignSelf      = asMap[area.valign] || 'start';
+    }
+
+    if (area.icon) {
+      var iconEl = el('img', 'ds-area__icon');
+      iconEl.src = area.icon;
+      var iconH = area.icon_height != null ? area.icon_height : '25%';
+      iconEl.style.maxHeight = toCSSPx(toVerticalPx(iconH, vpH, ctx));
+      iconEl.style.width = 'auto';
+      var iconAlign = area.align || 'left';
+      if (iconAlign === 'center') { iconEl.style.marginLeft = 'auto'; iconEl.style.marginRight = 'auto'; }
+      else if (iconAlign === 'right') { iconEl.style.marginLeft = 'auto'; }
+      section.appendChild(iconEl);
     }
 
     if (area.title) {
@@ -811,6 +827,15 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') titleEl.style.textAlign = titleAlign;
       applyFont(titleEl, titleFont, baseFontSize, ctx);
       section.appendChild(titleEl);
+    }
+
+    if (area.subtitle) {
+      var subEl = el('p', 'ds-area__subtitle');
+      subEl.textContent = area.subtitle;
+      var subAlign = area.align || 'left';
+      if (subAlign !== 'left') subEl.style.textAlign = subAlign;
+      applyFont(subEl, 'description', baseFontSize, ctx);
+      section.appendChild(subEl);
     }
 
     var grid = el('div', 'ds-items ds-items--cols-' + Math.min(columnCount, 3));
@@ -858,8 +883,24 @@ var MenuRenderer = (function () {
     if (background) section.style.background = resolveColor(background, ctx);
 
     if (area.valign) {
-      var valignMap = { top: 'start', center: 'center', bottom: 'end' };
-      section.style.alignSelf = valignMap[area.valign] || 'start';
+      var jcMapG = { top: 'flex-start', center: 'center', bottom: 'flex-end' };
+      var asMapG = { top: 'start',      center: 'center', bottom: 'end'      };
+      section.style.display        = 'flex';
+      section.style.flexDirection  = 'column';
+      section.style.justifyContent = jcMapG[area.valign] || 'flex-start';
+      section.style.alignSelf      = asMapG[area.valign] || 'start';
+    }
+
+    if (area.icon) {
+      var iconElG = el('img', 'ds-area__icon');
+      iconElG.src = area.icon;
+      var iconHG = area.icon_height != null ? area.icon_height : '25%';
+      iconElG.style.maxHeight = toCSSPx(toVerticalPx(iconHG, vpH, ctx));
+      iconElG.style.width = 'auto';
+      var iconAlignG = area.align || 'left';
+      if (iconAlignG === 'center') { iconElG.style.marginLeft = 'auto'; iconElG.style.marginRight = 'auto'; }
+      else if (iconAlignG === 'right') { iconElG.style.marginLeft = 'auto'; }
+      section.appendChild(iconElG);
     }
 
     if (area.title) {
@@ -869,6 +910,15 @@ var MenuRenderer = (function () {
       if (titleAlign !== 'left') titleEl.style.textAlign = titleAlign;
       applyFont(titleEl, titleFont, baseFontSize, ctx);
       section.appendChild(titleEl);
+    }
+
+    if (area.subtitle) {
+      var subElG = el('p', 'ds-area__subtitle');
+      subElG.textContent = area.subtitle;
+      var subAlignG = area.align || 'left';
+      if (subAlignG !== 'left') subElG.style.textAlign = subAlignG;
+      applyFont(subElG, 'description', baseFontSize, ctx);
+      section.appendChild(subElG);
     }
 
     var subCols = area.columns || 1;

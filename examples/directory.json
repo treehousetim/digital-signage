@@ -1,0 +1,47 @@
+{
+  "uses": "themes/dark.json",
+  "theme": {
+    "layout": {
+      "orientation": "portrait",
+      "columns": 3
+    },
+    "fonts": {
+      "area_title": { "family": "Montserrat", "weight": "700", "size": "$xl" },
+      "description": { "family": "Montserrat", "weight": "400", "size": "$sm" }
+    }
+  },
+  "header": {
+    "elements": [
+      { "type": "text", "text": "Building Directory", "font": "description" }
+    ]
+  },
+  "areas": [
+    {
+      "background": "linear-gradient(160deg, #6d28d9 0%, #4c1d95 100%)",
+      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/tooth.svg",
+      "icon_height": "20%",
+      "title": "Dr. Kayla Smith",
+      "subtitle": "Dental Services",
+      "align": "center",
+      "valign": "center"
+    },
+    {
+      "background": "linear-gradient(160deg, #0e7490 0%, #164e63 100%)",
+      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/device-desktop.svg",
+      "icon_height": "20%",
+      "title": "LHI Digital",
+      "subtitle": "Technology Support",
+      "align": "center",
+      "valign": "center"
+    },
+    {
+      "background": "linear-gradient(160deg, #15803d 0%, #14532d 100%)",
+      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/leaf.svg",
+      "icon_height": "20%",
+      "title": "Edwards & Co",
+      "subtitle": "Environmental Consultants",
+      "align": "center",
+      "valign": "center"
+    }
+  ]
+}

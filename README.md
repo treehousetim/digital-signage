@@ -230,6 +230,39 @@ Each config object accepts:
 
 Set `width: 0` to hide a specific type's divider entirely.
 
+### Identity / directory signs
+
+Areas support `icon`, `subtitle`, and `valign` for full-bleed identity signs without items:
+
+```json
+{
+  "uses": "themes/dark.json",
+  "theme": { "layout": { "orientation": "portrait", "columns": 1 } },
+  "header": {
+    "elements": [{ "type": "text", "text": "Floor 12", "font": "description" }]
+  },
+  "areas": [{
+    "background": "linear-gradient(135deg, #8B5CF6 0%, #2563EB 100%)",
+    "icon": "icons/tooth.svg",
+    "icon_height": "25%",
+    "title": "Dr. Kayla Smith",
+    "subtitle": "Dental Services",
+    "align": "center",
+    "valign": "center"
+  }]
+}
+```
+
+| Field | Description |
+|---|---|
+| `icon` | URL to an image or SVG rendered above the title |
+| `icon_height` | Max height of the icon — any spacing unit (`25%`, `200px`, `10em`). Default `25%` of viewport height |
+| `subtitle` | Secondary text below the title, styled with the `description` font role |
+| `background` | CSS color **or** `linear-gradient(...)` string — overrides `theme.areas.background` |
+| `valign` | `"top"` \| `"center"` \| `"bottom"` — vertically positions content within the area |
+
+The gradient editor in the editor panel lets you visually build gradients with color stops and a direction preset.
+
 ### 4. Font roles
 
 Elements reference fonts by role name, not by full font definition:
@@ -496,6 +529,7 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `surf-shop.json` | Lessons + retail | Cool theme, custom $sun var |
 | `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |
 | `themed.json` | Wine bar | Custom vars, font extension, full reference system |
+| `directory.json` | Building directory / identity signs | Portrait, gradient backgrounds, icon, subtitle, valign |
 
 ## Schema
 

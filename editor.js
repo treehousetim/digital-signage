@@ -73,6 +73,52 @@ var MenuEditor = (function () {
     onUpdate(coerceSpacing(formatted));
   }
 
+  // ── Gradient Helpers ──────────────────────────────────────────────────
+
+  // Split 'Ndeg, #color P%, ...' respecting nested parens (e.g. rgb(...))
+  function splitGradientArgs(str) {
+    var parts = [], depth = 0, cur = '';
+    for (var i = 0; i < str.length; i++) {
+      var c = str[i];
+      if (c === '(') depth++;
+      else if (c === ')') depth--;
+      else if (c === ',' && depth === 0) { parts.push(cur); cur = ''; continue; }
+      cur += c;
+    }
+    if (cur) parts.push(cur);
+    return parts;
+  }
+
+  // Parse 'linear-gradient(...)' → { angle, stops: [{color, pos}] } or null
+  function parseLinearGradient(str) {
+    if (typeof str !== 'string') return null;
+    var m = str.match(/^linear-gradient\((.+)\)$/i);
+    if (!m) return null;
+    var parts = splitGradientArgs(m[1]);
+    var angle = 135;
+    var stops = [];
+    var first = parts[0].trim();
+    if (/^\d+deg$/i.test(first)) {
+      angle = parseInt(first);
+      parts = parts.slice(1);
+    }
+    parts.forEach(function (p) {
+      p = p.trim();
+      var m2 = p.match(/^(#[0-9a-fA-F]{3,8})\s+(\d+)%$/);
+      if (m2) { stops.push({ color: m2[1], pos: parseInt(m2[2]) }); return; }
+      if (/^#[0-9a-fA-F]{3,8}$/.test(p)) stops.push({ color: p, pos: null });
+    });
+    return stops.length >= 2 ? { angle: angle, stops: stops } : null;
+  }
+
+  // Compose { angle, stops } → CSS linear-gradient string
+  function composeLinearGradient(angle, stops) {
+    return 'linear-gradient(' + angle + 'deg, ' +
+      stops.map(function (s) {
+        return s.pos != null ? s.color + ' ' + s.pos + '%' : s.color;
+      }).join(', ') + ')';
+  }
+
   function el(tag, className, attrs) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -456,7 +502,7 @@ var MenuEditor = (function () {
         { key: 'layout.column_gutter', type: 'text', label: 'Column Gutter', placeholder: '24px  1em  2%  $lg' }
       ]},
       { group: 'Colors', fields: [
-        { key: 'colors.background', type: 'color', label: 'Background' },
+        { key: 'colors.background', type: 'background', label: 'Background' },
         { key: 'colors.surface', type: 'color', label: 'Surface' },
         { key: 'colors.text', type: 'color', label: 'Text' },
         { key: 'colors.muted', type: 'color', label: 'Muted' },
@@ -501,7 +547,7 @@ var MenuEditor = (function () {
       ]},
       { group: 'Areas (defaults)', defaultCollapsed: true, fields: [
         { key: 'areas.padding', type: 'padding', label: 'Padding' },
-        { key: 'areas.background', type: 'color', label: 'Background' },
+        { key: 'areas.background', type: 'background', label: 'Background' },
         { key: 'areas.column_count', type: 'number', label: 'Item Columns' },
         { key: 'areas.gutter', type: 'text', label: 'Item Gutter', placeholder: '24px  1em  2%  $lg' },
         { key: 'areas.item_align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Item Align' },
@@ -534,7 +580,7 @@ var MenuEditor = (function () {
       { group: 'Header', defaultCollapsed: true, fields: [
         { key: 'header.height', type: 'text', label: 'Height', placeholder: '24px  1em  2%  $lg' },
         { key: 'header.padding', type: 'padding', label: 'Padding' },
-        { key: 'header.background', type: 'color', label: 'Background' },
+        { key: 'header.background', type: 'background', label: 'Background' },
         { key: 'header.columns.left.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Left Col' },
         { key: 'header.columns.center.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Center Col' },
         { key: 'header.columns.right.mode', type: 'select', options: ['', 'fit', 'fill'], label: 'Right Col' }
@@ -554,7 +600,11 @@ var MenuEditor = (function () {
     ],
     area: [
       { key: 'id', type: 'text', label: 'ID (auto)' },
-      { key: 'title', type: 'text', label: 'Title' },
+      { key: 'title',       type: 'text',       label: 'Title' },
+      { key: 'subtitle',    type: 'text',       label: 'Subtitle' },
+      { key: 'icon',        type: 'text',       label: 'Icon URL' },
+      { key: 'icon_height', type: 'text',       label: 'Icon Height', placeholder: '24px  1em  25%  $lg' },
+      { key: 'background',  type: 'background', label: 'Background' },
       { key: 'align', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Title Align' },
       { key: 'valign', type: 'select', options: ['', 'top', 'center', 'bottom'], label: 'Vertical Align' },
       { key: 'column_count', type: 'number', label: 'Item Columns' },
@@ -565,7 +615,7 @@ var MenuEditor = (function () {
       { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
         { key: 'style.title_font', type: 'font', label: 'Title Font' },
-        { key: 'style.background', type: 'color', label: 'Background' }
+        { key: 'style.background', type: 'background', label: 'Background' }
       ]}
     ],
     item: [
@@ -735,6 +785,218 @@ var MenuEditor = (function () {
       colorRow.appendChild(hexInput);
       colorRow.appendChild(transpLabel);
       wrapper.appendChild(colorRow);
+
+    } else if (fieldDef.type === 'background') {
+      var bgVal = value || '';
+      var parsed = parseLinearGradient(bgVal);
+      var bgMode = parsed ? 'gradient' : 'solid';
+
+      // State
+      var bgAngle = parsed ? parsed.angle : 135;
+      var bgStops = parsed ? parsed.stops.map(function (s) { return { color: s.color, pos: s.pos }; })
+                           : [{ color: '#000000', pos: 0 }, { color: '#ffffff', pos: 100 }];
+      var bgSolidColor = (!parsed && bgVal && bgVal !== 'transparent') ? bgVal : '#000000';
+      var bgTransparent = bgVal === 'transparent';
+
+      var bgWrap = el('div', 'me-bg-editor');
+
+      // Mode toggle row
+      var bgModeRow = el('div', 'me-bg-editor__mode-row');
+      var solidBtn = el('button', 'me-bg-editor__mode-btn' + (bgMode === 'solid' ? ' active' : ''));
+      solidBtn.type = 'button';
+      solidBtn.textContent = 'Solid';
+      var gradBtn = el('button', 'me-bg-editor__mode-btn' + (bgMode === 'gradient' ? ' active' : ''));
+      gradBtn.type = 'button';
+      gradBtn.textContent = 'Gradient';
+      bgModeRow.appendChild(solidBtn);
+      bgModeRow.appendChild(gradBtn);
+      bgWrap.appendChild(bgModeRow);
+
+      // ── Solid panel ──────────────────────────────────────────────────
+      var solidPanel = el('div', 'me-bg-editor__solid');
+      solidPanel.style.display = bgMode === 'solid' ? '' : 'none';
+
+      var solidColorIn = el('input', 'me-field__color', { type: 'color' });
+      solidColorIn.value = bgSolidColor;
+      var solidHexIn = el('input', 'me-field__input me-field__input--short', { type: 'text' });
+      solidHexIn.value = bgTransparent ? 'transparent' : bgSolidColor;
+      var sCb = el('input', '', { type: 'checkbox' });
+      sCb.checked = bgTransparent;
+      var sCbLabel = el('label', 'me-field__cb-wrap me-field__cb-wrap--small');
+      sCbLabel.appendChild(sCb);
+      var sCbText = el('span'); sCbText.textContent = 'transparent';
+      sCbLabel.appendChild(sCbText);
+
+      solidColorIn.addEventListener('input', function () {
+        bgSolidColor = solidColorIn.value;
+        solidHexIn.value = bgSolidColor;
+        sCb.checked = false;
+        bgTransparent = false;
+        store.update(fullPath, bgSolidColor);
+      });
+      solidHexIn.addEventListener('change', function () {
+        if (solidHexIn.value === 'transparent') {
+          sCb.checked = true; bgTransparent = true;
+          store.update(fullPath, 'transparent');
+        } else {
+          bgSolidColor = solidHexIn.value;
+          solidColorIn.value = bgSolidColor;
+          sCb.checked = false; bgTransparent = false;
+          store.update(fullPath, bgSolidColor);
+        }
+      });
+      sCb.addEventListener('change', function () {
+        bgTransparent = sCb.checked;
+        if (bgTransparent) {
+          solidHexIn.value = 'transparent';
+          store.update(fullPath, 'transparent');
+        } else {
+          solidHexIn.value = bgSolidColor;
+          solidColorIn.value = bgSolidColor;
+          store.update(fullPath, bgSolidColor);
+        }
+      });
+
+      var solidColorRow = el('div', 'me-field__color-row');
+      solidColorRow.appendChild(solidColorIn);
+      solidColorRow.appendChild(solidHexIn);
+      solidColorRow.appendChild(sCbLabel);
+      solidPanel.appendChild(solidColorRow);
+      bgWrap.appendChild(solidPanel);
+
+      // ── Gradient panel ───────────────────────────────────────────────
+      var gradPanel = el('div', 'me-bg-editor__gradient');
+      gradPanel.style.display = bgMode === 'gradient' ? '' : 'none';
+
+      // Preview bar
+      var gradPreview = el('div', 'me-gradient-preview');
+
+      // Angle row
+      var angleRow = el('div', 'me-gradient-angle-row');
+      var presetRow = el('div', 'me-gradient-presets');
+      var anglePresets = [
+        { label: '→', angle: 90 }, { label: '↓', angle: 180 },
+        { label: '↘', angle: 135 }, { label: '↗', angle: 45 }
+      ];
+      anglePresets.forEach(function (p) {
+        var pb = el('button', 'me-gradient-preset');
+        pb.type = 'button';
+        pb.title = p.angle + '°';
+        pb.textContent = p.label;
+        pb.addEventListener('click', function () {
+          bgAngle = p.angle;
+          angleIn.value = bgAngle;
+          refreshGradient();
+        });
+        presetRow.appendChild(pb);
+      });
+      var angleIn = el('input', 'me-field__input me-gradient-angle-input', { type: 'number', min: '0', max: '360' });
+      angleIn.value = bgAngle;
+      angleIn.addEventListener('input', function () {
+        bgAngle = parseInt(angleIn.value) || 0;
+        refreshGradient();
+      });
+      angleRow.appendChild(presetRow);
+      angleRow.appendChild(angleIn);
+      var angleDeg = el('span', 'me-gradient-angle-deg');
+      angleDeg.textContent = '°';
+      angleRow.appendChild(angleDeg);
+
+      // Stops list
+      var stopsWrap = el('div', 'me-gradient-stops');
+
+      function refreshGradient() {
+        var css = composeLinearGradient(bgAngle, bgStops);
+        gradPreview.style.background = css;
+        store.update(fullPath, css);
+      }
+
+      function renderStops() {
+        stopsWrap.innerHTML = '';
+        bgStops.forEach(function (stop, idx) {
+          var row = el('div', 'me-gradient-stop');
+
+          var stopColor = el('input', 'me-field__color', { type: 'color' });
+          stopColor.value = stop.color;
+          stopColor.addEventListener('input', function () {
+            bgStops[idx].color = stopColor.value;
+            refreshGradient();
+          });
+
+          var posIn = el('input', 'me-field__input me-gradient-stop__pos', { type: 'number', min: '0', max: '100' });
+          posIn.value = stop.pos != null ? stop.pos : '';
+          posIn.placeholder = '%';
+          posIn.addEventListener('input', function () {
+            var v = parseInt(posIn.value);
+            bgStops[idx].pos = isNaN(v) ? null : Math.min(100, Math.max(0, v));
+            refreshGradient();
+          });
+
+          var pct = el('span', 'me-gradient-stop__pct');
+          pct.textContent = '%';
+
+          var delBtn = el('button', 'me-gradient-stop__delete');
+          delBtn.type = 'button';
+          delBtn.textContent = '×';
+          delBtn.disabled = bgStops.length <= 2;
+          delBtn.addEventListener('click', function () {
+            if (bgStops.length <= 2) return;
+            bgStops.splice(idx, 1);
+            renderStops();
+            refreshGradient();
+          });
+
+          row.appendChild(stopColor);
+          row.appendChild(posIn);
+          row.appendChild(pct);
+          row.appendChild(delBtn);
+          stopsWrap.appendChild(row);
+        });
+      }
+      renderStops();
+
+      var addStopBtn = el('button', 'me-gradient-add');
+      addStopBtn.type = 'button';
+      addStopBtn.textContent = '+ Stop';
+      addStopBtn.addEventListener('click', function () {
+        // Insert new stop at midpoint between last two
+        var last = bgStops[bgStops.length - 1];
+        var prev = bgStops[bgStops.length - 2];
+        var newPos = (prev.pos != null && last.pos != null) ? Math.round((prev.pos + last.pos) / 2) : null;
+        bgStops.splice(bgStops.length - 1, 0, { color: '#888888', pos: newPos });
+        renderStops();
+        refreshGradient();
+      });
+
+      gradPanel.appendChild(gradPreview);
+      gradPanel.appendChild(angleRow);
+      gradPanel.appendChild(stopsWrap);
+      gradPanel.appendChild(addStopBtn);
+      bgWrap.appendChild(gradPanel);
+
+      // Initialize preview
+      if (bgMode === 'gradient') refreshGradient();
+
+      // Mode toggle logic
+      solidBtn.addEventListener('click', function () {
+        bgMode = 'solid';
+        solidBtn.classList.add('active');
+        gradBtn.classList.remove('active');
+        solidPanel.style.display = '';
+        gradPanel.style.display = 'none';
+        store.update(fullPath, bgTransparent ? 'transparent' : bgSolidColor);
+      });
+      gradBtn.addEventListener('click', function () {
+        bgMode = 'gradient';
+        gradBtn.classList.add('active');
+        solidBtn.classList.remove('active');
+        gradPanel.style.display = '';
+        solidPanel.style.display = 'none';
+        refreshGradient();
+      });
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(bgWrap);
 
     } else if (fieldDef.type === 'padding') {
       var padVal = value;

@@ -358,10 +358,11 @@ editor.destroy();
 - **localStorage auto-save**: editor state, panel widths, group collapse state, and selected node all persist
 - **Cmd+A** in JSON view selects only the JSON content
 - **Arrow keys** navigate the tree
+- **↑ / ↓** in any spacing field nudges the numeric value by 1, preserving the unit suffix (`8px` → `9px`, `1.5em` → `2.5em`). Hold **Shift** for ×10 steps, **Alt/Option** for ×0.1 steps. No-op on `$var` references.
 
 ## Resolution & units
 
-Content is resolution-independent. Spatial values can be percentages of the viewport (`"5%"`), pixels (`12`, `"12"`, `"12px"`), or var references (`"$md"`). Font sizes are em multipliers of a resolution-scaled base font size.
+Content is resolution-independent. Spatial values can be percentages of the viewport (`"5%"`), pixels (`12`, `"12"`, `"12px"`), any CSS unit (`"1.5em"`, `"0.5rem"`, `"10pt"`), or var references (`"$md"`). Font sizes are em multipliers of a resolution-scaled base font size.
 
 | Resolution | Canvas | Base font |
 |---|---|---|

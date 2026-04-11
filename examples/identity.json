@@ -4,13 +4,17 @@
     "layout": {
       "orientation": "portrait",
       "columns": 1
+    },
+    "fonts": {
+      "area_title": { "family": "Cormorant Garamond", "weight": "600", "size": "$hero", "color": "#f8f4ef" },
+      "description": { "family": "DM Sans", "weight": "400", "size": "$base", "color": "#8ca8c0" }
     }
   },
   "areas": [
     {
-      "background": "linear-gradient(160deg, #1d4ed8 0%, #1e3a8a 100%)",
+      "background": "linear-gradient(160deg, #1c2b3a 0%, #0a1520 100%)",
       "title": "Dr. Maria Chen",
-      "subtitle": "Family Medicine · Suite 210",
+      "subtitle": "Family Medicine  ·  Suite 210",
       "align": "center",
       "valign": "center"
     }

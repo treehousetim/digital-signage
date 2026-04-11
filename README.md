@@ -263,6 +263,8 @@ Areas support `icon`, `subtitle`, and `valign` for full-bleed identity signs wit
 
 The gradient editor in the editor panel lets you visually build gradients with color stops and a direction preset.
 
+The renderer's areas grid fills the full viewport height and distributes that space evenly across rows (`align-content: stretch`). Each area's content is then positioned within its cell using `valign`. This means identity/directory signs with `valign: center` will always fill the display regardless of how many panels there are.
+
 ### 4. Font roles
 
 Elements reference fonts by role name, not by full font definition:

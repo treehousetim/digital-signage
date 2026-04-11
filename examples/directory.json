@@ -3,43 +3,50 @@
   "theme": {
     "layout": {
       "orientation": "portrait",
-      "columns": 3
+      "columns": 1
     },
     "fonts": {
-      "area_title": { "family": "Montserrat", "weight": "700", "size": "$xl" },
-      "description": { "family": "Montserrat", "weight": "400", "size": "$sm" }
+      "area_title": { "family": "Cormorant Garamond", "weight": "600", "size": "$xl", "color": "#f8f4ef" },
+      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#a09880" }
+    },
+    "areas": {
+      "gutter": "0"
     }
   },
   "header": {
     "elements": [
-      { "type": "text", "text": "Building Directory", "font": "description" }
+      {
+        "type": "text",
+        "text": "ONE HARBOR PLAZA",
+        "font": "description"
+      }
     ]
   },
   "areas": [
     {
-      "background": "linear-gradient(160deg, #6d28d9 0%, #4c1d95 100%)",
-      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/tooth.svg",
-      "icon_height": "20%",
+      "background": "linear-gradient(160deg, #1c2b3a 0%, #0f1a24 100%)",
+      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/stethoscope.svg",
+      "icon_height": "12%",
       "title": "Dr. Kayla Smith",
-      "subtitle": "Dental Services",
+      "subtitle": "Family Medicine  ·  Suite 210",
       "align": "center",
       "valign": "center"
     },
     {
-      "background": "linear-gradient(160deg, #0e7490 0%, #164e63 100%)",
+      "background": "linear-gradient(160deg, #1a2a1e 0%, #0f1a12 100%)",
       "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/device-desktop.svg",
-      "icon_height": "20%",
+      "icon_height": "12%",
       "title": "LHI Digital",
-      "subtitle": "Technology Support",
+      "subtitle": "Technology Support  ·  Suite 340",
       "align": "center",
       "valign": "center"
     },
     {
-      "background": "linear-gradient(160deg, #15803d 0%, #14532d 100%)",
+      "background": "linear-gradient(160deg, #2a1e1a 0%, #1a1210 100%)",
       "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/leaf.svg",
-      "icon_height": "20%",
+      "icon_height": "12%",
       "title": "Edwards & Co",
-      "subtitle": "Environmental Consultants",
+      "subtitle": "Environmental Consultants  ·  Suite 115",
       "align": "center",
       "valign": "center"
     }

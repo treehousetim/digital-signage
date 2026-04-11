@@ -1051,11 +1051,13 @@ var MenuRenderer = (function () {
     target.innerHTML = '';
     target.removeAttribute('style');
 
-    // Viewport
+    // Viewport — flex column so areas grid can fill remaining height after header
     var viewport = el('div', 'ds-viewport');
     viewport.style.width = vpW + 'px';
     viewport.style.height = vpH + 'px';
     viewport.style.fontSize = baseFontSize + 'px';
+    viewport.style.display = 'flex';
+    viewport.style.flexDirection = 'column';
     var bg = resolveColor(theme.colors && theme.colors.background, ctx);
     if (bg) viewport.style.background = bg;
 
@@ -1065,11 +1067,15 @@ var MenuRenderer = (function () {
       if (headerRegion) viewport.appendChild(headerRegion);
     }
 
-    // Areas container
+    // Areas container — flex:1 fills the remaining viewport height;
+    // align-content:stretch distributes that height evenly across grid rows
     var containerCols = layout.columns || 1;
     var areasWrap = el('div', 'ds-areas');
     areasWrap.style.display = 'grid';
+    areasWrap.style.flex = '1';
+    areasWrap.style.minHeight = '0';
     areasWrap.style.gridTemplateColumns = 'repeat(' + containerCols + ', 1fr)';
+    areasWrap.style.alignContent = 'stretch';
     areasWrap.style.columnGap = toCSSPx(spacing.containerGutter);
     areasWrap.style.rowGap = toCSSPx(spacing.areaGap);
     areasWrap.style.padding = paddingCSS(spacing.viewportPadding);

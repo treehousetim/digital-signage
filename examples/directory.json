@@ -26,7 +26,7 @@
     {
       "background": "linear-gradient(160deg, #1a3fc4 0%, #0a1a5e 100%)",
       "icon": "fa-solid fa-stethoscope",
-      "icon_height": "16%",
+      "icon_height": "10%",
       "icon_color": "#7fb8ff",
       "title": "Dr. Kayla Smith",
       "subtitle": "FAMILY MEDICINE  ·  SUITE 210",
@@ -36,7 +36,7 @@
     {
       "background": "linear-gradient(160deg, #187a52 0%, #072e1e 100%)",
       "icon": "fa-solid fa-laptop",
-      "icon_height": "16%",
+      "icon_height": "10%",
       "icon_color": "#6debb0",
       "title": "LHI Digital",
       "subtitle": "TECHNOLOGY SUPPORT  ·  SUITE 340",
@@ -46,7 +46,7 @@
     {
       "background": "linear-gradient(160deg, #b84a10 0%, #3e1400 100%)",
       "icon": "fa-solid fa-leaf",
-      "icon_height": "16%",
+      "icon_height": "10%",
       "icon_color": "#ffa86e",
       "title": "Edwards & Co",
       "subtitle": "ENVIRONMENTAL  ·  SUITE 115",

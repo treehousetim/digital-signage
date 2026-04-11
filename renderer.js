@@ -814,11 +814,11 @@ var MenuRenderer = (function () {
     }
     if (area.valign) {
       var jcMap = { top: 'flex-start', center: 'center', bottom: 'flex-end' };
-      var asMap = { top: 'start',      center: 'center', bottom: 'end'      };
       section.style.display        = 'flex';
       section.style.flexDirection  = 'column';
       section.style.justifyContent = jcMap[area.valign] || 'flex-start';
-      section.style.alignSelf      = asMap[area.valign] || 'start';
+      // align-self stays stretch (default) so the area always fills its grid cell;
+      // justify-content handles where the *content* sits within that cell.
     }
 
     if (area.icon) {

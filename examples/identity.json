@@ -7,19 +7,33 @@
     },
     "fonts": {
       "area_title": { "family": "Cormorant Garamond", "weight": "700", "size": "$hero", "color": "#ffffff" },
-      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#c8b8f0", "letter_spacing": "0.18em" }
+      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#e0ceff", "letter_spacing": "0.16em" }
+    },
+    "header": {
+      "background": "transparent",
+      "height": "72px",
+      "padding": "0 48px"
     }
+  },
+  "header": {
+    "elements": [
+      {
+        "type": "text",
+        "text": "Floor 12",
+        "font": "area_title"
+      }
+    ]
   },
   "areas": [
     {
-      "background": "linear-gradient(160deg, #5a1fa8 0%, #2a0a5e 60%, #0e0428 100%)",
+      "background": "linear-gradient(155deg, #6b21e8 0%, #9333ea 40%, #5b1fcc 70%, #1a0640 100%)",
       "icon": "fa-solid fa-tooth",
-      "icon_height": "22%",
+      "icon_height": "30%",
       "icon_color": "#ffffff",
       "title": "Dr. Kayla Roth",
       "subtitle": "ORTHODONTIST  ·  SUITE 200",
-      "align": "center",
-      "valign": "center"
+      "align": "left",
+      "valign": "bottom"
     }
   ]
 }

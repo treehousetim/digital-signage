@@ -378,12 +378,12 @@ editor.destroy();
 
 ### Editor features
 
-- **Three-panel layout** with **resizable panes** (drag the dividers; widths persisted)
-- **Tree**: expand/collapse, click to select, action buttons float above the row with delayed hide, drag-and-drop reordering
-- **Inspector**: schema-driven form fields with grouped collapsible sections; group state and selected node persist in localStorage
+- **Three-panel layout** with **resizable panes** (drag the 4px stripe between panels; widths persisted in localStorage)
+- **Tree**: expand/collapse, click to select, action buttons (add, duplicate, delete) appear on row hover, drag-and-drop reordering
+- **Inspector**: schema-driven form fields; collapsible groups (state persisted); Dividers consolidated into one tabbed section (Default / Header / Area / Item / Variation); ID fields are read-only
 - **Dynamic font roles**: add custom roles in `theme.fonts` and they appear in every font dropdown automatically
 - **Style overrides** with "Inherited — click to override" cover; ✕ button on the group header reverts to inherited
-- **Live preview** in iframe, zoomable (25%–150%), with minimap viewport indicator; auto re-fits as panels resize
+- **Live preview** in iframe, zoomable (25%–150%); correctly fits both landscape (16:9) and portrait (9:16) menus; minimap viewport indicator shown at zoom > fit
 - **JSON tab**: editable, syntax-highlighted, tree-synced (clicking a tree node scrolls to & highlights its line)
 - **Click-to-select in preview**: click any area, item, or header element to select and inspect it
 - **Drag handles** for resizing padding (Element mode) or layout (Layout mode)

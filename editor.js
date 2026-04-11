@@ -510,41 +510,7 @@ var MenuEditor = (function () {
         { key: 'colors.divider', type: 'color', label: 'Divider' }
       ]},
       { group: 'Fonts', defaultCollapsed: true, type: 'fonts_editor', key: 'fonts' },
-      { group: 'Dividers: Default', defaultCollapsed: true, fields: [
-        { key: 'dividers.default.color', type: 'color', label: 'Color' },
-        { key: 'dividers.default.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.default.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
-        { key: 'dividers.default.sides', type: 'sides', label: 'Sides' },
-        { key: 'dividers.default.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
-      ]},
-      { group: 'Dividers: Header', defaultCollapsed: true, fields: [
-        { key: 'dividers.header.color', type: 'color', label: 'Color' },
-        { key: 'dividers.header.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.header.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
-        { key: 'dividers.header.sides', type: 'sides', label: 'Sides' },
-        { key: 'dividers.header.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
-      ]},
-      { group: 'Dividers: Area', defaultCollapsed: true, fields: [
-        { key: 'dividers.area.color', type: 'color', label: 'Color' },
-        { key: 'dividers.area.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.area.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
-        { key: 'dividers.area.sides', type: 'sides', label: 'Sides' },
-        { key: 'dividers.area.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
-      ]},
-      { group: 'Dividers: Item', defaultCollapsed: true, fields: [
-        { key: 'dividers.item.color', type: 'color', label: 'Color' },
-        { key: 'dividers.item.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.item.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
-        { key: 'dividers.item.sides', type: 'sides', label: 'Sides' },
-        { key: 'dividers.item.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
-      ]},
-      { group: 'Dividers: Variation', defaultCollapsed: true, fields: [
-        { key: 'dividers.variation.color', type: 'color', label: 'Color' },
-        { key: 'dividers.variation.width', type: 'number', label: 'Width (px)', step: 1 },
-        { key: 'dividers.variation.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
-        { key: 'dividers.variation.sides', type: 'sides', label: 'Sides' },
-        { key: 'dividers.variation.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
-      ]},
+      { group: 'Dividers', defaultCollapsed: true, type: 'dividers_editor' },
       { group: 'Areas (defaults)', defaultCollapsed: true, fields: [
         { key: 'areas.padding', type: 'padding', label: 'Padding' },
         { key: 'areas.background', type: 'background', label: 'Background' },
@@ -587,19 +553,19 @@ var MenuEditor = (function () {
       ]}
     ],
     header_text: [
-      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'id', type: 'text', label: 'ID', readonly: true },
       { key: 'text', type: 'text', label: 'Text' },
       { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
       { key: 'font', type: 'font_role', label: 'Font Role' }
     ],
     header_logo: [
-      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'id', type: 'text', label: 'ID', readonly: true },
       { key: 'src', type: 'text', label: 'Image URL' },
       { key: 'position', type: 'select', options: ['', 'left', 'center', 'right'], label: 'Position' },
       { key: 'max_height', type: 'number', label: 'Max Height', step: 0.25 }
     ],
     area: [
-      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'id', type: 'text', label: 'ID', readonly: true },
       { key: 'title',       type: 'text',       label: 'Title' },
       { key: 'subtitle',    type: 'text',       label: 'Subtitle' },
       { key: 'icon',        type: 'text',       label: 'Icon URL' },
@@ -614,12 +580,11 @@ var MenuEditor = (function () {
       { key: 'price_align', type: 'select', options: ['', 'left', 'right'], label: 'Price Align' },
       { key: 'padding', type: 'padding', label: 'Padding' },
       { group: 'Style Overrides', inheritable: true, fields: [
-        { key: 'style.title_font', type: 'font', label: 'Title Font' },
-        { key: 'style.background', type: 'background', label: 'Background' }
+        { key: 'style.title_font', type: 'font', label: 'Title Font' }
       ]}
     ],
     item: [
-      { key: 'id', type: 'text', label: 'ID (auto)' },
+      { key: 'id', type: 'text', label: 'ID', readonly: true },
       { key: 'name', type: 'text', label: 'Name' },
       { key: 'description', type: 'text', label: 'Description' },
       { key: 'price', type: 'text', label: 'Price' },
@@ -634,7 +599,7 @@ var MenuEditor = (function () {
       ]}
     ],
     variation: [
-      { key: 'id', type: 'text', label: 'ID' },
+      { key: 'id', type: 'text', label: 'ID', readonly: true },
       { key: 'name', type: 'text', label: 'Name' },
       { key: 'price', type: 'text', label: 'Price' }
     ]
@@ -654,19 +619,26 @@ var MenuEditor = (function () {
       var input = el('input', 'me-field__input', { type: 'text' });
       input.value = value || '';
       if (fieldDef.placeholder) input.placeholder = fieldDef.placeholder;
-      var timer;
-      input.addEventListener('input', function () {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-          store.update(fullPath, input.value || undefined);
-        }, 300);
-      });
-      input.addEventListener('keydown', function (e) {
-        spacingArrowKey(e, input, function (v) {
+      if (fieldDef.readonly) {
+        input.readOnly = true;
+        input.style.opacity = '0.5';
+        input.style.cursor = 'default';
+        input.style.userSelect = 'text';
+      } else {
+        var timer;
+        input.addEventListener('input', function () {
           clearTimeout(timer);
-          store.update(fullPath, v != null ? v : undefined);
+          timer = setTimeout(function () {
+            store.update(fullPath, input.value || undefined);
+          }, 300);
         });
-      });
+        input.addEventListener('keydown', function (e) {
+          spacingArrowKey(e, input, function (v) {
+            clearTimeout(timer);
+            store.update(fullPath, v != null ? v : undefined);
+          });
+        });
+      }
       wrapper.appendChild(label);
       wrapper.appendChild(input);
 
@@ -878,22 +850,34 @@ var MenuEditor = (function () {
         { label: '→', angle: 90 }, { label: '↓', angle: 180 },
         { label: '↘', angle: 135 }, { label: '↗', angle: 45 }
       ];
-      anglePresets.forEach(function (p) {
+      var presetBtns = [];
+      function syncPresetActive() {
+        presetBtns.forEach(function (btn, i) {
+          btn.classList.toggle('active', anglePresets[i].angle === bgAngle);
+        });
+      }
+
+      anglePresets.forEach(function (p, i) {
         var pb = el('button', 'me-gradient-preset');
         pb.type = 'button';
         pb.title = p.angle + '°';
         pb.textContent = p.label;
+        presetBtns.push(pb);
         pb.addEventListener('click', function () {
           bgAngle = p.angle;
           angleIn.value = bgAngle;
+          syncPresetActive();
           refreshGradient();
         });
         presetRow.appendChild(pb);
       });
+      syncPresetActive();
+
       var angleIn = el('input', 'me-field__input me-gradient-angle-input', { type: 'number', min: '0', max: '360' });
       angleIn.value = bgAngle;
       angleIn.addEventListener('input', function () {
         bgAngle = parseInt(angleIn.value) || 0;
+        syncPresetActive();
         refreshGradient();
       });
       angleRow.appendChild(presetRow);
@@ -1223,7 +1207,7 @@ var MenuEditor = (function () {
               }
             }, 400);
           });
-          var delBtn = el('button', 'me-tree-btn me-tree-btn--danger');
+          var delBtn = el('button', 'me-tree-btn me-tree-btn--danger', { title: 'Delete' });
           delBtn.textContent = '\u2715';
           delBtn.addEventListener('click', function () {
             delete vars[currentKey];
@@ -1236,7 +1220,7 @@ var MenuEditor = (function () {
           tableWrap.appendChild(row);
         });
         // Add new
-        var addBtn = el('button', 'me-tree-btn');
+        var addBtn = el('button', 'me-tree-btn', { title: 'Add variable' });
         addBtn.textContent = '+ add';
         addBtn.addEventListener('click', function () {
           var newKey = 'var-' + (entries.length + 1);
@@ -1678,7 +1662,9 @@ var MenuEditor = (function () {
 
       // Tree sections (Header, Areas) and unselectable nodes get empty inspector
       if (value == null && path !== 'theme.layout' && path !== 'theme' && path !== '' && path !== 'vars') {
-        // Empty inspector — no message
+        var emptyMsg = el('div', 'me-inspector__empty');
+        emptyMsg.innerHTML = 'Select a node in the<br>Structure panel to edit its properties.';
+        container.appendChild(emptyMsg);
         return;
       }
 
@@ -1792,6 +1778,43 @@ var MenuEditor = (function () {
                   f.style.display = 'none';
                 });
               }
+            } else if (def.type === 'dividers_editor') {
+              var dividerTypes = ['default', 'header', 'area', 'item', 'variation'];
+              var activeDivTab = dividerTypes[0];
+
+              var divTabBar = el('div', 'me-dividers-tabs');
+              var divFields = el('div', 'me-dividers-fields');
+
+              function buildDividerTab(typeName) {
+                var fields = [
+                  { key: 'dividers.' + typeName + '.color', type: 'color', label: 'Color' },
+                  { key: 'dividers.' + typeName + '.width', type: 'number', label: 'Width (px)', step: 1 },
+                  { key: 'dividers.' + typeName + '.style', type: 'select', options: ['', 'solid', 'dashed', 'dotted'], label: 'Style' },
+                  { key: 'dividers.' + typeName + '.sides', type: 'sides', label: 'Sides' },
+                  { key: 'dividers.' + typeName + '.padding', type: 'text', label: 'Padding', placeholder: '8px  1em  2%  $xs' }
+                ];
+                divFields.innerHTML = '';
+                fields.forEach(function (f) { renderField(divFields, path, f, store); });
+              }
+
+              dividerTypes.forEach(function (typeName) {
+                var btn = el('button', 'me-dividers-tab');
+                btn.textContent = typeName.charAt(0).toUpperCase() + typeName.slice(1);
+                btn.addEventListener('click', function () {
+                  activeDivTab = typeName;
+                  divTabBar.querySelectorAll('.me-dividers-tab').forEach(function (b) {
+                    b.classList.toggle('me-dividers-tab--active', b === btn);
+                  });
+                  buildDividerTab(typeName);
+                });
+                if (typeName === activeDivTab) btn.classList.add('me-dividers-tab--active');
+                divTabBar.appendChild(btn);
+              });
+
+              buildDividerTab(activeDivTab);
+              groupBody.appendChild(divTabBar);
+              groupBody.appendChild(divFields);
+
             } else if (def.type === 'fonts_editor') {
               var fontsPath = path ? path + '.' + def.key : def.key;
               var fontsObj = getAtPath(store.getData(), fontsPath) || {};
@@ -1939,11 +1962,14 @@ var MenuEditor = (function () {
     }
 
     // Minimap
-    var minimapWrap = el('div', 'me-minimap');
+    var minimapWrap = el('div', 'me-minimap', { title: 'Minimap — shows full layout at reduced scale' });
+    var minimapLabel = el('div', 'me-minimap__label');
+    minimapLabel.textContent = 'MINIMAP';
     var minimapCanvas = el('canvas', 'me-minimap__canvas');
     minimapCanvas.width = 160;
     minimapCanvas.height = 90;
     var minimapRect = el('div', 'me-minimap__rect');
+    minimapWrap.appendChild(minimapLabel);
     minimapWrap.appendChild(minimapCanvas);
     minimapWrap.appendChild(minimapRect);
     contentArea.appendChild(minimapWrap);

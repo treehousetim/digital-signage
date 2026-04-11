@@ -2369,7 +2369,7 @@ var MenuEditor = (function () {
           'html,body{margin:0;padding:0;overflow:hidden;background:#000}' +
           '[data-ds-id]{cursor:pointer}' +
           '[data-ds-id]:hover{outline:2px solid rgba(66,165,245,0.4);outline-offset:1px}' +
-          '.ds-selected{outline:2px solid rgba(66,165,245,0.8)!important;outline-offset:2px;background:rgba(66,165,245,0.06)!important}' +
+          '.ds-selected{outline:2px solid rgba(66,165,245,0.8)!important;outline-offset:2px;box-shadow:inset 0 0 0 10000px rgba(66,165,245,0.08)!important}' +
           '.ds-pad-handle{position:absolute;background:rgba(66,165,245,0.3);z-index:1000;min-width:6px;min-height:6px}' +
           '.ds-pad-handle--top,.ds-pad-handle--bottom{cursor:ns-resize;left:0;right:0;height:8px}' +
           '.ds-pad-handle--top{top:0}' +

@@ -497,6 +497,19 @@ var MenuRenderer = (function () {
 
   var loadedFontFamilies = {};
 
+  // ── Icon Libraries ─────────────────────────────────────────────────────
+
+  var loadedIconLibraries = {};
+
+  function injectFontAwesome() {
+    if (loadedIconLibraries['fontawesome']) return;
+    loadedIconLibraries['fontawesome'] = true;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css';
+    document.head.appendChild(link);
+  }
+
   function collectFonts(data, theme) {
     var fonts = {};
     function addFont(fontObj) {
@@ -809,14 +822,31 @@ var MenuRenderer = (function () {
     }
 
     if (area.icon) {
-      var iconEl = el('img', 'ds-area__icon');
-      iconEl.src = area.icon;
-      var iconH = area.icon_height != null ? area.icon_height : '25%';
-      iconEl.style.maxHeight = toCSSPx(toVerticalPx(iconH, vpH, ctx));
-      iconEl.style.width = 'auto';
+      var iconH     = area.icon_height != null ? area.icon_height : '25%';
+      var iconPx    = toVerticalPx(iconH, vpH, ctx);
       var iconAlign = area.align || 'left';
-      if (iconAlign === 'center') { iconEl.style.marginLeft = 'auto'; iconEl.style.marginRight = 'auto'; }
-      else if (iconAlign === 'right') { iconEl.style.marginLeft = 'auto'; }
+      var iconColor = area.icon_color || '#ffffff';
+      var isFAIcon  = !/^https?:\/\/|^\/|^\./.test(area.icon);
+
+      if (isFAIcon) {
+        // Font Awesome — inject stylesheet once, then render <i> element
+        injectFontAwesome();
+        var iconEl = el('i', 'ds-area__icon');
+        area.icon.split(/\s+/).forEach(function(cls) { if (cls) iconEl.classList.add(cls); });
+        iconEl.style.fontSize   = toCSSPx(iconPx);
+        iconEl.style.color      = iconColor;
+        iconEl.style.display    = 'block';
+        if (iconAlign === 'center') { iconEl.style.textAlign = 'center'; }
+        else if (iconAlign === 'right') { iconEl.style.textAlign = 'right'; }
+      } else {
+        // URL — img element; use height (not maxHeight) so intrinsic size is overridden
+        var iconEl = el('img', 'ds-area__icon');
+        iconEl.src = area.icon;
+        iconEl.style.height = toCSSPx(iconPx);
+        iconEl.style.width  = 'auto';
+        if (iconAlign === 'center') { iconEl.style.marginLeft = 'auto'; iconEl.style.marginRight = 'auto'; }
+        else if (iconAlign === 'right') { iconEl.style.marginLeft = 'auto'; }
+      }
       section.appendChild(iconEl);
     }
 

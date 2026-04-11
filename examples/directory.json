@@ -6,8 +6,8 @@
       "columns": 1
     },
     "fonts": {
-      "area_title": { "family": "Cormorant Garamond", "weight": "600", "size": "$xl", "color": "#f8f4ef" },
-      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#a09880" }
+      "area_title": { "family": "Cormorant Garamond", "weight": "700", "size": "$xl", "color": "#ffffff" },
+      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#ffffff", "letter_spacing": "0.12em" }
     },
     "areas": {
       "gutter": "0"
@@ -24,29 +24,32 @@
   },
   "areas": [
     {
-      "background": "linear-gradient(160deg, #1c2b3a 0%, #0f1a24 100%)",
-      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/stethoscope.svg",
-      "icon_height": "12%",
+      "background": "linear-gradient(160deg, #1a3fc4 0%, #0a1a5e 100%)",
+      "icon": "fa-solid fa-stethoscope",
+      "icon_height": "16%",
+      "icon_color": "#7fb8ff",
       "title": "Dr. Kayla Smith",
-      "subtitle": "Family Medicine  ·  Suite 210",
+      "subtitle": "FAMILY MEDICINE  ·  SUITE 210",
       "align": "center",
       "valign": "center"
     },
     {
-      "background": "linear-gradient(160deg, #1a2a1e 0%, #0f1a12 100%)",
-      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/device-desktop.svg",
-      "icon_height": "12%",
+      "background": "linear-gradient(160deg, #187a52 0%, #072e1e 100%)",
+      "icon": "fa-solid fa-laptop",
+      "icon_height": "16%",
+      "icon_color": "#6debb0",
       "title": "LHI Digital",
-      "subtitle": "Technology Support  ·  Suite 340",
+      "subtitle": "TECHNOLOGY SUPPORT  ·  SUITE 340",
       "align": "center",
       "valign": "center"
     },
     {
-      "background": "linear-gradient(160deg, #2a1e1a 0%, #1a1210 100%)",
-      "icon": "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/leaf.svg",
-      "icon_height": "12%",
+      "background": "linear-gradient(160deg, #b84a10 0%, #3e1400 100%)",
+      "icon": "fa-solid fa-leaf",
+      "icon_height": "16%",
+      "icon_color": "#ffa86e",
       "title": "Edwards & Co",
-      "subtitle": "Environmental Consultants  ·  Suite 115",
+      "subtitle": "ENVIRONMENTAL  ·  SUITE 115",
       "align": "center",
       "valign": "center"
     }

@@ -238,25 +238,31 @@ Areas support `icon`, `subtitle`, and `valign` for full-bleed identity signs wit
 {
   "uses": "themes/dark.json",
   "theme": { "layout": { "orientation": "portrait", "columns": 1 } },
-  "header": {
-    "elements": [{ "type": "text", "text": "Floor 12", "font": "description" }]
-  },
   "areas": [{
-    "background": "linear-gradient(135deg, #8B5CF6 0%, #2563EB 100%)",
-    "icon": "icons/tooth.svg",
-    "icon_height": "25%",
-    "title": "Dr. Kayla Smith",
-    "subtitle": "Dental Services",
+    "background": "linear-gradient(160deg, #5a1fa8 0%, #0e0428 100%)",
+    "icon": "fa-solid fa-tooth",
+    "icon_height": "22%",
+    "icon_color": "#ffffff",
+    "title": "Dr. Kayla Roth",
+    "subtitle": "ORTHODONTIST  ·  SUITE 200",
     "align": "center",
     "valign": "center"
   }]
 }
 ```
 
+#### Icons
+
+`icon` accepts two formats:
+
+- **Font Awesome classes** — space-separated class string, e.g. `"fa-solid fa-tooth"`. Font Awesome 6 Free is injected automatically from CDN. The icon renders as an `<i>` element sized by `icon_height` and colored by `icon_color`.
+- **URL** — any HTTP/S URL or relative path to an image or SVG. Rendered as an `<img>` element. Note that SVGs loaded this way ignore CSS `color`; for colored SVGs use Iconify API with a `?color=` parameter.
+
 | Field | Description |
 |---|---|
-| `icon` | URL to an image or SVG rendered above the title |
-| `icon_height` | Max height of the icon — any spacing unit (`25%`, `200px`, `10em`). Default `25%` of viewport height |
+| `icon` | Font Awesome classes (`"fa-solid fa-tooth"`) **or** URL to image/SVG |
+| `icon_height` | Height of the icon — any spacing unit (`25%`, `200px`, `10em`). Default `25%` of viewport height |
+| `icon_color` | CSS color applied to Font Awesome icons. Default `#ffffff` |
 | `subtitle` | Secondary text below the title, styled with the `description` font role |
 | `background` | CSS color **or** `linear-gradient(...)` string — overrides `theme.areas.background` |
 | `valign` | `"top"` \| `"center"` \| `"bottom"` — vertically positions content within the area |
@@ -531,8 +537,8 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `surf-shop.json` | Lessons + retail | Cool theme, custom $sun var |
 | `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |
 | `themed.json` | Wine bar | Custom vars, font extension, full reference system |
-| `directory.json` | Building directory / identity signs | Portrait, gradient backgrounds, icon, subtitle, valign |
-| `identity.json` | Single identity panel (minimal) | Simplest possible identity sign — title + subtitle + gradient, no items |
+| `directory.json` | Building directory / identity signs | Portrait, gradient backgrounds, Font Awesome icons, subtitle, valign |
+| `identity.json` | Single identity panel (minimal) | Simplest possible identity sign — FA icon + title + subtitle + gradient, no items |
 
 ## Schema
 

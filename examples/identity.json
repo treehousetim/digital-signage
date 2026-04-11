@@ -6,15 +6,18 @@
       "columns": 1
     },
     "fonts": {
-      "area_title": { "family": "Cormorant Garamond", "weight": "600", "size": "$hero", "color": "#f8f4ef" },
-      "description": { "family": "DM Sans", "weight": "400", "size": "$base", "color": "#8ca8c0" }
+      "area_title": { "family": "Cormorant Garamond", "weight": "700", "size": "$hero", "color": "#ffffff" },
+      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#c8b8f0", "letter_spacing": "0.18em" }
     }
   },
   "areas": [
     {
-      "background": "linear-gradient(160deg, #1c2b3a 0%, #0a1520 100%)",
-      "title": "Dr. Maria Chen",
-      "subtitle": "Family Medicine  ·  Suite 210",
+      "background": "linear-gradient(160deg, #5a1fa8 0%, #2a0a5e 60%, #0e0428 100%)",
+      "icon": "fa-solid fa-tooth",
+      "icon_height": "22%",
+      "icon_color": "#ffffff",
+      "title": "Dr. Kayla Roth",
+      "subtitle": "ORTHODONTIST  ·  SUITE 200",
       "align": "center",
       "valign": "center"
     }

@@ -530,6 +530,7 @@ MenuRenderer.watch('/api/menu.json', target, 30); // every 30 seconds
 | `server-status.json` | Infrastructure dashboard (non-menu) | Mono theme, semantic vars, area styling |
 | `themed.json` | Wine bar | Custom vars, font extension, full reference system |
 | `directory.json` | Building directory / identity signs | Portrait, gradient backgrounds, icon, subtitle, valign |
+| `identity.json` | Single identity panel (minimal) | Simplest possible identity sign — title + subtitle + gradient, no items |
 
 ## Schema
 

@@ -1,0 +1,18 @@
+{
+  "uses": "themes/dark.json",
+  "theme": {
+    "layout": {
+      "orientation": "portrait",
+      "columns": 1
+    }
+  },
+  "areas": [
+    {
+      "background": "linear-gradient(160deg, #1d4ed8 0%, #1e3a8a 100%)",
+      "title": "Dr. Maria Chen",
+      "subtitle": "Family Medicine · Suite 210",
+      "align": "center",
+      "valign": "center"
+    }
+  ]
+}

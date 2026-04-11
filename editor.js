@@ -2750,6 +2750,8 @@ var MenuEditor = (function () {
       { value: 'examples/surf-shop.json', label: 'Surf Shop' },
       { value: 'examples/server-status.json', label: 'Server Status' },
       { value: 'examples/themed.json', label: 'Themed (uses + refs)' },
+      { value: 'examples/directory.json', label: 'Directory Sign' },
+      { value: 'examples/identity.json', label: 'Identity (minimal)' },
       { value: 'examples/minimal.json', label: 'Minimal' }
     ];
     exOpts.forEach(function (o) {

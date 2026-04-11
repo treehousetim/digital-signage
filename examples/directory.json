@@ -6,11 +6,8 @@
       "columns": 1
     },
     "fonts": {
-      "area_title": { "family": "Cormorant Garamond", "weight": "700", "size": "$xl", "color": "#ffffff" },
-      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#ffffff", "letter_spacing": "0.12em" }
-    },
-    "areas": {
-      "gutter": "0"
+      "area_title": { "family": "Cormorant Garamond", "weight": "700", "size": "$hero", "color": "#ffffff" },
+      "description": { "family": "DM Sans", "weight": "400", "size": "$sm", "color": "#c4e0ff", "letter_spacing": "0.16em" }
     }
   },
   "header": {
@@ -26,32 +23,12 @@
     {
       "background": "linear-gradient(160deg, #1a3fc4 0%, #0a1a5e 100%)",
       "icon": "fa-solid fa-stethoscope",
-      "icon_height": "10%",
+      "icon_height": "30%",
       "icon_color": "#7fb8ff",
       "title": "Dr. Kayla Smith",
       "subtitle": "FAMILY MEDICINE  ·  SUITE 210",
-      "align": "center",
-      "valign": "center"
-    },
-    {
-      "background": "linear-gradient(160deg, #187a52 0%, #072e1e 100%)",
-      "icon": "fa-solid fa-laptop",
-      "icon_height": "10%",
-      "icon_color": "#6debb0",
-      "title": "LHI Digital",
-      "subtitle": "TECHNOLOGY SUPPORT  ·  SUITE 340",
-      "align": "center",
-      "valign": "center"
-    },
-    {
-      "background": "linear-gradient(160deg, #b84a10 0%, #3e1400 100%)",
-      "icon": "fa-solid fa-leaf",
-      "icon_height": "10%",
-      "icon_color": "#ffa86e",
-      "title": "Edwards & Co",
-      "subtitle": "ENVIRONMENTAL  ·  SUITE 115",
-      "align": "center",
-      "valign": "center"
+      "align": "left",
+      "valign": "bottom"
     }
   ]
 }
